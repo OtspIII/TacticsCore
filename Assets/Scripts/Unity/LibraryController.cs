@@ -1,12 +1,12 @@
 using UnityEngine;
 
-public class GameLibrary : MonoBehaviour
+public class LibraryController : MonoBehaviour
 {
     public ActorController ActorPrefab;
     public TileController TilePrefab;
     
-    void Start()
+    void Awake()
     {
-        
+        God.Library = this;
     }
 }
