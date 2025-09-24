@@ -7,6 +7,8 @@ public class GameManager : MonoBehaviour
     public List<TileController> AllTiles = new List<TileController>();
     public List<ActorController> AllActors = new List<ActorController>();
 
+    public PhaseScript CurrentPhase;
+
     void Awake()
     {
         God.GM = this;
@@ -18,13 +20,16 @@ public class GameManager : MonoBehaviour
        BuildLevel(); 
     }
 
+    public void StartPhase(PhaseScript p=null)
+    {
+        if (p == null) p = new PlayerTurnPhase();
+        if(CurrentPhase != null) CurrentPhase.End();
+        CurrentPhase = p;
+    }
+
     public void BuildLevel()
     {
-        foreach (ActorController a in AllActors.ToArray()) Destroy(a);
-        foreach (TileController t in AllTiles.ToArray()) Destroy(t);
-        AllActors.Clear();
-        AllTiles.Clear();
-        Map.Clear();
+        Wipe();
         LevelThing l = new LevelThing();
         foreach (TileThing t in l.AllTiles)
         {
@@ -34,6 +39,15 @@ public class GameManager : MonoBehaviour
                 SpawnActor(t.Contents);
             }
         }
+    }
+
+    public void Wipe()
+    {
+        foreach (ActorController a in AllActors.ToArray()) Destroy(a);
+        foreach (TileController t in AllTiles.ToArray()) Destroy(t);
+        AllActors.Clear();
+        AllTiles.Clear();
+        Map.Clear();
     }
 
     public TileController SpawnTile(TileThing t)
