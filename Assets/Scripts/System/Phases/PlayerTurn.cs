@@ -1,16 +1,15 @@
 using System.Collections.Generic;
-using NUnit.Framework;
 using UnityEngine;
 
 public class PlayerTurnPhase : PhaseScript
 {
     public List<ActorThing> Players = new List<ActorThing>();
     public ActorThing Selected;
-    public ActionScript Action;
     
     public PlayerTurnPhase()
     {
         Type = Phases.PlayerTurn;
+        Listeners.Add(EventTypes.ActionEnd);
     }
 
     public override void Begin()
@@ -23,7 +22,6 @@ public class PlayerTurnPhase : PhaseScript
                 a.TakeEvent(EventTypes.StartTurn);
             }
         }
-        Debug.Log("PLAYER TURN: " + Players.Count);
     }
 
     public override void OnRun()
@@ -36,32 +34,50 @@ public class PlayerTurnPhase : PhaseScript
         if (t.Contents != null)
         {
             if (Players.Contains(t.Contents))
-            {
-                if(Selected != null)
-                    Selected.Location.WipeTint();
-                Selected = t.Contents;
-                if (Selected.ActionsLeft.Contains(ActionCost.Move))
-                {
-                    Action = Selected.MoveAction;
-                    Action.Begin();
-                }
-                t.SetTint(Color.cornflowerBlue);
-            }
+                SelectPlayer(t.Contents);
             return;
         }
         if (Selected == null) return;
-        Debug.Log("ACT: " + Action?.Type);
-        if (Action != null && Action.TileClick(t))
-        {
+        if (Selected.SelectedAction != null)
+            Selected.SelectedAction.TileClick(t);
+    }
+
+    public void SelectPlayer(ActorThing p)
+    {
+        if (p.ActionsLeft.Count == 0) return;
+        if(Selected != null)
             Selected.Location.WipeTint();
-            if (Selected.ActionsLeft.Count == 0) Players.Remove(Selected);
-            Selected = null;
-            Action = null;
+        Selected = p;
+        if (Selected.ActionsLeft.Contains(ActionCost.Move))
+        {
+            Selected.SelectedAction = Selected.MoveAction;
+            Selected.SelectedAction.BeginSelect();
         }
+        p.Location.SetTint(Color.cornflowerBlue);
     }
 
     public override PhaseScript NextPhase()
     {
         return new EnemyTurnPhase();
+    }
+
+    public override void TakeEvent(EventInfo e)
+    {
+        switch (e.Type)
+        {
+            case EventTypes.ActionEnd:
+            {
+                ActorThing who = e.GetActor();
+                if (Selected != who) break;
+                Selected.Location.WipeTint();
+                if (Selected.ActionsLeft.Count == 0)
+                {
+                    Players.Remove(Selected);
+                    Selected.SelectedAction = null;
+                    Selected = null;
+                }
+                break;
+            }
+        }
     }
 }

@@ -13,7 +13,6 @@ public class EnvironmentPhase : PhaseScript
 
     public override void Begin()
     {
-        Debug.Log("ENVIRONMENT");
     }
 
     public override void OnRun()

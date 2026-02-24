@@ -17,7 +17,6 @@ public class EnemyTurnPhase : PhaseScript
         {
             if (!a.Has(Traits.Player)) Queued.Add(a);
         }
-        Debug.Log("ENEMY TURN: " + Queued.Count);
     }
 
     public override void OnRun()
@@ -29,8 +28,8 @@ public class EnemyTurnPhase : PhaseScript
         }
         ActorThing a = Queued.Random();
         Queued.Remove(a);
-        TileThing t = God.GM.AllTiles.Random().Info;
-        if(t.Contents == null) a.Walk(t);
+        ActionScript act = a.MoveAction;
+        act.AISelect();
     }
 
     public override PhaseScript NextPhase()

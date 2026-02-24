@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        Wipe();
+        WipeLevel();
         StartPhase(new BuildLevelPhase());
     }
     
@@ -84,7 +84,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    public void Wipe()
+    public void WipeLevel()
     {
         foreach (ActorController a in AllActors.ToArray()) Destroy(a);
         foreach (TileController t in AllTiles.ToArray()) Destroy(t);
@@ -138,6 +138,13 @@ public class GameManager : MonoBehaviour
 
     public void TileClick(TileThing t)
     {
-        CurrentPhase.TileClick(t);
+        if (CurrentCut != null) CurrentCut.TileClick(t);
+        else CurrentPhase.TileClick(t);
+    }
+
+    public void TakeEvent(EventInfo e)
+    {
+        if(CurrentPhase.Listeners.Contains(e.Type))
+            CurrentPhase.TakeEvent(e);
     }
 }

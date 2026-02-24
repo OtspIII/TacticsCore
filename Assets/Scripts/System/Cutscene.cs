@@ -64,6 +64,11 @@ public class Cutscene
         if (Duration <= 0) return 0;
         return Timer / Duration;
     }
+
+    public virtual void TileClick(TileThing t)
+    {
+        
+    }
 }
 
 public enum Cutscenes

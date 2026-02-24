@@ -230,4 +230,8 @@ public enum EventTypes{
     GainTrait       =0210,
     LoseTrait       =0211,
     
+    ActionStart     =1000,
+    ActionPhaseEnd  =1001,
+    ActionEnd       =1002,
+    
 }

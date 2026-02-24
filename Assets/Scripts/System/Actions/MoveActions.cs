@@ -12,13 +12,22 @@ public class WalkAction: ActionScript
         Phases.Add(new ActionPhase(this,1,2));
     }
 
-    public override void Execute(ActionPhase p, ActionInfo i)
+    public override void OnExecute(ActionPhase p, ActionInfo i)
     {
-        base.Execute(p,i);
-        Debug.Log("EXECUTE WALK");
         foreach (TileThing t in i.Tiles)
         {
             Who.Walk(t);
         }
+    }
+
+    public override void AISelect()
+    {
+        base.AISelect();
+        TileThing t = God.GM.AllTiles.Random().Info;
+        if (t.Contents == null)
+        {
+            Info.Tiles.Add(t);
+        }
+        Execute(Phase,Info);
     }
 }

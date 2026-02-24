@@ -7,6 +7,7 @@ public class PhaseScript
     public Phases Type;
     public float Duration;
     public float Timer;
+    public List<EventTypes> Listeners = new List<EventTypes>();
 
     public void Run()
     {
@@ -60,6 +61,11 @@ public class PhaseScript
     }
 
     public virtual void TileClick(TileThing t)
+    {
+        
+    }
+    
+    public virtual void TakeEvent(EventInfo e)
     {
         
     }

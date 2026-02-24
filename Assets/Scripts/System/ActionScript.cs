@@ -11,45 +11,64 @@ public class ActionScript
     public List<ActionPhase> Phases = new List<ActionPhase>();
     public int PhaseI = 0;
     public ActionPhase Phase {get{return Phases.Count > PhaseI ? Phases[PhaseI] : null;}}
-    
+
     public virtual void Begin()
     {
         PhaseI = 0;
         Info = new ActionInfo(this, PhaseI);
-        Debug.Log("BEGIN ACT: " + Type);
     }
-
-    public virtual void EndSelect()
+    
+    public virtual void BeginSelect()
     {
-        
+        Begin();
     }
 
-    public virtual void Run()
+    public virtual void RunSelect()
     {
         CheckForReady();
     }
     
-    public virtual void Execute(ActionPhase p,ActionInfo i)
-    {
-        EndSelect();
-    }
-    
-    public void End()
-    {
-        if(Cost == ActionCost.Major) Who.ActionsLeft.Clear();
-        else Who.ActionsLeft.Remove(Cost);
-        OnEnd();
-    }
-    
-    public virtual void OnEnd()
+    public virtual void EndSelect()
     {
         
     }
     
+    public virtual void AISelect()
+    {
+        Begin();
+    }
+
+    public void Execute(ActionPhase p,ActionInfo i)
+    {
+        OnExecute(p,i);
+        EndSelect();
+        PhaseI++;
+        if (PhaseI >= Phases.Count)
+        {
+            End();
+        }
+        else
+        {
+            Info = new ActionInfo(this, PhaseI);
+        }
+    }
+    
+    public virtual void OnExecute(ActionPhase p,ActionInfo i)
+    {
+        
+    }
+    
+    public void End()
+    {
+        Who.SelectedAction = null;
+        if(Cost == ActionCost.Major) Who.ActionsLeft.Clear();
+        else Who.ActionsLeft.Remove(Cost);
+        God.GM.TakeEvent(God.E(EventTypes.ActionEnd).Set(Who));
+    }
+    
+    
     public virtual bool TileClick(TileThing t)
     {
-        Debug.Log("PHASES: " + Phases.Count + PhaseI);
-        Debug.Log("P: " + Phases[PhaseI]);
         if (Info.Tiles.Count >= Phase.Tiles) return false;
         Info.Tiles.Add(t);
         return CheckForReady();
