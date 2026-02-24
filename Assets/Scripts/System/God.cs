@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +10,9 @@ public static class God
    
    public static Directions[] Cardinal = new[] {Directions.Up, Directions.Right, Directions.Down, Directions.Left}; 
    public static Directions[] EightDir = new[] {Directions.Up, Directions.Right, Directions.Down, Directions.Left,Directions.UR,Directions.UL,Directions.DL,Directions.DR};
+
+   public static bool DebugText = true;
+   public static string DebugTxt = "";
    
    public static bool CoinFlip(float odds=0.5f)
    {
@@ -268,6 +272,75 @@ public static class God
 		}
 
 		return Directions.None;
+	}
+	
+	public static Vector2Int DirToV(Directions d)
+	{
+		switch (d)
+		{
+			case Directions.Up: return new Vector2Int(0, 1);
+			case Directions.Right: return new Vector2Int(1, 0);
+			case Directions.Down: return new Vector2Int(0, -1);
+			case Directions.Left: return new Vector2Int(-1, 0);
+		}
+		return Vector2Int.zero;
+	}
+
+	///Feed this a direction (up) and it'll return its opposite (down)
+	public static Directions OppositeDir(Directions d)
+	{
+		switch (d)
+		{
+			case Directions.Up: return Directions.Down;
+			case Directions.Right: return Directions.Left;
+			case Directions.Down: return Directions.Up;
+			case Directions.Left: return Directions.Right;
+		}
+		return d;
+	}
+
+	public static string AddList(string r, string add)
+	{
+		if (r != "") r += ", ";
+		r += add;
+		return r;
+	}
+    
+	//We might want a fancier way of doing this eventually, so I'm making it a standalone function
+	public static float MergeWeight(float w, float n)
+	{
+		return w * n;
+	} 
+	
+	public static void Log(string txt,bool force=false)
+	{
+		if (!DebugText && !force) return;
+		Debug.Log(txt);
+	}
+    
+	public static void LogWarning(string txt)
+	{
+		Debug.LogWarning(txt + (DebugTxt != "" ? "\n"+DebugTxt:""));
+	}
+    
+	public static void LogError(string txt)
+	{
+		Debug.LogWarning(txt + (DebugTxt != "" ? "\n"+DebugTxt:""));
+	}
+    
+	public static EventInfo E(EventTypes e=EventTypes.None)
+	{
+		return new EventInfo(e);
+	}
+
+	public static Coroutine C(IEnumerator c)
+	{
+		if (God.GM == null)
+		{
+			God.LogError("Tried to call God.C outside of the gameplay scene!");
+			return null;
+		}
+		return God.GM.StartCoroutine(c);
 	}
 }
 

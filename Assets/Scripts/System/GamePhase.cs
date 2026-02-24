@@ -31,6 +31,11 @@ public class PhaseScript
     {
         
     }
+    
+    public virtual void Resume()
+    {
+        
+    }
 
     public virtual void End()
     {
@@ -52,6 +57,11 @@ public class PhaseScript
     {
         if (Duration <= 0) return 0;
         return Timer / Duration;
+    }
+
+    public virtual void TileClick(TileThing t)
+    {
+        
     }
 }
 

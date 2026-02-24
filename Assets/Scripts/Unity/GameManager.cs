@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         God.GM = this;
+        Parser.Init();
         ThingBuilder.Setup();
     }
 
@@ -53,8 +54,12 @@ public class GameManager : MonoBehaviour
         if (CurrentCut == c)
         {
             CurrentCut = null;
-            if(Cuts.Count == 0)
+            if (Cuts.Count == 0)
+            {
                 Audit();
+                CurrentPhase.Resume();
+            }
+                
         }
     }
 
@@ -127,5 +132,10 @@ public class GameManager : MonoBehaviour
         }
 
         return r;
+    }
+
+    public void TileClick(TileThing t)
+    {
+        CurrentPhase.TileClick(t);
     }
 }

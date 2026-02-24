@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class TileController : MonoBehaviour
@@ -27,5 +28,10 @@ public class TileController : MonoBehaviour
         Vector3 r = transform.position;
         r.z = 0;
         return r;
+    }
+
+    void OnMouseDown()
+    {
+        God.GM.TileClick(Info);
     }
 }

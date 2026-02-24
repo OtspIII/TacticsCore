@@ -11,3 +11,10 @@ public enum Classes
     Dog=2,
     FireBeetle=3,
 }
+
+public enum Traits
+{
+    None=0,
+    Player=1,
+    Health=2,
+}
