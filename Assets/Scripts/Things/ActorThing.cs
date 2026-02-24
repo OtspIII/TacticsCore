@@ -28,4 +28,9 @@ public class ActorThing
         Location = l;
         l.Contents = this;
     }
+
+    public bool IsPlayer()
+    {
+        return true;
+    }
 }

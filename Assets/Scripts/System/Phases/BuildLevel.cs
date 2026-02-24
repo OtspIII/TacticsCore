@@ -10,6 +10,17 @@ public class BuildLevelPhase : PhaseScript
     public override void Begin()
     {
         Debug.Log("HI");
-        End();
+        LevelThing l = new LevelThing();
+        God.GM.Level = l;
+        foreach (TileThing t in l.AllTiles)
+        {
+            God.GM.SpawnTile(t);
+            if (t.Contents != null)
+            {
+                God.GM.SpawnActor(t.Contents);
+            }
+        }
+        God.GM.StartPhase();
     }
+
 }

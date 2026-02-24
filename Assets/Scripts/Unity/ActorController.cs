@@ -13,7 +13,7 @@ public class ActorController : MonoBehaviour
         Info.Body = this;
         TileController loc = God.GM.GetTile(Info.Location);
         transform.parent = loc.transform;
-        transform.localPosition = new Vector3(0, 0, -10);
+        transform.position = loc.GetContentPos(Info);
         // Debug.Log(Info.Class);
         if (Info.Class != Classes.None)
         {
@@ -32,5 +32,12 @@ public class ActorController : MonoBehaviour
     private void OnDestroy()
     {
         God.GM.AllActors.Remove(this);
+    }
+
+    public void Audit()
+    {
+        TileController loc = God.GM.GetTile(Info.Location);
+        transform.parent = loc.transform;
+        transform.position = loc.GetContentPos(Info);
     }
 }

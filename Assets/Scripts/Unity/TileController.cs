@@ -21,4 +21,11 @@ public class TileController : MonoBehaviour
     {
         God.GM.AllTiles.Remove(this);
     }
+
+    public Vector3 GetContentPos(ActorThing a)
+    {
+        Vector3 r = transform.position;
+        r.z = 0;
+        return r;
+    }
 }

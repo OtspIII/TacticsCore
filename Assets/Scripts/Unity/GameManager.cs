@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,8 +7,11 @@ public class GameManager : MonoBehaviour
     public Dictionary<int, Dictionary<int, TileController>> Map = new Dictionary<int, Dictionary<int, TileController>>();
     public List<TileController> AllTiles = new List<TileController>();
     public List<ActorController> AllActors = new List<ActorController>();
+    public LevelThing Level;
 
     public PhaseScript CurrentPhase;
+    public Cutscene CurrentCut;
+    public List<Cutscene> Cuts = new List<Cutscene>();
 
     void Awake()
     {
@@ -17,29 +21,61 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-       BuildLevel(); 
+        Wipe();
+        StartPhase(new BuildLevelPhase());
+    }
+    
+    void Update(){
+        if (CurrentCut != null)
+        {
+            CurrentCut.Run();
+        }
+        else if (Cuts.Count > 0)
+        {
+            CurrentCut = Cuts[0];
+            Cuts.Remove(CurrentCut);
+            CurrentCut.Begin();
+        }
+        else if(CurrentPhase != null)  CurrentPhase.Run();
+    }
+
+    public void AddCut(Cutscene c)
+    {
+        if (Cuts.Count > 0)
+        {
+            if (Cuts[Cuts.Count - 1].Merge(c)) return;
+        }
+        Cuts.Add(c);
+    }
+
+    public void EndCut(Cutscene c)
+    {
+        if (CurrentCut == c)
+        {
+            CurrentCut = null;
+            if(Cuts.Count == 0)
+                Audit();
+        }
     }
 
     public void StartPhase(PhaseScript p=null)
     {
-        if (p == null) p = new PlayerTurnPhase();
+        if (p == null)
+        {
+            if (CurrentPhase != null) p = CurrentPhase.NextPhase();
+            if(p == null) p = new PlayerTurnPhase();
+        }
         if(CurrentPhase != null) CurrentPhase.End();
         CurrentPhase = p;
+        CurrentPhase.Begin();
     }
 
-    public void BuildLevel()
+    public void Audit()
     {
-        Wipe();
-        LevelThing l = new LevelThing();
-        foreach (TileThing t in l.AllTiles)
-        {
-            SpawnTile(t);
-            if (t.Contents != null)
-            {
-                SpawnActor(t.Contents);
-            }
-        }
+        foreach (ActorController a in AllActors)
+            a.Audit();
     }
+
 
     public void Wipe()
     {
@@ -80,5 +116,16 @@ public class GameManager : MonoBehaviour
     public ActorController GetActor(ActorThing a)
     {
         return a.Body;
+    }
+
+    public List<ActorThing> GetActors()
+    {
+        List<ActorThing> r = new List<ActorThing>();
+        foreach (ActorController a in AllActors)
+        {
+            r.Add(a.Info);
+        }
+
+        return r;
     }
 }

@@ -1,10 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 
-public class PhaseScript
+public class Cutscene
 {
-    public Phases Type;
+
+    public Cutscenes Type;
     public float Duration;
     public float Timer;
 
@@ -12,42 +12,53 @@ public class PhaseScript
     {
         if (Duration > 0)
         {
-            Timer+=Time.deltaTime;
+            Timer += Time.deltaTime;
             if (Timer >= Duration)
             {
-                God.GM.StartPhase(NextPhase());
+                End();
                 return;
             }
         }
         OnRun();
     }
-    
+
     public virtual void OnRun()
     {
-        
-    }
 
-    public virtual void Begin()
-    {
-        
-    }
-
-    public virtual void End()
-    {
-        
     }
     
-
-    public virtual PhaseScript NextPhase()
+    public void Begin()
     {
-        return null;
+        God.GM.StartCoroutine(Script());
+        OnBegin();
     }
     
+    public virtual void OnBegin()
+    {
+
+    }
+
+    public void End()
+    {
+        OnEnd();
+        God.GM.EndCut(this);
+    }
+    
+    public virtual void OnEnd()
+    {
+
+    }
+
     public virtual IEnumerator Script()
     {
         yield return null;
     }
-    
+
+    public virtual bool Merge(Cutscene c)
+    {
+        return false;
+    }
+
     public float Perc()
     {
         if (Duration <= 0) return 0;
@@ -55,11 +66,8 @@ public class PhaseScript
     }
 }
 
-public enum Phases
+public enum Cutscenes
 {
     None=0,
-    BuildLevel=1,
-    PlayerTurn=2,
-    EnemyTurn=3,
-    Environment=4,
+    Movement=1,
 }
