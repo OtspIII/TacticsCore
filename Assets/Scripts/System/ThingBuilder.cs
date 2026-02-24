@@ -14,27 +14,29 @@ public static class ThingBuilder
     {
         if (IsSetup) return;
         IsSetup = true;
-        AddPlayer(Classes.Fighter,5);
-        AddClass(Classes.Dog,3);
-        AddClass(Classes.FireBeetle,2);
+        AddPlayer(Classes.Fighter,5,2);
+        AddClass(Classes.Dog,3,1);
+        AddClass(Classes.FireBeetle,2,2);
     }
 
-    public static ClassPrefab AddPlayer(Classes c,int hp)
+    public static ClassPrefab AddPlayer(Classes c,int hp,int spd)
     {
         ClassPrefab r = new ClassPrefab(c);
         PlayerList.Add(r);
         ClassDict.Add(c,r);
         r.Trait(Traits.Player);
         r.Trait(Traits.Health,hp);
+        if(spd > 0) r.Trait(Traits.Mobile,spd);
         return r;
     }
     
-    public static ClassPrefab AddClass(Classes c,int hp)
+    public static ClassPrefab AddClass(Classes c,int hp,int spd)
     {
         ClassPrefab r = new ClassPrefab(c);
         ClassList.Add(r);
         ClassDict.Add(c,r);
         r.Trait(Traits.Health,hp);
+        if(spd > 0) r.Trait(Traits.Mobile,spd);
         return r;
     }
 

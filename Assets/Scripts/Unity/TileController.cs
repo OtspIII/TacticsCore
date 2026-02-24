@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class TileController : MonoBehaviour
 {
+    public SpriteRenderer SR;
     public TileThing Info;
     
     public void Setup(TileThing src)
@@ -33,5 +34,11 @@ public class TileController : MonoBehaviour
     void OnMouseDown()
     {
         God.GM.TileClick(Info);
+    }
+
+    public void Audit()
+    {
+        Info.WipeTint(); //IDK, prob too simple
+        SR.color = Info.Tint;
     }
 }

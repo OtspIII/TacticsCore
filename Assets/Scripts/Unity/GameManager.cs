@@ -79,6 +79,8 @@ public class GameManager : MonoBehaviour
     {
         foreach (ActorController a in AllActors)
             a.Audit();
+        foreach (TileController a in AllTiles)
+            a.Audit();
     }
 
 

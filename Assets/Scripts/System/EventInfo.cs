@@ -223,8 +223,11 @@ public class EventInfo
 public enum EventTypes{
     //Core
     None            =0000,
+    Setup           =0001,
     
-    GainTrait       =0110,
-    LoseTrait       =0111,
+    StartTurn       =0100,
+    
+    GainTrait       =0210,
+    LoseTrait       =0211,
     
 }

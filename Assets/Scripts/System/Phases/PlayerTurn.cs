@@ -5,6 +5,8 @@ using UnityEngine;
 public class PlayerTurnPhase : PhaseScript
 {
     public List<ActorThing> Players = new List<ActorThing>();
+    public ActorThing Selected;
+    public ActionScript Action;
     
     public PlayerTurnPhase()
     {
@@ -15,7 +17,11 @@ public class PlayerTurnPhase : PhaseScript
     {
         foreach (ActorThing a in God.GM.GetActors())
         {
-            if (a.Has(Traits.Player)) Players.Add(a);
+            if (a.Has(Traits.Player))
+            {
+                Players.Add(a);
+                a.TakeEvent(EventTypes.StartTurn);
+            }
         }
         Debug.Log("PLAYER TURN: " + Players.Count);
     }
@@ -27,9 +33,31 @@ public class PlayerTurnPhase : PhaseScript
 
     public override void TileClick(TileThing t)
     {
-        if (Players.Count == 0 || t.Contents != null) return;
-        Players[0].Walk(t);
-        Players.RemoveAt(0);
+        if (t.Contents != null)
+        {
+            if (Players.Contains(t.Contents))
+            {
+                if(Selected != null)
+                    Selected.Location.WipeTint();
+                Selected = t.Contents;
+                if (Selected.ActionsLeft.Contains(ActionCost.Move))
+                {
+                    Action = Selected.MoveAction;
+                    Action.Begin();
+                }
+                t.SetTint(Color.cornflowerBlue);
+            }
+            return;
+        }
+        if (Selected == null) return;
+        Debug.Log("ACT: " + Action?.Type);
+        if (Action != null && Action.TileClick(t))
+        {
+            Selected.Location.WipeTint();
+            if (Selected.ActionsLeft.Count == 0) Players.Remove(Selected);
+            Selected = null;
+            Action = null;
+        }
     }
 
     public override PhaseScript NextPhase()

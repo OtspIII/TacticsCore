@@ -9,7 +9,6 @@ public class BuildLevelPhase : PhaseScript
     
     public override void Begin()
     {
-        Debug.Log("HI");
         LevelThing l = new LevelThing();
         God.GM.Level = l;
         foreach (TileThing t in l.AllTiles)

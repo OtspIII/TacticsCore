@@ -11,12 +11,23 @@ public static class Parser
         Setup = true;
         TraitDict.Add(Traits.Health, new HealthTrait());
         TraitDict.Add(Traits.Player, new PlayerTrait());
+        TraitDict.Add(Traits.Mobile, new MobileTrait());
     }
     
     public static TraitThing Get(Traits t)
     {
         if (TraitDict.TryGetValue(t, out TraitThing r)) return r;
         God.LogError("ERROR MISSING TRAIT: " + t+"\nMust add to TraitManager");
+        return null;
+    }
+    
+    public static ActionScript Get(Actions t,ActorThing a)
+    {
+        switch (t)
+        {
+            case Actions.Walk: return new WalkAction(a);
+        }
+        God.LogError("ERROR MISSING ACTION: " + t);
         return null;
     }
 }

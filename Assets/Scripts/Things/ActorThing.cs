@@ -23,6 +23,8 @@ public class ActorThing
     [HideInInspector]public bool IsSetup = false;     //Have I run setup already? Prevents setup from running twice
     [HideInInspector]public bool Destroyed = false; //Have I been marked for destruction? So I don't trigger death effects multiple times
 
+    public List<ActionCost> ActionsLeft = new List<ActionCost>();
+    public ActionScript MoveAction =  new ActionScript();
     
     public ActorThing(Actors type,TileThing l)
     {
@@ -46,7 +48,7 @@ public class ActorThing
         {
             AddTrait(t.Type, t.E);
         }
-        
+        TakeEvent(EventTypes.Setup);
         SetLocation(l);
     }
 

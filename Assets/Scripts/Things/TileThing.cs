@@ -1,9 +1,12 @@
+using UnityEngine;
+
 public class TileThing
 {
     public int X;
     public int Y;
     public ActorThing Contents;
     public TileController Body;
+    public Color Tint;
 
     public TileThing(int x, int y)
     {
@@ -14,5 +17,17 @@ public class TileThing
     public TileThing Neighbor(int x, int y)
     {
         return God.GM.Level.GetTile(X + x, Y + y);
+    }
+
+    public void SetTint(Color t)
+    {
+        Tint = t;
+        Body.SR.color = t;
+    }
+    
+    public void WipeTint()
+    {
+        Tint = Color.white;
+        Body.SR.color = Color.white;
     }
 }
