@@ -65,7 +65,7 @@ public class Cutscene
         return Timer / Duration;
     }
 
-    public virtual void TileClick(TileThing t)
+    public virtual void TileClick(GameTile t)
     {
         
     }
@@ -75,4 +75,5 @@ public enum Cutscenes
 {
     None=0,
     Movement=1,
+    Attack=2,
 }

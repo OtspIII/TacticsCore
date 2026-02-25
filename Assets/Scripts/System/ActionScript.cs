@@ -21,6 +21,9 @@ public class ActionScript
     public virtual void BeginSelect()
     {
         Begin();
+        Info.Opts = Who.Location.Flood(Phase.Range, GetNeighborMode(), Who);
+        foreach(GameTile t in Info.Opts) t.SetTint(Color.darkSeaGreen);
+        Debug.Log("OPTS: " + Info.Opts.Count + " / " + Phase.Range);
     }
 
     public virtual void RunSelect()
@@ -30,7 +33,7 @@ public class ActionScript
     
     public virtual void EndSelect()
     {
-        
+        foreach(GameTile t in Info.Opts) t.WipeTint();
     }
     
     public virtual void AISelect()
@@ -67,7 +70,7 @@ public class ActionScript
     }
     
     
-    public virtual bool TileClick(TileThing t)
+    public virtual bool TileClick(GameTile t)
     {
         if (Info.Tiles.Count >= Phase.Tiles) return false;
         Info.Tiles.Add(t);
@@ -89,6 +92,15 @@ public class ActionScript
 
         return false;
     }
+
+    public virtual NeighborMode GetNeighborMode()
+    {
+        switch (Phase.Target)
+        {
+            case TargetType.EmptyTile: return NeighborMode.Walking;
+        }
+        return NeighborMode.None;
+    }
 }
 
 public class ActionInfo
@@ -96,13 +108,19 @@ public class ActionInfo
     public int Phase;
     public ActorThing Src;
     public ActionScript Action;
-    public List<TileThing> Tiles = new List<TileThing>();
+    public List<GameTile> Tiles = new List<GameTile>();
+    public List<GameTile> Opts = new List<GameTile>();
 
     public ActionInfo(ActionScript act, int phase)
     {
         Phase = phase;
         Action = act;
         Src = act.Who;
+    }
+
+    public GameTile GetTile(int n = 0)
+    {
+        return Tiles.Count > n ? Tiles[n] : null;
     }
 }
 
@@ -112,8 +130,9 @@ public class ActionPhase
     public ActionScript Action;
     public int Tiles;
     public int Range;
+    public TargetType Target = TargetType.Tile;
 
-    public ActionPhase(ActionScript act,int t, int rng)
+    public ActionPhase(ActionScript act,int t, int rng,TargetType targ =TargetType.Tile)
     {
         Action = act;
         Src = act.Who;
@@ -129,4 +148,12 @@ public enum ActionCost
     Major=1,
     Bonus=2,
     Move=3
+}
+
+public enum TargetType
+{
+    None=0,
+    Character=1,
+    Tile=2,
+    EmptyTile=3,
 }

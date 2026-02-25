@@ -29,7 +29,7 @@ public class PlayerTurnPhase : PhaseScript
         if(Players.Count == 0) God.GM.StartPhase();
     }
 
-    public override void TileClick(TileThing t)
+    public override void TileClick(GameTile t)
     {
         if (t.Contents != null)
         {

@@ -4,9 +4,9 @@ using UnityEngine;
 public class TileController : MonoBehaviour
 {
     public SpriteRenderer SR;
-    public TileThing Info;
+    public GameTile Info;
     
-    public void Setup(TileThing src)
+    public void Setup(GameTile src)
     {
         Info = src;
         Info.Body = this;

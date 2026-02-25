@@ -5,7 +5,7 @@ public class ActorThing
 {
     public Actors Type;
     public Classes Class = Classes.None;
-    public TileThing Location;
+    public GameTile Location;
     public ActorController Body;
     
     //These variables handle the Trait subsystem within a Thing
@@ -28,20 +28,20 @@ public class ActorThing
     
     public ActionScript MoveAction =  new ActionScript();
     
-    public ActorThing(Actors type,TileThing l)
+    public ActorThing(Actors type,GameTile l)
     {
         Type = type;
         Setup(l);
     }
     
-    public ActorThing(Classes type,TileThing l)
+    public ActorThing(Classes type,GameTile l)
     {
         Type = Actors.Character;
         Class = type;
         Setup(l);
     }
 
-    private void Setup(TileThing l)
+    private void Setup(GameTile l)
     {
         ActorPrefab pre;
         if (Class != Classes.None) pre = ThingBuilder.ClassDict[Class];
@@ -54,7 +54,7 @@ public class ActorThing
         SetLocation(l);
     }
 
-    public void SetLocation(TileThing l)
+    public void SetLocation(GameTile l)
     {
         if (Location != null)
         {
@@ -234,9 +234,9 @@ public class ActorThing
         return e;
     }
 
-    public void Walk(TileThing t)
+    public void Walk(GameTile t)
     {
-        TileThing o = Location;
+        GameTile o = Location;
         SetLocation(t);
         God.GM.AddCut(new MoveCut(this,o,t));
     }

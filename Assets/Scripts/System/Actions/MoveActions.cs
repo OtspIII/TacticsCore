@@ -9,12 +9,12 @@ public class WalkAction: ActionScript
         Type = Actions.Walk;
         Who = a;
         Cost = ActionCost.Major;
-        Phases.Add(new ActionPhase(this,1,2));
+        Phases.Add(new ActionPhase(this,1,2,TargetType.EmptyTile));
     }
 
     public override void OnExecute(ActionPhase p, ActionInfo i)
     {
-        foreach (TileThing t in i.Tiles)
+        foreach (GameTile t in i.Tiles)
         {
             Who.Walk(t);
         }
@@ -23,8 +23,9 @@ public class WalkAction: ActionScript
     public override void AISelect()
     {
         base.AISelect();
-        TileThing t = God.GM.AllTiles.Random().Info;
-        if (t.Contents == null)
+        List<GameTile> opts = Who.Location.Flood(Phase.Range,NeighborMode.Walking,Who);//God.GM.AllTiles.Random().Info;
+        GameTile t = opts.Random();
+        if (t != null && t.Contents == null)
         {
             Info.Tiles.Add(t);
         }

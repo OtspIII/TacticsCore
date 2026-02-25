@@ -6,11 +6,11 @@ using UnityEngine;
 public class MoveCut : Cutscene
 {
     ActorThing A;
-    TileThing Old;
-    TileThing New;
+    GameTile Old;
+    GameTile New;
     public List<MiniMoveCut> Moves = new List<MiniMoveCut>();
     
-    public MoveCut(ActorThing a,TileThing old,TileThing n)
+    public MoveCut(ActorThing a,GameTile old,GameTile n)
     {
         Type = Cutscenes.Movement;
         A = a;
@@ -57,10 +57,10 @@ public class MoveCut : Cutscene
     public class MiniMoveCut
     {
         public ActorThing A;
-        public TileThing Old;
-        public TileThing New;
+        public GameTile Old;
+        public GameTile New;
 
-        public MiniMoveCut(ActorThing a,TileThing old,TileThing n)
+        public MiniMoveCut(ActorThing a,GameTile old,GameTile n)
         {
             A = a;
             Old = old;

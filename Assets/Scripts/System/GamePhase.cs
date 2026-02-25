@@ -60,7 +60,7 @@ public class PhaseScript
         return Timer / Duration;
     }
 
-    public virtual void TileClick(TileThing t)
+    public virtual void TileClick(GameTile t)
     {
         
     }

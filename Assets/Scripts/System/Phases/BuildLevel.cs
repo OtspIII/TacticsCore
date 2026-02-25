@@ -11,7 +11,7 @@ public class BuildLevelPhase : PhaseScript
     {
         LevelThing l = new LevelThing();
         God.GM.Level = l;
-        foreach (TileThing t in l.AllTiles)
+        foreach (GameTile t in l.AllTiles)
         {
             God.GM.SpawnTile(t);
             if (t.Contents != null)

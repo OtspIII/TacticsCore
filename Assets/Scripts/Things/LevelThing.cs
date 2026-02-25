@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class LevelThing
 {
-    public Dictionary<int, Dictionary<int, TileThing>> Map = new Dictionary<int, Dictionary<int, TileThing>>();
-    public List<TileThing> AllTiles = new List<TileThing>();
+    public Dictionary<int, Dictionary<int, GameTile>> Map = new Dictionary<int, Dictionary<int, GameTile>>();
+    public List<GameTile> AllTiles = new List<GameTile>();
     public List<ActorThing> AllActors = new List<ActorThing>();
     
     public LevelThing()
@@ -12,13 +12,13 @@ public class LevelThing
         for(int x=0;x<5;x++)
             for (int y = 0; y < 5; y++)
                 AddTile(x, y);
-        List<TileThing> OpenTiles = new List<TileThing>();
+        List<GameTile> OpenTiles = new List<GameTile>();
         OpenTiles.AddRange(AllTiles);
         List<Classes> playerOpts = ThingBuilder.GetPlayers();
         for (int n = 0; n < 2; n++)
         {
             if (OpenTiles.Count == 0) break;
-            TileThing chosen = OpenTiles.Random();
+            GameTile chosen = OpenTiles.Random();
             OpenTiles.Remove(chosen);
             AddActor(playerOpts.RandomE(), chosen);
         }
@@ -26,34 +26,34 @@ public class LevelThing
         for (int n = 0; n < 3; n++)
         {
             if (OpenTiles.Count == 0) break;
-            TileThing chosen = OpenTiles.Random();
+            GameTile chosen = OpenTiles.Random();
             OpenTiles.Remove(chosen);
             AddActor(classOpts.RandomE(), chosen);
         }
     }
 
-    public TileThing AddTile(int x, int y)
+    public GameTile AddTile(int x, int y)
     {
-        TileThing t = new TileThing(x, y);
+        GameTile t = new GameTile(x, y);
         AllTiles.Add(t);
-        if(!Map.ContainsKey(x)) Map.Add(x,new Dictionary<int, TileThing>());
+        if(!Map.ContainsKey(x)) Map.Add(x,new Dictionary<int, GameTile>());
         Map[x].Add(y, t);
         return t;
     }
 
-    public TileThing GetTile(int x, int y)
+    public GameTile GetTile(int x, int y)
     {
         if (!Map.ContainsKey(x)) return null;
-        return Map[x].TryGetValue(y, out TileThing r) ? r : null;
+        return Map[x].TryGetValue(y, out GameTile r) ? r : null;
     }
 
-    public ActorThing AddActor(Classes c, TileThing t)
+    public ActorThing AddActor(Classes c, GameTile t)
     {
         ActorThing r = new ActorThing(c, t);
         return r;
     }
     
-    public ActorThing AddActor(Actors a, TileThing t)
+    public ActorThing AddActor(Actors a, GameTile t)
     {
         ActorThing r = new ActorThing(a, t);
         return r;

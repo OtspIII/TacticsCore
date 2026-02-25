@@ -93,7 +93,7 @@ public class GameManager : MonoBehaviour
         Map.Clear();
     }
 
-    public TileController SpawnTile(TileThing t)
+    public TileController SpawnTile(GameTile t)
     {
         TileController r = Instantiate(God.Library.TilePrefab);
         r.Setup(t);
@@ -115,7 +115,7 @@ public class GameManager : MonoBehaviour
         return Map[x].TryGetValue(y, out TileController r) ? r : null;
     }
 
-    public TileController GetTile(TileThing t)
+    public TileController GetTile(GameTile t)
     {
         return GetTile(t.X, t.Y);
     }
@@ -136,7 +136,7 @@ public class GameManager : MonoBehaviour
         return r;
     }
 
-    public void TileClick(TileThing t)
+    public void TileClick(GameTile t)
     {
         if (CurrentCut != null) CurrentCut.TileClick(t);
         else CurrentPhase.TileClick(t);
