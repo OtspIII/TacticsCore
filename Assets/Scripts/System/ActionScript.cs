@@ -23,7 +23,6 @@ public class ActionScript
         Begin();
         Info.Opts = Who.Location.Flood(Phase.Range, GetNeighborMode(), Who);
         foreach(GameTile t in Info.Opts) t.SetTint(Color.darkSeaGreen);
-        Debug.Log("OPTS: " + Info.Opts.Count + " / " + Phase.Range);
     }
 
     public virtual void RunSelect()
