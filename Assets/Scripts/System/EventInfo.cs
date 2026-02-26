@@ -234,4 +234,7 @@ public enum EventTypes{
     ActionPhaseEnd  =1001,
     ActionEnd       =1002,
     
+    Damage          =2000,
+    Death           =2001,
+    
 }

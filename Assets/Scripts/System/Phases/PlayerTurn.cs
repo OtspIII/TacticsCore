@@ -27,18 +27,23 @@ public class PlayerTurnPhase : PhaseScript
     public override void OnRun()
     {
         if(Players.Count == 0) God.GM.StartPhase();
+        if (Input.GetKeyDown(KeyCode.Alpha1) && Selected != null)
+        {
+            SelectAction(new AttackAction(Selected));
+        }
     }
 
     public override void TileClick(GameTile t)
     {
-        if (t.Contents != null)
+        if (t.Contents != null && (Selected?.SelectedAction == null || !Selected.SelectedAction.Info.Opts.Contains(t)))
         {
             if (Players.Contains(t.Contents))
+            {
                 SelectPlayer(t.Contents);
-            return;
+                return;
+            }
         }
-        if (Selected == null) return;
-        if (Selected.SelectedAction != null)
+        if (Selected?.SelectedAction != null)
             Selected.SelectedAction.TileClick(t);
     }
 
@@ -46,14 +51,24 @@ public class PlayerTurnPhase : PhaseScript
     {
         if (p.ActionsLeft.Count == 0) return;
         WipeTint();
-        if (Selected?.SelectedAction != null) Selected.SelectedAction.WipeTint();
         Selected = p;
         if (Selected.ActionsLeft.Contains(ActionCost.Move))
         {
-            Selected.SelectedAction = Selected.MoveAction;
-            Selected.SelectedAction.BeginSelect();
+            SelectAction(Selected.MoveAction);
         }
         SetTint(TileTints.ActiveThing,p.Location);
+    }
+
+    public void SelectAction(ActionScript a)
+    {
+        if (a.Who != Selected)
+        {
+            God.LogWarning("TRIED TO SET ACTION OF INACTIVE PLAYER: " + a + " / " + a.Who);
+            return;
+        }
+        WipeTint();
+        Selected.SelectedAction = a;
+        Selected.SelectedAction.BeginSelect();
     }
 
     public override PhaseScript NextPhase()
@@ -79,5 +94,11 @@ public class PlayerTurnPhase : PhaseScript
                 break;
             }
         }
+    }
+
+    public override void WipeTint()
+    {
+        base.WipeTint();
+        if (Selected?.SelectedAction != null) Selected.SelectedAction.WipeTint();
     }
 }

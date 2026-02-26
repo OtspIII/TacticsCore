@@ -8,7 +8,7 @@ public class PhaseScript
     public float Duration;
     public float Timer;
     public List<EventTypes> Listeners = new List<EventTypes>();
-    public List<TileTint> Tints = new List<TileTint>();
+    public Dictionary<TileTints,TileTint> Tints = new Dictionary<TileTints, TileTint>();
 
     public void Run()
     {
@@ -72,18 +72,30 @@ public class PhaseScript
     }
 
     
-    public void WipeTint()
+    public virtual void WipeTint()
     {
-        foreach (TileTint t in Tints) t.End();
+        foreach (TileTint t in Tints.Values) t.End();
         Tints.Clear();
     }
     public void SetTint(TileTints t, params GameTile[] tiles)
     {
-        Tints.Add(new TileTint(t, tiles));
+        TileTint tt = new TileTint(t, tiles);
+        if (Tints.ContainsKey(t))
+        {
+            Tints[t] = tt;
+            return;
+        }
+        Tints.Add(t,tt);
     }
     public void SetTint(TileTints t, List<GameTile> tiles)
     {
-        Tints.Add(new TileTint(t, tiles));
+        TileTint tt = new TileTint(t, tiles);
+        if (Tints.ContainsKey(t))
+        {
+            Tints[t] = tt;
+            return;
+        }
+        Tints.Add(t,tt);
     }
 }
 

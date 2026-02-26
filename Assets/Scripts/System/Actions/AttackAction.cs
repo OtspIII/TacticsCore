@@ -15,6 +15,10 @@ public class AttackAction: ActionScript
     public override void OnExecute(ActionPhase p, ActionInfo i)
     {
         God.GM.AddCut(new AttackCut(Who,i.GetTile()));
+        foreach (GameTile t in i.Tiles)
+        {
+            t.TakeEvent(God.E(EventTypes.Damage));
+        }
     }
 
     public override void AISelect()

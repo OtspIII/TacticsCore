@@ -11,7 +11,7 @@ public class ActionScript
     public List<ActionPhase> Phases = new List<ActionPhase>();
     public int PhaseI = 0;
     public ActionPhase Phase {get{return Phases.Count > PhaseI ? Phases[PhaseI] : null;}}
-    public List<TileTint> Tints = new List<TileTint>();
+    public Dictionary<TileTints,TileTint> Tints = new Dictionary<TileTints, TileTint>();
 
     public virtual void Begin()
     {
@@ -33,7 +33,7 @@ public class ActionScript
     
     public virtual void EndSelect()
     {
-        foreach(TileTint t in Tints) t.End();
+        WipeTint();
     }
     
     public virtual void AISelect()
@@ -105,16 +105,28 @@ public class ActionScript
     
     public void WipeTint()
     {
-        foreach (TileTint t in Tints) t.End();
+        foreach (TileTint t in Tints.Values) t.End();
         Tints.Clear();
     }
     public void SetTint(TileTints t, params GameTile[] tiles)
     {
-        Tints.Add(new TileTint(t, tiles));
+        TileTint tt = new TileTint(t, tiles);
+        if (Tints.ContainsKey(t))
+        {
+            Tints[t] = tt;
+            return;
+        }
+        Tints.Add(t,tt);
     }
     public void SetTint(TileTints t, List<GameTile> tiles)
     {
-        Tints.Add(new TileTint(t, tiles));
+        TileTint tt = new TileTint(t, tiles);
+        if (Tints.ContainsKey(t))
+        {
+            Tints[t] = tt;
+            return;
+        }
+        Tints.Add(t,tt);
     }
 }
 

@@ -240,4 +240,14 @@ public class ActorThing
         SetLocation(t);
         God.GM.AddCut(new MoveCut(this,o,t));
     }
+
+    public void Destruct(bool silent=false)
+    {
+        Destroyed = true;
+        Location.Contents = null;
+        if(silent)
+            Body.Destruct();
+        else
+            God.GM.AddCut(new DeathCut(this));
+    }
 }

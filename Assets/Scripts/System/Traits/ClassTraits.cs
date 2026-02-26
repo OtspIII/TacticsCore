@@ -51,5 +51,25 @@ public class HealthTrait : TraitThing
     public HealthTrait()
     {
         Type = Traits.Health;
+        AddListen(EventTypes.Damage);
+        AddListen(EventTypes.Death);
+    }
+    
+    public override void TakeEvent(TraitInfo i, EventInfo e)
+    {
+        switch (e.Type)
+        {
+            case EventTypes.Damage:
+            {
+                God.GM.AddCut(new HeadtextCut(i.Who,"Ouch"));
+                i.Who.TakeEvent(EventTypes.Death);
+                break;
+            }
+            case EventTypes.Death:
+            {
+                i.Who.Destruct();
+                break;
+            }
+        }
     }
 }

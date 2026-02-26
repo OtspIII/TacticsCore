@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 
 public class ActorController : MonoBehaviour
@@ -6,6 +7,7 @@ public class ActorController : MonoBehaviour
     public ActorThing Info;
     public SpriteRenderer Portrait;
     public SpriteRenderer Ring;
+    public TextMeshPro HeadText;
     
     public void Setup(ActorThing src)
     {
@@ -39,5 +41,15 @@ public class ActorController : MonoBehaviour
         TileController loc = God.GM.GetTile(Info.Location);
         transform.parent = loc.transform;
         transform.position = loc.GetContentPos(Info);
+    }
+
+    public void Destruct()
+    {
+        Destroy(gameObject);
+    }
+
+    public void SetHeadtext(string txt)
+    {
+        HeadText.text = txt;
     }
 }

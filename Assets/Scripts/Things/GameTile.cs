@@ -104,6 +104,16 @@ public class GameTile
         }
         return true;
     }
+
+    public void TakeEvent(EventInfo e)
+    {
+        if (Contents != null)
+        {
+            EventInfo ee = new EventInfo();
+            ee.Clone(e);
+            Contents.TakeEvent(ee);
+        }
+    }
 }
 
 public enum NeighborMode

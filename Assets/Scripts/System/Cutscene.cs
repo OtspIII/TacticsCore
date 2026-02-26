@@ -76,4 +76,6 @@ public enum Cutscenes
     None=0,
     Movement=1,
     Attack=2,
+    Headtext=3,
+    Death=4,
 }
