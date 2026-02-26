@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ActorThing
+public class ActorThing : Thing
 {
     public Actors Type;
     public Classes Class = Classes.None;
@@ -27,6 +27,7 @@ public class ActorThing
     public ActionScript SelectedAction;
     
     public ActionScript MoveAction =  new ActionScript();
+    public List<ActionScript> Actions = new List<ActionScript>();
     
     public ActorThing(Actors type,GameTile l)
     {
@@ -51,6 +52,7 @@ public class ActorThing
             AddTrait(t.Type, t.E);
         }
         TakeEvent(EventTypes.Setup);
+        if(Actions.Count == 0) Actions.Add(new AttackAction(this));//Placeholder!
         SetLocation(l);
     }
 
@@ -249,5 +251,18 @@ public class ActorThing
             Body.Destruct();
         else
             God.GM.AddCut(new DeathCut(this));
+    }
+
+    public override void Imprint(CardScript c)
+    {
+        Sprite s = null;
+        string name = Type.ToString();
+        string desc = "";
+        if (Class != Classes.None)
+        {
+            s = God.Library.GetPortrait(Class);
+            name = Class.ToString();
+        }
+        c.Imprint(s,name,desc);
     }
 }

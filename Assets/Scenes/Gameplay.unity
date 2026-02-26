@@ -281,14 +281,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameManager
       objectReference: {fileID: 0}
-    - target: {fileID: 4508694872200259299, guid: 50c403bb46b1477469129a7ebf76541c, type: 3}
-      propertyPath: TilePrefab
-      value: 
-      objectReference: {fileID: 4252613098120622041, guid: 9fac628e25ab33445922b0dbf2ef6f0e, type: 3}
-    - target: {fileID: 4508694872200259299, guid: 50c403bb46b1477469129a7ebf76541c, type: 3}
-      propertyPath: ActorPrefab
-      value: 
-      objectReference: {fileID: 8528638710827512730, guid: 74f9ce1e78374b34bbe19d1081f3113c, type: 3}
     - target: {fileID: 7467108046132333736, guid: 50c403bb46b1477469129a7ebf76541c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -332,7 +324,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5153802379873051293, guid: 50c403bb46b1477469129a7ebf76541c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 50c403bb46b1477469129a7ebf76541c, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

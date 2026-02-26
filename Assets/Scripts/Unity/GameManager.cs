@@ -12,12 +12,19 @@ public class GameManager : MonoBehaviour
     public PhaseScript CurrentPhase;
     public Cutscene CurrentCut;
     public List<Cutscene> Cuts = new List<Cutscene>();
+    public GameObject BotBar;
+    public GameObject BBCursor;
+    public Vector3 CursorStart;
+    public List<CardScript> CardLine = new List<CardScript>();
+    public CardScript MainCard;
 
     void Awake()
     {
         God.GM = this;
         Parser.Init();
         ThingBuilder.Setup();
+        CursorStart = BBCursor.transform.position;
+        MainCard.Wipe();
     }
 
     void Start()
@@ -141,10 +148,40 @@ public class GameManager : MonoBehaviour
         if (CurrentCut != null) CurrentCut.TileClick(t);
         else CurrentPhase.TileClick(t);
     }
+    
+    public void TileMouseEnter(GameTile t)
+    {
+        t.GetThing()?.Imprint(MainCard);
+    }
+    
+    public void TileMouseExit(GameTile t)
+    {
+        MainCard.Wipe();
+    }
 
     public void TakeEvent(EventInfo e)
     {
         if(CurrentPhase.Listeners.Contains(e.Type))
             CurrentPhase.TakeEvent(e);
+    }
+
+    public void SpawnCard(Thing t)
+    {
+        CardScript c = Instantiate(God.Library.CardPrefab, BBCursor.transform.position, Quaternion.identity);
+        c.transform.localScale = new Vector3(God.CardSize, God.CardSize, 1);
+        c.transform.parent = transform;
+        t.Imprint(c);
+        c.SetEvent(God.E(EventTypes.SelectCard).Set(t));
+        BBCursor.transform.position += new Vector3(God.CardSize, 0, 0);
+    }
+
+    public void WipeCards()
+    {
+        foreach (CardScript c in CardLine)
+        {
+            Destroy(c.gameObject);
+        }
+        CardLine.Clear();
+        BBCursor.transform.position += CursorStart;
     }
 }

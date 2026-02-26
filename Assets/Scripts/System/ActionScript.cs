@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ActionScript
+public class ActionScript : Thing
 {
     public Actions Type;
     public ActionCost Cost;
@@ -103,8 +103,17 @@ public class ActionScript
         return NeighborMode.None;
     }
     
-    public void WipeTint()
+    public void WipeTint(TileTints type=TileTints.None)
     {
+        if (type != TileTints.None)
+        {
+            if (Tints.ContainsKey(type))
+            {
+                Tints[type].End();
+                Tints.Remove(type);
+            }
+            return;
+        }
         foreach (TileTint t in Tints.Values) t.End();
         Tints.Clear();
     }
@@ -127,6 +136,11 @@ public class ActionScript
             return;
         }
         Tints.Add(t,tt);
+    }
+
+    public override void Imprint(CardScript c)
+    {
+        c.Imprint(null,Type.ToString(),"");
     }
 }
 

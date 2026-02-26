@@ -57,6 +57,19 @@ public class PlayerTurnPhase : PhaseScript
             SelectAction(Selected.MoveAction);
         }
         SetTint(TileTints.ActiveThing,p.Location);
+        foreach (ActionScript a in p.Actions)
+        {
+            God.GM.SpawnCard(a);
+        }
+    }
+
+    public void UnselectPlayer()
+    {
+        if (Selected == null) return;
+        WipeTint();
+        God.GM.WipeCards();
+        Selected.SelectedAction = null;
+        Selected = null;
     }
 
     public void SelectAction(ActionScript a)
@@ -68,7 +81,7 @@ public class PlayerTurnPhase : PhaseScript
         }
         WipeTint();
         Selected.SelectedAction = a;
-        Selected.SelectedAction.BeginSelect();
+        Selected.SelectedAction?.BeginSelect();
     }
 
     public override PhaseScript NextPhase()
@@ -88,17 +101,26 @@ public class PlayerTurnPhase : PhaseScript
                 if (Selected.ActionsLeft.Count == 0)
                 {
                     Players.Remove(Selected);
-                    Selected.SelectedAction = null;
-                    Selected = null;
+                    UnselectPlayer();
+                }
+                break;
+            }
+            case EventTypes.SelectCard:
+            {
+                Thing t = e.GetThing();
+                Debug.Log("SELECT CARD: " + t);
+                if (t is ActionScript && Selected != null)
+                {
+                    SelectAction((ActionScript)t);
                 }
                 break;
             }
         }
     }
 
-    public override void WipeTint()
+    public override void WipeTint(TileTints type=TileTints.None)
     {
-        base.WipeTint();
-        if (Selected?.SelectedAction != null) Selected.SelectedAction.WipeTint();
+        base.WipeTint(type);
+        if (Selected?.SelectedAction != null) Selected.SelectedAction.WipeTint(type);
     }
 }

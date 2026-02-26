@@ -12,7 +12,8 @@ public class EventInfo
     public Dictionary<string, float> Numbers = new Dictionary<string, float>();
     public Dictionary<string, string> Texts = new Dictionary<string, string>();
     public List<string> Bools = new List<string>();
-    public Dictionary<string, ActorThing> Things = new Dictionary<string, ActorThing>();
+    public Dictionary<string, ActorThing> Actors = new Dictionary<string, ActorThing>();
+    public Dictionary<string, Thing> Things = new Dictionary<string, Thing>();
     public Dictionary<string, Vector2Int> Vectors = new Dictionary<string, Vector2Int>();
     public Dictionary<string, Traits> TraitI = new Dictionary<string, Traits>();
 
@@ -150,7 +151,7 @@ public class EventInfo
         return Bools.Contains(b);
     }
     
-    //Thing
+    //Actors
     public EventInfo Set(ActorController a)
     {
         return SetActor("", a != null ? a.Info : null);
@@ -165,12 +166,32 @@ public class EventInfo
     }
     public EventInfo SetActor(string i, ActorThing a)
     {
-        if (!Things.TryAdd(i,a)) Things[i]=a;
+        if (!Actors.TryAdd(i,a)) Actors[i]=a;
         return this;
     }
     public ActorThing GetActor(string i="")
     {
-        if (Things.TryGetValue(i, out ActorThing r)) return r;
+        if (Actors.TryGetValue(i, out ActorThing r)) return r;
+        return null;
+    }
+    
+    //Things
+    public EventInfo Set(Thing a)
+    {
+        return SetThing("", a);
+    }
+    public EventInfo Set(string i, Thing a)
+    {
+        return SetThing(i, a);
+    }
+    public EventInfo SetThing(string i, Thing a)
+    {
+        if (!Things.TryAdd(i,a)) Things[i]=a;
+        return this;
+    }
+    public Thing GetThing(string i="")
+    {
+        if (Things.TryGetValue(i, out Thing r)) return r;
         return null;
     }
     
@@ -236,5 +257,7 @@ public enum EventTypes{
     
     Damage          =2000,
     Death           =2001,
+    
+    SelectCard      =3000,
     
 }

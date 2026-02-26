@@ -72,8 +72,17 @@ public class PhaseScript
     }
 
     
-    public virtual void WipeTint()
+    public virtual void WipeTint(TileTints type=TileTints.None)
     {
+        if (type != TileTints.None)
+        {
+            if (Tints.ContainsKey(type))
+            {
+                Tints[type].End();
+                Tints.Remove(type);
+            }
+            return;
+        }
         foreach (TileTint t in Tints.Values) t.End();
         Tints.Clear();
     }

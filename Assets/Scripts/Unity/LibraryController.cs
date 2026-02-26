@@ -5,6 +5,7 @@ public class LibraryController : MonoBehaviour
 {
     public ActorController ActorPrefab;
     public TileController TilePrefab;
+    public CardScript CardPrefab;
     
     protected Dictionary<string,Sprite> ClassPortraits = new Dictionary<string, Sprite>();
     

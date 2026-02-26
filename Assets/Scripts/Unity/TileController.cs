@@ -36,6 +36,16 @@ public class TileController : MonoBehaviour
         God.GM.TileClick(Info);
     }
 
+    void OnMouseEnter()
+    {
+        God.GM.TileMouseEnter(Info);
+    }
+
+    void OnMouseExit()
+    {
+        God.GM.TileMouseExit(Info);
+    }
+
     public void Audit()
     {
         Info.WipeTint(); //IDK, prob too simple

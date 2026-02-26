@@ -13,6 +13,8 @@ public static class God
 
    public static bool DebugText = true;
    public static string DebugTxt = "";
+
+   public static float CardSize = 1.5f;
    
    public static bool CoinFlip(float odds=0.5f)
    {

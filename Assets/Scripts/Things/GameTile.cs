@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameTile
+public class GameTile : Thing
 {
     public int X;
     public int Y;
@@ -113,6 +113,12 @@ public class GameTile
             ee.Clone(e);
             Contents.TakeEvent(ee);
         }
+    }
+
+    public Thing GetThing()
+    {
+        if (Contents != null) return Contents;
+        return null;
     }
 }
 
