@@ -11,6 +11,7 @@ public class ActionScript
     public List<ActionPhase> Phases = new List<ActionPhase>();
     public int PhaseI = 0;
     public ActionPhase Phase {get{return Phases.Count > PhaseI ? Phases[PhaseI] : null;}}
+    public List<TileTint> Tints = new List<TileTint>();
 
     public virtual void Begin()
     {
@@ -22,7 +23,7 @@ public class ActionScript
     {
         Begin();
         Info.Opts = Who.Location.Flood(Phase.Range, GetNeighborMode(), Who);
-        foreach(GameTile t in Info.Opts) t.SetTint(Color.darkSeaGreen);
+        SetTint(TileTints.GoodOption,Info.Opts);
     }
 
     public virtual void RunSelect()
@@ -32,7 +33,7 @@ public class ActionScript
     
     public virtual void EndSelect()
     {
-        foreach(GameTile t in Info.Opts) t.WipeTint();
+        foreach(TileTint t in Tints) t.End();
     }
     
     public virtual void AISelect()
@@ -72,6 +73,7 @@ public class ActionScript
     public virtual bool TileClick(GameTile t)
     {
         if (Info.Tiles.Count >= Phase.Tiles) return false;
+        if(!Info.Opts.Contains(t)) return false;
         Info.Tiles.Add(t);
         return CheckForReady();
     }
@@ -99,6 +101,20 @@ public class ActionScript
             case TargetType.EmptyTile: return NeighborMode.Walking;
         }
         return NeighborMode.None;
+    }
+    
+    public void WipeTint()
+    {
+        foreach (TileTint t in Tints) t.End();
+        Tints.Clear();
+    }
+    public void SetTint(TileTints t, params GameTile[] tiles)
+    {
+        Tints.Add(new TileTint(t, tiles));
+    }
+    public void SetTint(TileTints t, List<GameTile> tiles)
+    {
+        Tints.Add(new TileTint(t, tiles));
     }
 }
 

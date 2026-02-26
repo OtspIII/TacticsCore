@@ -45,15 +45,15 @@ public class PlayerTurnPhase : PhaseScript
     public void SelectPlayer(ActorThing p)
     {
         if (p.ActionsLeft.Count == 0) return;
-        if(Selected != null)
-            Selected.Location.WipeTint();
+        WipeTint();
+        if (Selected?.SelectedAction != null) Selected.SelectedAction.WipeTint();
         Selected = p;
         if (Selected.ActionsLeft.Contains(ActionCost.Move))
         {
             Selected.SelectedAction = Selected.MoveAction;
             Selected.SelectedAction.BeginSelect();
         }
-        p.Location.SetTint(Color.cornflowerBlue);
+        SetTint(TileTints.ActiveThing,p.Location);
     }
 
     public override PhaseScript NextPhase()

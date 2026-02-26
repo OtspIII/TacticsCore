@@ -7,7 +7,7 @@ public class GameTile
     public int Y;
     public ActorThing Contents;
     public TileController Body;
-    public Color Tint;
+    public List<TileTint> Tints = new  List<TileTint>();
 
     public GameTile(int x, int y)
     {
@@ -26,15 +26,34 @@ public class GameTile
         return God.GM.Level.GetTile(X + dir.x, Y + dir.y);
     }
 
-    public void SetTint(Color t)
+    public Color GetTint()
     {
-        Tint = t;
-        Body.SR.color = t;
+        Color r = Color.white;
+        int best = 0;
+        foreach (TileTint t in Tints)
+        {
+            if(t.Priority < best) continue;
+            r = t.GetColor();
+            best = t.Priority;
+        }
+        return r;
+    }
+
+    public void AddTint(TileTint t)
+    {
+        Tints.Add(t);
+        Body.SR.color = GetTint();
     }
     
+    public void RemoveTint(TileTint t)
+    {
+        Tints.Remove(t);
+        Body.SR.color = GetTint();
+    }
+
     public void WipeTint()
     {
-        Tint = Color.white;
+        Tints.Clear();
         Body.SR.color = Color.white;
     }
     
@@ -43,7 +62,7 @@ public class GameTile
         List<GameTile> r = new List<GameTile> ();
         foreach (Directions p in eightDir ? God.EightDir : God.Cardinal) {
             GameTile n = Neighbor (p);
-            if (ValidNeighbor(n))
+            if (ValidNeighbor(n,nm))
                 r.Add (n);
         }
         return r;
@@ -72,6 +91,7 @@ public class GameTile
             }
         }
         r.AddRange(active);
+        if (nm == NeighborMode.Walking) r.Remove(this);
         return r;
     }
 

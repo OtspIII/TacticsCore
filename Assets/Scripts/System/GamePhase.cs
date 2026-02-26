@@ -8,6 +8,7 @@ public class PhaseScript
     public float Duration;
     public float Timer;
     public List<EventTypes> Listeners = new List<EventTypes>();
+    public List<TileTint> Tints = new List<TileTint>();
 
     public void Run()
     {
@@ -68,6 +69,21 @@ public class PhaseScript
     public virtual void TakeEvent(EventInfo e)
     {
         
+    }
+
+    
+    public void WipeTint()
+    {
+        foreach (TileTint t in Tints) t.End();
+        Tints.Clear();
+    }
+    public void SetTint(TileTints t, params GameTile[] tiles)
+    {
+        Tints.Add(new TileTint(t, tiles));
+    }
+    public void SetTint(TileTints t, List<GameTile> tiles)
+    {
+        Tints.Add(new TileTint(t, tiles));
     }
 }
 

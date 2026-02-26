@@ -39,6 +39,5 @@ public class TileController : MonoBehaviour
     public void Audit()
     {
         Info.WipeTint(); //IDK, prob too simple
-        SR.color = Info.Tint;
     }
 }

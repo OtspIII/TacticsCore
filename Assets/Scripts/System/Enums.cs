@@ -259,8 +259,6 @@ public enum TileTints
 	Threat=12,
 	Harmful=15,
 	Custom=18,
-	
-	
 }
 
 public enum Colors

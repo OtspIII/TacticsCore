@@ -31,4 +31,9 @@ public class WalkAction: ActionScript
         }
         Execute(Phase,Info);
     }
+
+    public override NeighborMode GetNeighborMode()
+    {
+        return NeighborMode.Walking;
+    }
 }
