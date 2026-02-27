@@ -82,7 +82,6 @@ public enum IntStats{
     Defense=3,
     Damage=5,
     InjuryRate=6,
-	
     Reactions=8,
     Vision=9,//How far can you see?
     HP=10,
@@ -94,6 +93,8 @@ public enum IntStats{
     MaxDamage=19,
     Vulnerable=20,
     DamageTaken=21,
+    MoveLeft=22,
+    MoveUsed=23,
 }
 
 public enum CTags{

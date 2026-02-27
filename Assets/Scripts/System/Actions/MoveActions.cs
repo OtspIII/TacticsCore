@@ -9,7 +9,7 @@ public class WalkAction: ActionScript
         Type = Actions.Walk;
         Who = a;
         Cost = ActionCost.Major;
-        Phases.Add(new ActionPhase(this,1,2,TargetType.EmptyTile));
+        Phases.Add(new ActionPhase(this,God.N(Who,IntStats.Movespeed),TargetType.EmptyTile));
     }
 
     public override void OnExecute(ActionPhase p, ActionInfo i)
@@ -23,7 +23,7 @@ public class WalkAction: ActionScript
     public override void AISelect()
     {
         base.AISelect();
-        List<GameTile> opts = Who.Location.Flood(Phase.Range,NeighborMode.Walking,Who);//God.GM.AllTiles.Random().Info;
+        List<GameTile> opts = Who.Location.Flood(Phase.Range.V(),NeighborMode.Walking,Who);//God.GM.AllTiles.Random().Info;
         GameTile t = opts.Random();
         if (t != null && t.Contents == null)
         {

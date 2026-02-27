@@ -22,7 +22,7 @@ public class ActionScript : Thing
     public virtual void BeginSelect()
     {
         Begin();
-        Info.Opts = Who.Location.Flood(Phase.Range, GetNeighborMode(), Who);
+        Info.Opts = Who.Location.Flood(Phase.Range.V(), GetNeighborMode(), Who);
         SetTint(TileTints.GoodOption,Info.Opts);
     }
 
@@ -175,10 +175,18 @@ public class ActionPhase
     public ActorThing Src;
     public ActionScript Action;
     public int Tiles;
-    public int Range;
+    public Number Range;
     public TargetType Target = TargetType.Tile;
 
-    public ActionPhase(ActionScript act,int t, int rng,TargetType targ =TargetType.Tile)
+    public ActionPhase(ActionScript act, int rng,TargetType targ =TargetType.Tile,int t=1)
+    {
+        Action = act;
+        Src = act.Who;
+        Tiles = t;
+        Range = God.N(rng);
+    }
+    
+    public ActionPhase(ActionScript act,Number rng,TargetType targ =TargetType.Tile,int t=1)
     {
         Action = act;
         Src = act.Who;

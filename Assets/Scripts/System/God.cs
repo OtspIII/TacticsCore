@@ -20,6 +20,9 @@ public static class God
    {
 	   return UnityEngine.Random.value < odds;
    }
+
+   public static Number N(int n, int m = 1) { return new Number(n, m); }
+   public static Number N(ActorThing who,IntStats s, int m = 1) { return new Number(who, s,m); }
    
    public static Vector2 MouseLoc(Camera cam=null)
    {

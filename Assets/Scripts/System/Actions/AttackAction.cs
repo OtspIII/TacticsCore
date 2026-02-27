@@ -9,7 +9,7 @@ public class AttackAction: ActionScript
         Type = Actions.BasicAttack;
         Who = a;
         Cost = ActionCost.Major;
-        Phases.Add(new ActionPhase(this,1,1,TargetType.Character));
+        Phases.Add(new ActionPhase(this,1,TargetType.Character,1));
     }
 
     public override void OnExecute(ActionPhase p, ActionInfo i)
