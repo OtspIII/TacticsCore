@@ -28,7 +28,7 @@ public class LibraryController : MonoBehaviour
     {
 	    return ClassPortraits.TryGetValue(a.ToString(), out Sprite r) ? r : null;
     }
-    public Sprite GetPortrait(Classes a)
+    public Sprite GetPortrait(CharClass a)
     {
 	    return ClassPortraits.TryGetValue(a.ToString(), out Sprite r) ? r : null;
     }

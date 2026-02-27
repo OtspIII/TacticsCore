@@ -17,7 +17,7 @@ public class ActorController : MonoBehaviour
         transform.parent = loc.transform;
         transform.position = loc.GetContentPos(Info);
         // Debug.Log(Info.Class);
-        if (Info.Class != Classes.None)
+        if (Info.Class != CharClass.None)
         {
             Sprite s = God.Library.GetPortrait(Info.Class);
             if (s != null) Portrait.sprite = s;

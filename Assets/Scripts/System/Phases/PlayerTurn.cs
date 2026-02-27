@@ -50,6 +50,7 @@ public class PlayerTurnPhase : PhaseScript
     public void SelectPlayer(ActorThing p)
     {
         if (p.ActionsLeft.Count == 0) return;
+        if(Selected != null) UnselectPlayer();
         WipeTint();
         Selected = p;
         if (Selected.ActionsLeft.Contains(ActionCost.Move))
@@ -76,7 +77,7 @@ public class PlayerTurnPhase : PhaseScript
     {
         if (a.Who != Selected)
         {
-            God.LogWarning("TRIED TO SET ACTION OF INACTIVE PLAYER: " + a + " / " + a.Who);
+            God.LogWarning("TRIED TO SET ACTION OF INACTIVE PLAYER: " + a + " / " + a.Who + " / " + Selected);
             return;
         }
         WipeTint();
@@ -108,7 +109,6 @@ public class PlayerTurnPhase : PhaseScript
             case EventTypes.SelectCard:
             {
                 Thing t = e.GetThing();
-                Debug.Log("SELECT CARD: " + t);
                 if (t is ActionScript && Selected != null)
                 {
                     SelectAction((ActionScript)t);

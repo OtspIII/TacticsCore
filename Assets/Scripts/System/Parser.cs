@@ -9,7 +9,7 @@ public static class Parser
     {
         if (Setup) return;
         Setup = true;
-        TraitDict.Add(Traits.Health, new HealthTrait());
+        TraitDict.Add(Traits.Alive, new AliveTrait());
         TraitDict.Add(Traits.Player, new PlayerTrait());
         TraitDict.Add(Traits.Mobile, new MobileTrait());
     }

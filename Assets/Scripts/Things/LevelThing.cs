@@ -14,7 +14,7 @@ public class LevelThing
                 AddTile(x, y);
         List<GameTile> OpenTiles = new List<GameTile>();
         OpenTiles.AddRange(AllTiles);
-        List<Classes> playerOpts = ThingBuilder.GetPlayers();
+        List<CharClass> playerOpts = ThingBuilder.GetPlayers();
         for (int n = 0; n < 2; n++)
         {
             if (OpenTiles.Count == 0) break;
@@ -22,7 +22,7 @@ public class LevelThing
             OpenTiles.Remove(chosen);
             AddActor(playerOpts.RandomE(), chosen);
         }
-        List<Classes> classOpts = ThingBuilder.GetClasses(1);
+        List<CharClass> classOpts = ThingBuilder.GetClasses(1);
         for (int n = 0; n < 3; n++)
         {
             if (OpenTiles.Count == 0) break;
@@ -47,7 +47,7 @@ public class LevelThing
         return Map[x].TryGetValue(y, out GameTile r) ? r : null;
     }
 
-    public ActorThing AddActor(Classes c, GameTile t)
+    public ActorThing AddActor(CharClass c, GameTile t)
     {
         ActorThing r = new ActorThing(c, t);
         return r;

@@ -142,6 +142,11 @@ public class ActionScript : Thing
     {
         c.Imprint(null,Type.ToString(),"");
     }
+
+    public override string ToString()
+    {
+        return "Action["+Type+"/"+Who+"]";
+    }
 }
 
 public class ActionInfo

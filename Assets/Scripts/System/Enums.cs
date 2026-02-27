@@ -4,27 +4,75 @@ public enum Actors
     Character=1
 }
 
-public enum Classes
-{
-    None=0,
-    Fighter=1,
-    Dog=2,
-    FireBeetle=3,
-}
 
 public enum Traits
 {
-    None=0,
-    Player=1,
-    Health=2,
-    Mobile=3,
-}
-
-public enum Actions
-{
-    None               =0000,
-    Walk               =0001,
-    GenericAttack      =0002,
+	None=0,
+	//The Basics	#0000
+	Universal		=0001,		//Everything has this
+	Mobile			=0002,		//Lets you walk
+	Hidden			=0003,		//Makes you possibly not visible
+	Player			=004,		//Makes you a player
+	//Characters	#1000
+	Alive			=1001,		//Lets you act in a fight
+	Vision			=1002,		//Lets you see
+	CanTalk			=1003,		//Lets you do social events
+	Rescuable		=1004,		//If you see them they join your group
+	TimeLimit		=1005,		//Vanish after X turns
+	Gossip			=1006,		//
+	//Monsters		#2000
+	Undead			=2001,		//Takes damage from healing, heals from necrotic
+	Lycanthrope		=2002,		//Transform when you first take damage
+	//Items			#3000
+	Equipment		=3001,		//Lets you
+	Takeable		=3002,		//You can pick it up and take it with you
+	GP				=3003,		//Adds to your gold score
+	Gem				=3004,		//Randomized gem
+	RLoot			=3005,		//Randomized treasure
+	//Scenery		#5000
+	IsDoor			=5001,		//Blocks movement and LoS until opened
+	IsCage			=5002,		//Traps you
+	IsExit			=5003,		//Lets you leave the dungeon
+	IsTrap			=5004,		//Triggers when you open the thing
+	IsContainer		=5005,		//Can hold items and be looted
+	FragileFloor	=5006,		//Breaks from stepping on, lots of other stuff
+	Pinata			=5007,		//Can hold items, drops them on the foor when destroyed
+	Disguise		=5008,		//Is an illusion, hides another thing inside
+	Disguised		=5009,		//On the contents of a disguise object
+	Lootable		=5010,		//Like a container you can't close
+	DifficultTerrain=5011,		//Costs extra to stand on
+	Readable		=5012,		//You can read this!
+	ActOnBump		=5013,		//Poke it and it spills chems everywhere
+	Flammable		=5014,		//Can catch fire from fire damage
+	DamageTerrain   =5015,		//Take damage if you move onto or start on
+	WinGame			=5016,		//Ends the game when you use it
+	Destructable	=5017,		//Can be destroyed with damage
+	Throne	        =5018,		//Sit for a twist
+	Fountain	    =5019,		//Drink for a permanent change
+	Lever	        =5020,		//Pull for a environmental effect
+	Altar	        =5021,		//Pray for a party-wide twist
+	//Status Effects#7000
+	RatBiteFever	=7001,		//Makes you take a while to heal when you get home##
+	Asleep			=7002,		//Miss your turns, wake up on damage
+	InCage			=7003,		//You've been trapped in a cage!
+	Poisoned		=7004,		//Take damage at the start of every turn
+	Bound			=7005,		//Stuck in webs/ropes/etc
+	Afraid			=7006,		//Run away with your move action
+	OnFire			=7007,		//Take damage each turn
+	Stunned			=7008,		//Lose your turn
+	Charmed			=7009,		//Switch teams
+	Baited			=7010,		//Marks someone to be attacked by monsters
+	Regenerating	=7011,		//Heal 1HP every turn
+	Confused		=7012,		//Pick random targets
+	Paralyzed		=7013,		//Ghoul paralysiz
+	TrollRegen		=7014,		//Full health regen every turn, hurt by fire
+	LashOut			=7015,		//Instant effect, attack a random gsquare
+	//Buffs			#8000
+	GearReward		=8001,
+	GearPowerup		=8002,
+	StatReward		=8003,
+	BoonReward		=8004,
+	
 }
 
 public enum IntStats{
@@ -161,6 +209,7 @@ public enum StrStats
 	Lore=1,		//Paired with the Readable trait
 	Tags=2,		//Displayed in description
 	Description=3,//Shows up in description
+	Damage=4,
 }
 
 
@@ -409,4 +458,341 @@ public enum IColors
 	Gray=6,
 	Brown=7,
 	Black=8,
+}
+
+public enum CharClass{
+	None=0,
+	Narrator=1,
+	LichPope=2,
+	AncientHero=3,
+	Misha=4,
+	Auto=5,
+//Playable			 1XXX
+	Fighter				=1001,
+	Wizard				=1002,
+	Thief				=1003,
+	Cleric				=1004,
+//NPCs				 2XXX
+	//Mundane		=21XX
+	Villager			=2101,
+	PhantomServant		=2102,
+	//Dungeon		 22XX
+	Gnome				=2201,
+	//Story			 23XX
+	Munchmoss			=2301,
+//Beasts			 3XXX
+	//Pets				 31XX
+	Dog					=3101,
+	//Solo Threats	 	32XX
+	Bear				=3210,
+	//Amphibians & Reptiles
+	GiantFrog			=3301,
+//Humanoids			 4XXX
+	//Goblins		 401X
+	GoblinTroublemaker	=4010,
+	GoblinBigmouth		=4011,
+	GoblinChief			=4012,
+	GoblinBeasttamer	=4013,
+	GoblinPyro			=4014,
+	//Trolls		 410X
+	Troll				=4101,
+	Ogre				=4102,
+	Witch				=4111,
+	//Fae			 420X
+	Pixie				=4201,
+	ElvenFarmer			=4211,
+	MushroomMan			=4221,
+	SporeCorpse			=4222,
+	MiniMushroom		=4223,
+	//Ratfolk		 430X
+	RatmanCardTosser	=4301,
+	RatmanGourmand		=4302,
+	RatmanPrayerSqueak	=4303,
+	RatmanMutant		=4304,
+	//Misc				 49XX
+	Doppleganger		=4900,
+	Werewolf			=4901,
+//Undead&Constructs		 5XXX
+	Skeleton			=5010,
+	Zombie				=5011,
+	Ghoul				=5021,
+	Wight				=5030,
+	//Constructs
+	LivingStatue		=5901,
+	StoneAngel			=5902,
+	Gargoyle			=5903,
+	LivingBoulder		=5904,
+//MagicCreatures	 6XXX
+	Dragon				=6010,
+//Extradimensional	 7XXX
+//Vermin			 8XXX
+	//Bugs			 81XX
+	GiantSpider			=8100,
+	DreameaterSpider	=8101,
+	GiantCentipede		=8102,
+	FireBeetle			=8110,
+	BombBeetle			=8111,
+	//Mammals		 82XX
+	GiantRat			=8200,
+	GiantBat			=8210,
+	GoblinDog			=8230,
+	//Effects
+	Test				=9000,
+}
+
+public enum Actions{
+	//0-Generic,2-Player,3-Monster,4-Items
+	//Generic: 01-Basic,02-Forced
+	None=0,
+	//Basic Actions
+	BasicAttack=	0010001,
+	Sprint=			0010002,
+	RunAway=		0010003,
+	Interact=		0010004,
+	Walk=			0010005,
+//Player: 01-Fighter,02-Wizard,03-Cleric,04-Thief
+	//1-MainH,2-OffH,3-Helm,4-Armor,5-Hands,6-Feet,7-Tool
+//Any				100XXXX
+	//Feet
+	SafeStep=		1006001,
+	SwapOut=		100602,
+	//Tools
+	TenFootPoke=	1007001,
+	HealingPotion=	1007002,
+	Caltrops=		1007003,
+	StrengthPotion=	1007004,
+//Fighter			101XXXX
+	//MainH
+	SureStrike=		1011001,
+	FlamingStrike=	1011002,
+	PressingBlow=	1011003,
+	PiercingStrike=	1011004,
+	//OffH
+	Cleave=			1012001,
+	GuardedStrike=	1012102,
+	Yank=			1012103,
+	//Helm
+	Taunt=			1013001,
+	Grab=		1013002,
+	//Armor
+	Shout=			1014001,
+	LureToSlaughter=1014002,//
+	ComeAtMe=		1014003,
+	MightyBlow=	1014004,
+	//Hands
+	YellCommand=	1015001,
+	SecondWind=		1015002,
+	Block=			1015003,
+	//Feet
+	Leap=   		1016001,
+	HoldYourGround= 1016002,
+	LastStand=		1016003,
+//Wizard			102XXXX
+	//MainH
+	FireDart=		1021001,
+	ArcaneBlast=	1021002,
+	Freeze=			1021003,
+	ForceBolt=		1021004,
+	//OffH
+	IcyWind=		1022001,
+	Confuse=		1022002,
+	Distract=		1022003,
+	//Helm
+	Charm=			1023001,
+	Death=			1023002,
+	//Armor
+	Fireball=		1024001,
+	Sleep=			1024002,
+	SummonRats=		1024003,
+	//Hands
+	MageHand=		1025001,
+	PhantomServant=	1025002,
+	HeatArmor=		1025003,
+	//Feet
+	Teleport=		1026001,
+	Blink=			1026002,
+	ExplosiveTeleport=1026003,
+//Cleric			103XXXX
+	//MainH
+	KnockbackStrike=1031001,
+	ExposeOpening=	1031002,
+	RallyingStrike=	1031003,
+	StunningStrike=	1031004,
+	//OffH
+	Heal=			1032001,
+	Shield=			1032002,
+	Strengthen=		1032003,
+	//Helm
+	Fear=			1033001,
+	Weaken=			1033002,
+	RendArmor=		1033003,
+	//Armor
+	Bless=			1034001,
+	BlessingOfSpeed=1034002,
+	StunningWord=	1034003,
+	WaveOfHealth=	1034004,
+	//Hands
+	SummonWall=		1035001,
+	CureStatus=		1035002,
+	Regen=			1035003,
+	//Feet
+	WellspringOfHealth=1036001,
+	ShockwaveStomp=	1036002,
+	
+//Thief				104XXXX
+	//MainH
+	HitAndRun=		1041001,
+	SwappingBlow=	1041002,
+	StabOfOpportunity=1041003,
+	PoisonedStrike=		1041004,
+	//OffH
+	FireFlask=		1042001,
+	ShootArrow=		1042002,
+	Shove=			1042003,
+	//Helm
+	SandInEyes=		1043001,
+	EvadeNotice=	1043002,
+	Stumble=		1043003,
+	//Armor
+	PoisonBomb=		1044001,
+	Backstab=		1044003,
+	BypassArmor=	1044004,
+	//Hands
+	QuickInteract=	1045001,
+	ThrowKnife=		1045002,
+	RagePowder=		1045003,
+	//Feet
+	Tumble=			1046001,
+	QuickStep=		1046002,
+	Swap=			1046003,
+
+//Misc
+	ThrowRock=		3000001,
+	Test=			3000002,
+//	ThrowGoopyFruit=3070005,
+}
+
+public enum ActorP
+{
+	None=0,
+	Gear=1,
+	Auto=2,
+	F1Terrain=     1001,
+	F2Terrain=     1002,
+	F3Terrain=     1003,
+	F4Terrain=     1004,
+	F5Terrain=     1005,
+	//			  #2XXX Terrain
+	Water=		   2001,//Needs transforms
+	Ice=		   2002,//Needs transforms
+	Snow=		   2003,//
+	Poison=        2004,
+	HealingGoo=    2005,//
+	Grass=		   2101,//
+	Flowers=	   2101,//
+	Mushrooms=	   2101,//
+	Hellshrooms=   2101,//
+	Brambles=	   2101,//
+	Flames=        2201,//
+	Lava=		   2202,//
+	Guano=         2203,
+	Mirror=        2206,//
+	Sand=		   2207,//
+	Hellfire=	   2208,//
+	Web=           2301,
+	WebClump=      2302,
+	ThickWeb=      2303,
+	BonePile=      2304,
+	Caltrops=      2401,
+	Trash=         2501,
+	Graffiti=      2502,
+	Metal=         2503,//
+	Circuits=      2504,//
+	
+
+	//			  #3XXX Gasses
+	Smoke=		   3001,
+	Darkness=	   3002,
+	Steam=	       3003,//
+	PoisonGas=	   3004,//
+	Dust=	       3005,//
+	SnowFlurry=	   3006,//
+	Mist=	       3007,//
+	HealingMist=   3008,//
+	ChaosGas=	   3009,//
+
+	//            #4000 Items
+//	PlateMail=    4004,
+//	LeatherArmor= 4005,
+	GoopyFruit=   4015,
+	//            #5000 Furniture
+	StoneDoor=     5001,
+	WoodDoor=      5002,
+	Tree=          5005,
+	Statue=        5006,
+	Table=         5007,
+	Barricade=     5008,
+	Cage=          5009,
+	ExitDoor=      5010,
+	Idol=          5011,
+	Wall=          5012,
+	Barrel=        5014,
+	Sack=          5015,
+	Sarcophagus=   5017,
+	Throne=        5018,
+	Chest=         5019,
+	Book=          5023,
+	Vat=           5024,
+	Shelves=       5025,
+	StairsDown=    5028,
+	Treasure=      5029,
+	GoldCoins=     5030,
+	BronzeDoor=    5031,
+	PhantomWall=   5032,
+	Fountain=	   5033,
+	Altar=	       5034,
+	Lever=	       5036,
+	Gem=		   5037,
+	RLoot=		   5038,
+	//            #6000 Traps
+	RockFallTrap  =6001,
+	PoisonNeedleTrap  =6002,
+	//			  #7XXX Loot
+	FireBeetleAss	=7001,
+	//			  	#8XXX Rewards
+	GearRewardF=	8001,
+	GearRewardW=	8002,
+	GearRewardC=	8003,
+	GearRewardT=	8004,
+	GearPowerupF=	8011,
+	GearPowerupW=	8012,
+	GearPowerupC=	8013,
+	GearPowerupT=	8014,
+	BoonReward=		8030,
+	StatRewardF=	8041,
+	StatRewardW=	8042,
+	StatRewardC=	8043,
+	StatRewardT=	8044,
+	
+	//			  #9XXX CustomEffects
+	NoMonster			=9001,//Monsters shouldn't spawn here
+	
+}
+
+public enum AImprovements
+{
+	None=0,
+				  //0XX - Stat boosts
+	Damage=			001,
+	MaxDamage=		002,
+				  //1XX - Numerical boosts
+	Range=			101,
+	PatternSize=	102,
+	Uses=			103,
+	
+				  //2XX - Core Changes
+	PatternShape=	201,
+	AddTag=			202,
+	RemoveTag=		203,
+	DType=			204,
 }

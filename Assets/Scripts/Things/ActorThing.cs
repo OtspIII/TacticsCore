@@ -4,7 +4,7 @@ using UnityEngine;
 public class ActorThing : Thing
 {
     public Actors Type;
-    public Classes Class = Classes.None;
+    public CharClass Class = CharClass.None;
     public GameTile Location;
     public ActorController Body;
     
@@ -28,6 +28,9 @@ public class ActorThing : Thing
     
     public ActionScript MoveAction =  new ActionScript();
     public List<ActionScript> Actions = new List<ActionScript>();
+    public Dictionary<IntStats, int> Stats = new Dictionary<IntStats, int>();
+    public Dictionary<StrStats, string> TxtStats = new Dictionary<StrStats, string>();
+    public DieRoll BaseDamage;
     
     public ActorThing(Actors type,GameTile l)
     {
@@ -35,7 +38,7 @@ public class ActorThing : Thing
         Setup(l);
     }
     
-    public ActorThing(Classes type,GameTile l)
+    public ActorThing(CharClass type,GameTile l)
     {
         Type = Actors.Character;
         Class = type;
@@ -45,11 +48,23 @@ public class ActorThing : Thing
     private void Setup(GameTile l)
     {
         ActorPrefab pre;
-        if (Class != Classes.None) pre = ThingBuilder.ClassDict[Class];
+        if (Class != CharClass.None) pre = ThingBuilder.ClassDict[Class];
         else pre = ThingBuilder.ActorDict[Type];
         foreach (TraitBuilder t in pre.TraitList)
         {
             AddTrait(t.Type, t.E);
+        }
+        foreach (IntStats s in pre.Stats.Keys)
+        {
+            Stats.Add(s,pre.Stats[s]);
+            if(s == IntStats.HP) 
+                Stats.Add(IntStats.MaxHP,pre.Stats[s]);
+        }
+        foreach (StrStats s in pre.TxtStats.Keys)
+        {
+            TxtStats.Add(s,pre.TxtStats[s]);
+            if (s == StrStats.Damage)
+                BaseDamage = new DieRoll(pre.TxtStats[s]);
         }
         TakeEvent(EventTypes.Setup);
         if(Actions.Count == 0) Actions.Add(new AttackAction(this));//Placeholder!
@@ -258,11 +273,44 @@ public class ActorThing : Thing
         Sprite s = null;
         string name = Type.ToString();
         string desc = "";
-        if (Class != Classes.None)
+        if (Class != CharClass.None)
         {
             s = God.Library.GetPortrait(Class);
             name = Class.ToString();
         }
         c.Imprint(s,name,desc);
+    }
+
+    public int Get(IntStats k,int def=0)
+    {
+        return Stats.TryGetValue(k, out int r) ? r : def;
+    }
+    
+    public string Get(StrStats k, string def = "")
+    {
+        return TxtStats.TryGetValue(k, out string r) ? r : def;
+    }
+
+    public void Set(IntStats k, int amt)
+    {
+        if (Stats.ContainsKey(k)) Stats[k] = amt;
+        else Stats.Add(k,amt);
+    }
+    
+    public void Set(StrStats k, string v)
+    {
+        if (TxtStats.ContainsKey(k)) TxtStats[k] = v;
+        else TxtStats.Add(k,v);
+    }
+    
+    public void Change(IntStats k, int amt)
+    {
+        if (Stats.ContainsKey(k)) Stats[k] += amt;
+        else Stats.Add(k,amt);
+    }
+
+    public override string ToString()
+    {
+        return "Actor[" + Class + "]";
     }
 }

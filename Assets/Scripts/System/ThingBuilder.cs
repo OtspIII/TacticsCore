@@ -7,50 +7,65 @@ public static class ThingBuilder
     public static List<ActorPrefab> ActorList = new List<ActorPrefab>();
     public static Dictionary<Actors, ActorPrefab> ActorDict = new Dictionary<Actors, ActorPrefab>();
     public static List<ClassPrefab> ClassList = new List<ClassPrefab>();
-    public static Dictionary<Classes, ClassPrefab> ClassDict = new Dictionary<Classes, ClassPrefab>();
+    public static Dictionary<CharClass, ClassPrefab> ClassDict = new Dictionary<CharClass, ClassPrefab>();
     public static List<ClassPrefab> PlayerList = new List<ClassPrefab>();
 
     public static void Setup()
     {
         if (IsSetup) return;
         IsSetup = true;
-        AddPlayer(Classes.Fighter,5,2);
-        AddClass(Classes.Dog,3,1);
-        AddClass(Classes.FireBeetle,2,2);
+        AddPlayer(CharClass.Fighter,10,3,4,"1d8");
+        AddPlayer(CharClass.Wizard,5,0,4,"1d4");
+        AddPlayer(CharClass.Cleric,8,2,4,"1d6");
+        AddPlayer(CharClass.Thief,7,1,5,"1d8");
+        AddNPC(CharClass.RatmanCardTosser,4,0,5,"1d3");
+        AddNPC(CharClass.RatmanGourmand,8,0,4,"1d6");
+        AddNPC(CharClass.RatmanPrayerSqueak,4,0,5,"1d3");
+        AddNPC(CharClass.RatmanMutant,4,0,5,"2d4");
     }
 
-    public static ClassPrefab AddPlayer(Classes c,int hp,int spd)
+    public static ClassPrefab AddPlayer(CharClass c,int hp,int def,int spd,string dmg)
     {
-        ClassPrefab r = new ClassPrefab(c);
+        ClassPrefab r = AddClass(c, hp, def, spd, dmg);
         PlayerList.Add(r);
-        ClassDict.Add(c,r);
         r.Trait(Traits.Player);
-        r.Trait(Traits.Health,hp);
-        if(spd > 0) r.Trait(Traits.Mobile,spd);
         return r;
     }
     
-    public static ClassPrefab AddClass(Classes c,int hp,int spd)
+    public static ClassPrefab AddNPC(CharClass c,int hp,int def,int spd,string dmg)
+    {
+        ClassPrefab r = AddClass(c, hp, def, spd, dmg);
+        ClassList.Add(r);
+        return r;
+    }
+    
+    public static ClassPrefab AddClass(CharClass c,int hp,int def,int spd,string dmg)
     {
         ClassPrefab r = new ClassPrefab(c);
-        ClassList.Add(r);
         ClassDict.Add(c,r);
-        r.Trait(Traits.Health,hp);
-        if(spd > 0) r.Trait(Traits.Mobile,spd);
+        r.Trait(Traits.Alive);
+        if (spd > 0)
+        {
+            r.Trait(Traits.Mobile);
+            r.Stats.Add(IntStats.Movespeed,spd);
+        }
+        r.Stats.Add(IntStats.HP,hp);
+        r.Stats.Add(IntStats.Defense,def);
+        r.TxtStats.Add(StrStats.Damage,dmg);
         return r;
     }
 
-    public static List<Classes> GetClasses(int level)
+    public static List<CharClass> GetClasses(int level)
     {
-        List<Classes> r = new List<Classes>();
+        List<CharClass> r = new List<CharClass>();
         foreach(ClassPrefab c in ClassList)
             r.Add(c.Class);
         return r;
     }
     
-    public static List<Classes> GetPlayers()
+    public static List<CharClass> GetPlayers()
     {
-        List<Classes> r = new List<Classes>();
+        List<CharClass> r = new List<CharClass>();
         foreach(ClassPrefab c in PlayerList)
             r.Add(c.Class);
         return r;
@@ -62,6 +77,8 @@ public class ActorPrefab
 {
     public Actors Type;
     public List<TraitBuilder> TraitList = new List<TraitBuilder>();
+    public Dictionary<IntStats, int> Stats = new Dictionary<IntStats, int>();
+    public Dictionary<StrStats, string> TxtStats = new Dictionary<StrStats, string>();
 
     public ActorPrefab() { }
     
@@ -81,9 +98,9 @@ public class ActorPrefab
 
 public class ClassPrefab : ActorPrefab
 {
-    public Classes Class;
-    
-    public ClassPrefab(Classes t)
+    public CharClass Class;
+
+    public ClassPrefab(CharClass t)
     {
         Type = Actors.Character;
         Class = t;

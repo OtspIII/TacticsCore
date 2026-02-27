@@ -46,11 +46,12 @@ public class MobileTrait : TraitThing
     }
 }
 
-public class HealthTrait : TraitThing
+public class AliveTrait : TraitThing
 {
-    public HealthTrait()
+    public AliveTrait()
     {
-        Type = Traits.Health;
+        Type = Traits.Alive;
+        AddListen(EventTypes.Setup);
         AddListen(EventTypes.Damage);
         AddListen(EventTypes.Death);
     }
@@ -59,10 +60,19 @@ public class HealthTrait : TraitThing
     {
         switch (e.Type)
         {
+            case EventTypes.Setup:
+            {
+                break;
+            }
             case EventTypes.Damage:
             {
-                God.GM.AddCut(new HeadtextCut(i.Who,"Ouch"));
-                i.Who.TakeEvent(EventTypes.Death);
+                int hp = i.Who.Get(IntStats.HP);
+                int dmg = e.GetInt();
+                hp -= dmg;
+                i.Who.Set(IntStats.HP,hp);
+                God.GM.AddCut(new HeadtextCut(i.Who,"-"+dmg));
+                if(hp <= 0)
+                    i.Who.TakeEvent(EventTypes.Death);
                 break;
             }
             case EventTypes.Death:

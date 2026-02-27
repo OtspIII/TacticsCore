@@ -173,6 +173,7 @@ public class GameManager : MonoBehaviour
         t.Imprint(c);
         c.SetEvent(God.E(EventTypes.SelectCard).Set(t));
         BBCursor.transform.position += new Vector3(God.CardSize, 0, 0);
+        CardLine.Add(c);
     }
 
     public void WipeCards()
@@ -182,6 +183,6 @@ public class GameManager : MonoBehaviour
             Destroy(c.gameObject);
         }
         CardLine.Clear();
-        BBCursor.transform.position += CursorStart;
+        BBCursor.transform.position = CursorStart;
     }
 }

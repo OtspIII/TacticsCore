@@ -6,7 +6,7 @@ public class AttackAction: ActionScript
 {
     public AttackAction(ActorThing a)
     {
-        Type = Actions.GenericAttack;
+        Type = Actions.BasicAttack;
         Who = a;
         Cost = ActionCost.Major;
         Phases.Add(new ActionPhase(this,1,1,TargetType.Character));
@@ -17,7 +17,7 @@ public class AttackAction: ActionScript
         God.GM.AddCut(new AttackCut(Who,i.GetTile()));
         foreach (GameTile t in i.Tiles)
         {
-            t.TakeEvent(God.E(EventTypes.Damage));
+            t.TakeEvent(God.E(EventTypes.Damage).Set(Who.BaseDamage.Roll()));
         }
     }
 
