@@ -77,9 +77,9 @@ public struct DieRoll{
 		if (s.Contains("W"))
 		{
 			DieRoll dr = who.BaseDamage;
-			n = dr.Size.V();
-			diem = dr.Rolls.V();
-			bm = dr.Bonus.V();
+			n = dr.Size.V(who);
+			diem = dr.Rolls.V(who);
+			bm = dr.Bonus.V(who);
 			s = s.Substring(0,s.IndexOf("W"));
 		}
 		else if (s.Contains("M"))
@@ -109,7 +109,7 @@ public struct DieRoll{
 
 	
 	public int[] Calculate(ActorThing who,ActionScript act=null,GEvents msg=GEvents.None){
-		int[] r = new int[3]{Rolls.V(),Size.V(),Bonus.V()};
+		int[] r = new int[3]{Rolls.V(who),Size.V(who),Bonus.V(who)};
 		return r;
 	}
 
@@ -138,7 +138,7 @@ public class Number
 {
 	public int N = 0;
 	public IntStats Stat = IntStats.None;
-	public ActorThing Who;
+	public ActorThing Who=null;
 	public int Mult = 1;
 
 	public Number(int n,int m=1)
@@ -154,10 +154,17 @@ public class Number
 		Mult = m;
 	}
 	
-	
-	public int V()
+	public Number(IntStats s,int m=1)
 	{
-		if (Stat == IntStats.None || Who == null) return N * Mult;
-		return Who.Get(Stat) * Mult;
+		Stat = s;
+		Mult = m;
+	}
+	
+	
+	public int V(ActorThing who=null)
+	{
+		if (who == null) who = Who;
+		if (Stat == IntStats.None || who == null) return N * Mult;
+		return who.Get(Stat) * Mult;
 	}
 }

@@ -27,10 +27,6 @@ public class PlayerTurnPhase : PhaseScript
     public override void OnRun()
     {
         if(Players.Count == 0) God.GM.StartPhase();
-        if (Input.GetKeyDown(KeyCode.Alpha1) && Selected != null)
-        {
-            SelectAction(new AttackAction(Selected));
-        }
     }
 
     public override void TileClick(GameTile t)
@@ -55,12 +51,13 @@ public class PlayerTurnPhase : PhaseScript
         Selected = p;
         if (Selected.ActionsLeft.Contains(ActionCost.Move))
         {
-            SelectAction(Selected.MoveAction);
+            SelectAction(Selected.GetAct(ActionSlot.BasicMove));
         }
         SetTint(TileTints.ActiveThing,p.Location);
-        foreach (ActionScript a in p.Actions)
+        foreach (ActionSlot a in God.ActSlots)
         {
-            God.GM.SpawnCard(a);
+            if (!Selected.KnownActions.ContainsKey(a)) continue;
+            God.GM.SpawnCard(Selected.KnownActions[a]);
         }
     }
 

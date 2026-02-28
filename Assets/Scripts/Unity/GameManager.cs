@@ -151,7 +151,7 @@ public class GameManager : MonoBehaviour
     
     public void TileMouseEnter(GameTile t)
     {
-        t.GetThing()?.Imprint(MainCard);
+        t.GetThing()?.ImprintCard(MainCard);
     }
     
     public void TileMouseExit(GameTile t)
@@ -170,7 +170,7 @@ public class GameManager : MonoBehaviour
         CardScript c = Instantiate(God.Library.CardPrefab, BBCursor.transform.position, Quaternion.identity);
         c.transform.localScale = new Vector3(God.CardSize, God.CardSize, 1);
         c.transform.parent = transform;
-        t.Imprint(c);
+        t.ImprintCard(c);
         c.SetEvent(God.E(EventTypes.SelectCard).Set(t));
         BBCursor.transform.position += new Vector3(God.CardSize, 0, 0);
         CardLine.Add(c);

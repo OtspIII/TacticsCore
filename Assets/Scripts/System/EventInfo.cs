@@ -14,6 +14,7 @@ public class EventInfo
     public List<string> Bools = new List<string>();
     public Dictionary<string, ActorThing> Actors = new Dictionary<string, ActorThing>();
     public Dictionary<string, Thing> Things = new Dictionary<string, Thing>();
+    public Dictionary<string, GameTile> Tiles = new Dictionary<string, GameTile>();
     public Dictionary<string, Vector2Int> Vectors = new Dictionary<string, Vector2Int>();
     public Dictionary<string, Traits> TraitI = new Dictionary<string, Traits>();
 
@@ -195,6 +196,26 @@ public class EventInfo
         return null;
     }
     
+    //Tiles
+    public EventInfo Set(GameTile a)
+    {
+        return SetTile("", a);
+    }
+    public EventInfo Set(string i, GameTile a)
+    {
+        return SetTile(i, a);
+    }
+    public EventInfo SetTile(string i, GameTile a)
+    {
+        if (!Tiles.TryAdd(i,a)) Tiles[i]=a;
+        return this;
+    }
+    public GameTile GetTile(string i="")
+    {
+        if (Tiles.TryGetValue(i, out GameTile r)) return r;
+        return null;
+    }
+    
     
     //Vector
     public EventInfo Set(Vector2Int a)
@@ -258,6 +279,8 @@ public enum EventTypes{
     Damage          =2000,
     Death           =2001,
     
-    SelectCard      =3000,
+    WalkTo          =3000,
+    
+    SelectCard      =9000,
     
 }

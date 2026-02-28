@@ -11,6 +11,8 @@ public static class God
    public static Directions[] Cardinal = new[] {Directions.Up, Directions.Right, Directions.Down, Directions.Left}; 
    public static Directions[] EightDir = new[] {Directions.Up, Directions.Right, Directions.Down, Directions.Left,Directions.UR,Directions.UL,Directions.DL,Directions.DR};
 
+   public static List<ActionSlot> ActSlots = new List<ActionSlot>() { ActionSlot.BasicAttack ,ActionSlot.Secondary,ActionSlot.Utility,ActionSlot.Ultimate};
+   
    public static bool DebugText = true;
    public static string DebugTxt = "";
 
@@ -23,6 +25,7 @@ public static class God
 
    public static Number N(int n, int m = 1) { return new Number(n, m); }
    public static Number N(ActorThing who,IntStats s, int m = 1) { return new Number(who, s,m); }
+   public static Number N(IntStats s, int m = 1) { return new Number(s,m); }
    
    public static Vector2 MouseLoc(Camera cam=null)
    {

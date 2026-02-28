@@ -5,7 +5,7 @@
         
     }
 
-    public virtual void Imprint(CardScript c)
+    public virtual void ImprintCard(CardScript c)
     {
         
     }

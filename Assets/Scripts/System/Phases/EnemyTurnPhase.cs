@@ -28,8 +28,12 @@ public class EnemyTurnPhase : PhaseScript
         }
         ActorThing a = Queued.Random();
         Queued.Remove(a);
-        ActionScript act = a.MoveAction;
+        ActionScript act = a.GetAct(ActionSlot.BasicMove);
         act.AISelect();
+        act.Execute();
+        act = a.GetAct(ActionSlot.BasicAttack);
+        act.AISelect();
+        act.Execute();
     }
 
     public override PhaseScript NextPhase()

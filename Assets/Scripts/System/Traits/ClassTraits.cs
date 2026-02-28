@@ -30,16 +30,18 @@ public class MobileTrait : TraitThing
     public MobileTrait()
     {
         Type = Traits.Mobile;
-        AddListen(EventTypes.Setup);
+        AddListen(EventTypes.WalkTo);
     }
     
     public override void TakeEvent(TraitInfo i, EventInfo e)
     {
         switch (e.Type)
         {
-            case EventTypes.Setup:
+            case EventTypes.WalkTo:
             {
-                i.Who.MoveAction = new WalkAction(i.Who);
+                GameTile t = e.GetTile();
+                if (t == null) t = e.GetTile("Target");
+                i.Who.Walk(t);
                 break;
             }
         }
@@ -66,6 +68,7 @@ public class AliveTrait : TraitThing
             }
             case EventTypes.Damage:
             {
+                
                 int hp = i.Who.Get(IntStats.HP);
                 int dmg = e.GetInt();
                 hp -= dmg;

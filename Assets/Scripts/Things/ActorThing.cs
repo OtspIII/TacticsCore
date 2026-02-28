@@ -26,8 +26,8 @@ public class ActorThing : Thing
     public List<ActionCost> ActionsLeft = new List<ActionCost>();
     public ActionScript SelectedAction;
     
-    public ActionScript MoveAction =  new ActionScript();
-    public List<ActionScript> Actions = new List<ActionScript>();
+    // public ActionScript MoveAction =  new ActionScript();
+    public Dictionary<ActionSlot,ActionScript> KnownActions = new  Dictionary<ActionSlot,ActionScript>();
     public Dictionary<IntStats, int> Stats = new Dictionary<IntStats, int>();
     public Dictionary<StrStats, string> TxtStats = new Dictionary<StrStats, string>();
     public DieRoll BaseDamage;
@@ -67,8 +67,18 @@ public class ActorThing : Thing
                 BaseDamage = new DieRoll(pre.TxtStats[s]);
         }
         TakeEvent(EventTypes.Setup);
-        if(Actions.Count == 0) Actions.Add(new AttackAction(this));//Placeholder!
+        if(!KnownActions.ContainsKey(ActionSlot.BasicMove)) AddAction(Actions.Walk);
+        if(!KnownActions.ContainsKey(ActionSlot.BasicAttack)) AddAction(Actions.BasicAttack);
+        // if(Actions.Count == 0) Actions.Add(new AttackAction(this));//Placeholder!
         SetLocation(l);
+    }
+
+    public void AddAction(Actions a)
+    {
+        ActionScript act = ThingBuilder.MakeAction(a);
+        act.Who = this;
+        if(KnownActions.ContainsKey(act.Slot)) KnownActions[act.Slot] = act;
+        else KnownActions.Add(act.Slot, act);
     }
 
     public void SetLocation(GameTile l)
@@ -268,7 +278,7 @@ public class ActorThing : Thing
             God.GM.AddCut(new DeathCut(this));
     }
 
-    public override void Imprint(CardScript c)
+    public override void ImprintCard(CardScript c)
     {
         Sprite s = null;
         string name = Type.ToString();
@@ -312,5 +322,10 @@ public class ActorThing : Thing
     public override string ToString()
     {
         return "Actor[" + Class + "]";
+    }
+
+    public ActionScript GetAct(ActionSlot a)
+    {
+        return KnownActions.TryGetValue(a, out ActionScript r) ? r : null;
     }
 }

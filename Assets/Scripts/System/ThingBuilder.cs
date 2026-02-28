@@ -9,6 +9,7 @@ public static class ThingBuilder
     public static List<ClassPrefab> ClassList = new List<ClassPrefab>();
     public static Dictionary<CharClass, ClassPrefab> ClassDict = new Dictionary<CharClass, ClassPrefab>();
     public static List<ClassPrefab> PlayerList = new List<ClassPrefab>();
+    public static Dictionary<Actions,ActionPrefab> ActionDict = new Dictionary<Actions, ActionPrefab>();
 
     public static void Setup()
     {
@@ -22,6 +23,9 @@ public static class ThingBuilder
         AddNPC(CharClass.RatmanGourmand,8,0,4,"1d6");
         AddNPC(CharClass.RatmanPrayerSqueak,4,0,5,"1d3");
         AddNPC(CharClass.RatmanMutant,4,0,5,"2d4");
+
+        AddAction(Actions.Walk, ActionCost.Move, ActionSlot.BasicMove, new ActionPhase(God.N(IntStats.Movespeed),Cutscenes.None,TargetType.EmptyTile).Add(ActEventTarget.Self,God.E(EventTypes.WalkTo)));
+        AddAction(Actions.BasicAttack, ActionCost.Major, ActionSlot.BasicAttack, new ActionPhase(1,Cutscenes.Attack).Add(God.E(EventTypes.Damage).Set(1)));
     }
 
     public static ClassPrefab AddPlayer(CharClass c,int hp,int def,int spd,string dmg)
@@ -54,6 +58,13 @@ public static class ThingBuilder
         r.TxtStats.Add(StrStats.Damage,dmg);
         return r;
     }
+    
+    public static ActionPrefab AddAction(Actions t,ActionCost cost,ActionSlot slot,params ActionPhase[] phases)
+    {
+        ActionPrefab r = new ActionPrefab(t,cost,slot,phases);
+        ActionDict.Add(t,r);
+        return r;
+    }
 
     public static List<CharClass> GetClasses(int level)
     {
@@ -71,6 +82,14 @@ public static class ThingBuilder
         return r;
     }
     
+    public static ActionScript MakeAction(Actions a)
+    {
+        ActionScript r = new ActionScript();
+        ActionPrefab p = ActionDict[a];
+        r.Imprint(p);
+        return r;
+    }
+    
 }
 
 public class ActorPrefab
@@ -79,6 +98,7 @@ public class ActorPrefab
     public List<TraitBuilder> TraitList = new List<TraitBuilder>();
     public Dictionary<IntStats, int> Stats = new Dictionary<IntStats, int>();
     public Dictionary<StrStats, string> TxtStats = new Dictionary<StrStats, string>();
+    public List<Actions> KnownActions = new List<Actions>();
 
     public ActorPrefab() { }
     
@@ -92,6 +112,12 @@ public class ActorPrefab
         TraitBuilder t = new TraitBuilder(tr);
         TraitList.Add(t);
         if (n != 0) t.E.Set(n);
+        return this;
+    }
+
+    public ActorPrefab Act(Actions a)
+    {
+        KnownActions.Add(a);
         return this;
     }
 }
@@ -115,5 +141,21 @@ public class TraitBuilder
     public TraitBuilder(Traits t)
     {
         Type = t;
+    }
+}
+
+public class ActionPrefab
+{
+    public Actions Type;
+    public ActionCost Cost;
+    public ActionSlot Slot;
+    public List<ActionPhase> Phases = new List<ActionPhase>();
+
+    public ActionPrefab(Actions t,ActionCost cost,ActionSlot slot,params ActionPhase[] phases)
+    {
+        Type = t;
+        Cost = cost;
+        Slot = slot;
+        Phases.AddRange(phases);
     }
 }

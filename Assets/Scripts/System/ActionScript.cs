@@ -8,11 +8,20 @@ public class ActionScript : Thing
     public ActionCost Cost;
     public ActorThing Who;
     public ActionInfo Info;
+    public ActionSlot Slot;
     public List<ActionPhase> Phases = new List<ActionPhase>();
     public int PhaseI = 0;
     public ActionPhase Phase {get{return Phases.Count > PhaseI ? Phases[PhaseI] : null;}}
     public Dictionary<TileTints,TileTint> Tints = new Dictionary<TileTints, TileTint>();
 
+    public void Imprint(ActionPrefab p)
+    {
+        Type = p.Type;
+        Cost = p.Cost;
+        Slot = p.Slot;
+        foreach (ActionPhase ap in p.Phases) Phases.Add(new ActionPhase(ap,this));
+    }
+    
     public virtual void Begin()
     {
         PhaseI = 0;
@@ -22,7 +31,7 @@ public class ActionScript : Thing
     public virtual void BeginSelect()
     {
         Begin();
-        Info.Opts = Who.Location.Flood(Phase.Range.V(), GetNeighborMode(), Who);
+        Info.Opts = Who.Location.Flood(Phase.Range.V(Who), GetNeighborMode(), Who);
         SetTint(TileTints.GoodOption,Info.Opts);
     }
 
@@ -39,11 +48,54 @@ public class ActionScript : Thing
     public virtual void AISelect()
     {
         Begin();
+        Info.Opts = Who.Location.Flood(Phase.Range.V(Who), GetNeighborMode(), Who);
+        if (Info.Opts.Count == 0) return;
+        Info.Tiles.AddRange(FindBest(Info.Opts,Phase.Tiles));
     }
 
+    public List<GameTile> FindBest(List<GameTile> opts,int howMany=1)
+    {
+        List<GameTile> o = new List<GameTile>();
+        o.AddRange(opts);
+        List<GameTile> r = new List<GameTile>();
+        for (int n = 0; n < howMany; n++)
+        {
+            if (o.Count == 0) break;
+            GameTile chosen = o.Random();
+            r.Add(chosen);
+            if (Phase.UniqueTiles) o.Remove(chosen);
+        }
+        return r;
+    }
+
+    public void Execute()
+    {
+        Execute(Phase,Info);
+    }
+    
     public void Execute(ActionPhase p,ActionInfo i)
     {
-        OnExecute(p,i);
+        foreach (GameTile t in i.Tiles)
+        {
+            
+            Cutscene cut = ActCut(p, t);
+            if (cut != null)
+            {
+                God.GM.AddCut(cut);
+            }
+            ActorThing who = t.Contents;
+            foreach (ActionEvent a in p.Events)
+            {
+                ActorThing targ = who;
+                if (a.Target == ActEventTarget.Self) targ = Who;
+                if (targ == null) continue;
+                foreach (EventInfo e in a.Events)
+                {
+                    targ.TakeEvent(e.Set("Target",t));
+                }
+            }
+        }
+
         EndSelect();
         PhaseI++;
         if (PhaseI >= Phases.Count)
@@ -138,7 +190,7 @@ public class ActionScript : Thing
         Tints.Add(t,tt);
     }
 
-    public override void Imprint(CardScript c)
+    public override void ImprintCard(CardScript c)
     {
         c.Imprint(null,Type.ToString(),"");
     }
@@ -146,6 +198,18 @@ public class ActionScript : Thing
     public override string ToString()
     {
         return "Action["+Type+"/"+Who+"]";
+    }
+
+    public Cutscene ActCut(ActionPhase p,GameTile i)
+    {
+        switch (p.Cut)
+        {
+            case Cutscenes.Attack:
+            {
+                return new AttackCut(Who, i);
+            }
+        }
+        return null;
     }
 }
 
@@ -177,21 +241,98 @@ public class ActionPhase
     public int Tiles;
     public Number Range;
     public TargetType Target = TargetType.Tile;
+    public List<ActionEvent> Events =  new List<ActionEvent>();
+    public bool UniqueTiles =false;
+    public Cutscenes Cut = Cutscenes.None;
 
-    public ActionPhase(ActionScript act, int rng,TargetType targ =TargetType.Tile,int t=1)
+    public ActionPhase(int rng,Cutscenes cut=Cutscenes.None,TargetType targ =TargetType.Tile,int t=1)
     {
-        Action = act;
-        Src = act.Who;
         Tiles = t;
         Range = God.N(rng);
+        Cut = cut;
     }
     
-    public ActionPhase(ActionScript act,Number rng,TargetType targ =TargetType.Tile,int t=1)
+    public ActionPhase(Number rng,Cutscenes cut=Cutscenes.None,TargetType targ =TargetType.Tile,int t=1)
     {
-        Action = act;
-        Src = act.Who;
         Tiles = t;
         Range = rng;
+        Cut = cut;
+    }
+
+    public ActionPhase(ActionPhase ap,ActionScript act)
+    {
+        Tiles = ap.Tiles;
+        Range = ap.Range;
+        Target = ap.Target;
+        Events = ap.Events;
+        Cut = ap.Cut;
+        UniqueTiles = ap.UniqueTiles;
+        Action = act;
+        Src = act.Who;
+    }
+
+    public ActionPhase Add(ActionEvent e)
+    {
+        Events.Add(e);
+        return this;
+    }
+    
+    public ActionPhase Add(ActPattern p,int size,ActEventTarget t, params EventInfo[] events)
+    {
+        Events.Add(new ActionEvent(p,size,t,events));
+        return this;
+    }
+    
+    public ActionPhase Add(ActPattern p,int size,params EventInfo[] events)
+    {
+        Events.Add(new ActionEvent(p,size,events));
+        return this;
+    }
+    
+    public ActionPhase Add(ActEventTarget t, params EventInfo[] events)
+    {
+        Events.Add(new ActionEvent(ActPattern.None,1,t,events));
+        return this;
+    }
+    
+    public ActionPhase Add(params EventInfo[] events)
+    {
+        Events.Add(new ActionEvent(events));
+        return this;
+    }
+    
+    public ActionPhase SetUnique(bool u)
+    {
+        UniqueTiles = u;
+        return this;
+    }
+}
+
+public class ActionEvent
+{
+    public List<EventInfo> Events =  new List<EventInfo>();
+    public ActPattern Pattern = ActPattern.None;
+    public int Size=1;
+    public ActEventTarget  Target = ActEventTarget.Everything;
+
+    public ActionEvent(ActPattern p,int size,ActEventTarget t, params EventInfo[] events)
+    {
+        Pattern = p;
+        Size=size;
+        Target = t;
+        Events.AddRange(events);
+    }
+    
+    public ActionEvent(ActPattern p,int size,params EventInfo[] events)
+    {
+        Pattern = p;
+        Size=size;
+        Events.AddRange(events);
+    }
+    
+    public ActionEvent(params EventInfo[] events)
+    {
+        Events.AddRange(events);
     }
 }
 
@@ -210,4 +351,26 @@ public enum TargetType
     Character=1,
     Tile=2,
     EmptyTile=3,
+}
+
+public enum ActEventTarget
+{
+    None=0,
+    Everything=1,
+    Characters=2,
+    Floor=3,
+    Allies=4,
+    Enemies=5,
+    Tile=6,
+    Self=7,
+}
+
+public enum ActionSlot
+{
+    None=0,
+    BasicMove=1,
+    BasicAttack=2,
+    Secondary=3,
+    Utility=4,
+    Ultimate=5
 }

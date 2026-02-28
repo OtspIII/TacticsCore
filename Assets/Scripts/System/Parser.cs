@@ -21,13 +21,4 @@ public static class Parser
         return null;
     }
     
-    public static ActionScript Get(Actions t,ActorThing a)
-    {
-        switch (t)
-        {
-            case Actions.Walk: return new WalkAction(a);
-        }
-        God.LogError("ERROR MISSING ACTION: " + t);
-        return null;
-    }
 }
