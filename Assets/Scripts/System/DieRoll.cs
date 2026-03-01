@@ -8,12 +8,14 @@ public struct DieRoll{
 	public Number Rolls;
 	public Number Size;
 	public Number Bonus;
+	public bool Setup;
 
 	public DieRoll (int r, int s , int b){
 		Desc = "";
 		Rolls = God.N(r);
 		Size = God.N(s);
 		Bonus = God.N(b);
+		Setup = true;
 	}
 
 	public DieRoll (string desc,ActorThing who=null)
@@ -22,6 +24,7 @@ public struct DieRoll{
 		Rolls = God.N(1);
 		Size = God.N(1);
 		Bonus = God.N(0);
+		Setup = true;
 		string rl = "";
 		string sz = "";
 		string b = "";
@@ -53,13 +56,17 @@ public struct DieRoll{
 			Debug.LogError (desc + " / " + rl + " / " + sz +
 				" / " + b + " / " + sub + "." + ex.Message); 
 		}
-
+		if (b == "W")
+		{
+			sz = "W";
+			b = "";
+		}
 		Rolls = ParseN(rl,who);
+		if (Rolls.N == 0) Rolls.N = 1;
 		Size = ParseN(sz,who,out int rm,out int bm);
 		Bonus = ParseN(b,who);
 		Bonus.Mult *= bm;
 		Rolls.Mult *= rm;
-//		Debug.Log (desc + " / " + Rolls + " / " + Size + " / " + Bonus + " / " + sub + "."); 
 	}
 
 	public Number ParseN(string s, ActorThing who)
@@ -100,7 +107,7 @@ public struct DieRoll{
 
 		int tempN = 0;
 		if (int.TryParse(s, out int num)) tempN = num;
-		if (st == IntStats.None) n = tempN;
+		if (st == IntStats.None && s != "") n = tempN;
 		else m = tempN;
 		if (m == 0) m = 1;
 		if (st == IntStats.None) return God.N(n, m);
@@ -130,7 +137,7 @@ public struct DieRoll{
 
 	public override string ToString()
 	{
-		return "Die Roll[" + Desc + "]";
+		return "Die Roll[" + Desc + "/" + Rolls + " / " + Size + " / " + Bonus + "]";
 	}
 }
 
@@ -159,12 +166,23 @@ public class Number
 		Stat = s;
 		Mult = m;
 	}
+
 	
 	
 	public int V(ActorThing who=null)
 	{
 		if (who == null) who = Who;
-		if (Stat == IntStats.None || who == null) return N * Mult;
-		return who.Get(Stat) * Mult;
+		int st = Stat != IntStats.None ? who.Get(Stat) : 0;
+		return (N + st) * Mult;
+	}
+	
+	public static Number Zero
+	{
+		get { return new Number(0); }
+	}
+
+	public override string ToString()
+	{
+		return "N[" + N + " / " + Stat + " / " + Mult + " / " + (Who != null ? Who.Class : "")+"]";
 	}
 }

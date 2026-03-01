@@ -24,8 +24,8 @@ public static class ThingBuilder
         AddNPC(CharClass.RatmanPrayerSqueak,4,0,5,"1d3");
         AddNPC(CharClass.RatmanMutant,4,0,5,"2d4");
 
-        AddAction(Actions.Walk, ActionCost.Move, ActionSlot.BasicMove, new ActionPhase(God.N(IntStats.Movespeed),Cutscenes.None,TargetType.EmptyTile).Add(ActEventTarget.Self,God.E(EventTypes.WalkTo)));
-        AddAction(Actions.BasicAttack, ActionCost.Major, ActionSlot.BasicAttack, new ActionPhase(1,Cutscenes.Attack).Add(God.E(EventTypes.Damage).Set(1)));
+        AddAction(Actions.Walk, ActionCost.Move, ActionSlot.BasicMove).Move();
+        AddAction(Actions.BasicAttack, ActionCost.Major, ActionSlot.BasicAttack).SingleTarget(1,God.E(EventTypes.Damage).Set("Roll","W"));
     }
 
     public static ClassPrefab AddPlayer(CharClass c,int hp,int def,int spd,string dmg)
@@ -33,12 +33,14 @@ public static class ThingBuilder
         ClassPrefab r = AddClass(c, hp, def, spd, dmg);
         PlayerList.Add(r);
         r.Trait(Traits.Player);
+        r.Team = GameTeam.Player;
         return r;
     }
     
-    public static ClassPrefab AddNPC(CharClass c,int hp,int def,int spd,string dmg)
+    public static ClassPrefab AddNPC(CharClass c,int hp,int def,int spd,string dmg,bool aggro=true)
     {
         ClassPrefab r = AddClass(c, hp, def, spd, dmg);
+        if (aggro) r.Team = GameTeam.Enemy;
         ClassList.Add(r);
         return r;
     }
@@ -59,9 +61,9 @@ public static class ThingBuilder
         return r;
     }
     
-    public static ActionPrefab AddAction(Actions t,ActionCost cost,ActionSlot slot,params ActionPhase[] phases)
+    public static ActionPrefab AddAction(Actions t,ActionCost cost,ActionSlot slot,params Traits[] traits)
     {
-        ActionPrefab r = new ActionPrefab(t,cost,slot,phases);
+        ActionPrefab r = new ActionPrefab(t,cost,slot,traits);
         ActionDict.Add(t,r);
         return r;
     }
@@ -99,6 +101,7 @@ public class ActorPrefab
     public Dictionary<IntStats, int> Stats = new Dictionary<IntStats, int>();
     public Dictionary<StrStats, string> TxtStats = new Dictionary<StrStats, string>();
     public List<Actions> KnownActions = new List<Actions>();
+    public GameTeam Team = GameTeam.None;
 
     public ActorPrefab() { }
     
@@ -150,12 +153,35 @@ public class ActionPrefab
     public ActionCost Cost;
     public ActionSlot Slot;
     public List<ActionPhase> Phases = new List<ActionPhase>();
+    public List<Traits> Trait = new List<Traits>();
 
-    public ActionPrefab(Actions t,ActionCost cost,ActionSlot slot,params ActionPhase[] phases)
+    public ActionPrefab(Actions t,ActionCost cost,ActionSlot slot,params Traits[] tr)
     {
         Type = t;
         Cost = cost;
         Slot = slot;
-        Phases.AddRange(phases);
+        Trait.AddRange(tr);
+    }
+
+    public ActionPrefab Phase(ActionPhase p)
+    {
+        Phases.Add(p);
+        return this;
+    }
+    
+    public ActionPrefab SingleTarget(int range,params EventInfo[] events)
+    {
+        ActionPhase p = new ActionPhase(range,Cutscenes.Attack,TargetType.Tile);
+        p.Add(ActEventTarget.Characters, events);
+        Phases.Add(p);
+        return this;
+    }
+    
+    public ActionPrefab Move(int range=0)
+    {
+        ActionPhase p = new ActionPhase(God.N(IntStats.Movespeed),Cutscenes.None,TargetType.EmptyTile,AITarget.Empty);
+        p.Add(ActEventTarget.Self, God.E(EventTypes.WalkTo));
+        Phases.Add(p);
+        return this;
     }
 }

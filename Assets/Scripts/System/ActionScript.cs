@@ -13,6 +13,9 @@ public class ActionScript : Thing
     public int PhaseI = 0;
     public ActionPhase Phase {get{return Phases.Count > PhaseI ? Phases[PhaseI] : null;}}
     public Dictionary<TileTints,TileTint> Tints = new Dictionary<TileTints, TileTint>();
+    public Dictionary<EventTypes, List<Traits>> TakeListen = new Dictionary<EventTypes, List<Traits>>();
+    public Dictionary<EventTypes, List<Traits>> AuditEvents = new Dictionary<EventTypes, List<Traits>>();
+    public List<Traits> TraitList = new List<Traits>();
 
     public void Imprint(ActionPrefab p)
     {
@@ -20,6 +23,62 @@ public class ActionScript : Thing
         Cost = p.Cost;
         Slot = p.Slot;
         foreach (ActionPhase ap in p.Phases) Phases.Add(new ActionPhase(ap,this));
+        foreach (Traits t in p.Trait) AddTrait(t);
+        foreach (EventTypes e in TakeListen.Keys) SortListen(e);
+        foreach (EventTypes e in AuditEvents.Keys) SortListen(e,true);
+        
+    }
+    
+    ///Adds a new trait to the Thing
+    public void AddTrait(Traits t)
+    {
+        TraitList.Add(t);
+        TraitThing tr = Parser.Get(t);
+        tr.Init(this);
+    }
+    
+    public void SortListen(EventTypes e,bool audit=false)
+    {
+        List<Traits> l = audit ? AuditEvents[e] : TakeListen[e];
+        if (l.Count <= 1) return;
+        Dictionary<Traits, float> prio = new Dictionary<Traits, float>();
+        foreach (Traits t in l)
+        {
+            TraitThing tr = Parser.Get(t);
+            float pr = tr.TakeListen[e];
+            prio.Add(t,pr);
+        }
+        l.Sort((a, b) => { return prio[a] > prio[b] ? 1 : -1; });
+    }
+
+    public void TakeEvent(EventInfo e)
+    {
+        TakeListen.TryGetValue(e.Type, out List<Traits> take);
+        if(take != null)
+            foreach (Traits t in take)
+            {
+                Parser.Get(t).TakeEvent(this,e);
+                if(e.Abort) break;
+            }
+    }
+    public void AuditEvent(EventInfo e)
+    {
+        if (e.Texts.ContainsKey("Roll"))
+        {
+            string dmg = e.GetString("Roll");
+            e.Roll = new DieRoll(dmg,Who);
+        }
+        AuditEvents.TryGetValue(e.Type, out List<Traits> take);
+        if (!e.Numbers.ContainsKey("") && e.Roll.Setup)
+        {
+            e.Set(e.Roll.Roll(Who));
+        }
+        if(take != null)
+            foreach (Traits t in take)
+            {
+                Parser.Get(t).TakeEvent(this,e);
+                if(e.Abort) break;
+            }
     }
     
     public virtual void Begin()
@@ -31,8 +90,9 @@ public class ActionScript : Thing
     public virtual void BeginSelect()
     {
         Begin();
-        Info.Opts = Who.Location.Flood(Phase.Range.V(Who), GetNeighborMode(), Who);
-        SetTint(TileTints.GoodOption,Info.Opts);
+        FindOptions();
+        SetTint(TileTints.GoodOption,Info.GoodOpts);
+        SetTint(TileTints.OkayOption,Info.BadOpts);
     }
 
     public virtual void RunSelect()
@@ -48,9 +108,47 @@ public class ActionScript : Thing
     public virtual void AISelect()
     {
         Begin();
-        Info.Opts = Who.Location.Flood(Phase.Range.V(Who), GetNeighborMode(), Who);
-        if (Info.Opts.Count == 0) return;
-        Info.Tiles.AddRange(FindBest(Info.Opts,Phase.Tiles));
+        FindOptions();
+        // Info.Opts = Who.Location.Flood(Phase.Range.V(Who), GetNeighborMode(), Who);
+        if (Info.GoodOpts.Count == 0) return;
+        Info.Tiles.AddRange(FindBest(Info.GoodOpts,Phase.Tiles));
+    }
+
+    public void FindOptions()
+    {
+        Dictionary<GameTile, bool> r = new Dictionary<GameTile, bool>();
+        List<GameTile> opts = Who.Location.Flood(Phase.Range.V(Who), GetNeighborMode(), Who);
+        foreach (GameTile t in opts)
+        {
+            if (Phase.Target == TargetType.Character && t.Contents == null) continue;
+            if (Phase.Target == TargetType.EmptyTile && t.Contents != null) continue;
+            if (Phase.AI == AITarget.Enemies && t == Who.Location) continue;
+            Info.Opts.Add(t);
+            if(IsGood(t))
+                Info.GoodOpts.Add(t);
+            else
+                Info.BadOpts.Add(t);
+        }
+    }
+
+    public bool IsGood(GameTile o)
+    {
+        switch (Phase.AI)
+        {
+            case AITarget.Enemies: return Who.IsEnemy(o.Contents);
+            case AITarget.Allies: return o.Contents != null && Who.Team == o.Contents.Team;
+            case AITarget.Empty: return o.Contents == null;
+            case AITarget.Anyone: return o.Contents != null;
+        }
+        return true;
+    }
+    
+    public void AddListen(EventTypes e, Traits t,bool audit = false)
+    {
+        //Which dictionary are we adding this to? Pre or normal listen?
+        Dictionary<EventTypes, List<Traits>> d = audit ? AuditEvents : TakeListen;
+        if(!d.ContainsKey(e)) d.Add(e,new List<Traits>()); //If the dictionary doesn't already have this event, add it
+        if(!d[e].Contains(t)) d[e].Add(t);                 //If the event doesn't have this trait, add it
     }
 
     public List<GameTile> FindBest(List<GameTile> opts,int howMany=1)
@@ -91,7 +189,11 @@ public class ActionScript : Thing
                 if (targ == null) continue;
                 foreach (EventInfo e in a.Events)
                 {
-                    targ.TakeEvent(e.Set("Target",t));
+                    EventInfo ae = God.E();
+                    ae.Clone(e);
+                    ae.Set("Target", t).Set("Source", Who);
+                    AuditEvent(ae);
+                    targ.TakeEvent(ae);
                 }
             }
         }
@@ -220,6 +322,8 @@ public class ActionInfo
     public ActionScript Action;
     public List<GameTile> Tiles = new List<GameTile>();
     public List<GameTile> Opts = new List<GameTile>();
+    public List<GameTile> GoodOpts = new List<GameTile>();
+    public List<GameTile> BadOpts = new List<GameTile>();
 
     public ActionInfo(ActionScript act, int phase)
     {
@@ -244,19 +348,24 @@ public class ActionPhase
     public List<ActionEvent> Events =  new List<ActionEvent>();
     public bool UniqueTiles =false;
     public Cutscenes Cut = Cutscenes.None;
+    public AITarget AI = AITarget.Enemies;
 
-    public ActionPhase(int rng,Cutscenes cut=Cutscenes.None,TargetType targ =TargetType.Tile,int t=1)
+    public ActionPhase(int rng,Cutscenes cut=Cutscenes.None,TargetType targ =TargetType.Tile,AITarget ai=AITarget.Enemies,int t=1)
     {
         Tiles = t;
         Range = God.N(rng);
         Cut = cut;
+        Target = targ;
+        AI = ai;
     }
     
-    public ActionPhase(Number rng,Cutscenes cut=Cutscenes.None,TargetType targ =TargetType.Tile,int t=1)
+    public ActionPhase(Number rng,Cutscenes cut=Cutscenes.None,TargetType targ =TargetType.Tile,AITarget ai=AITarget.Enemies,int t=1)
     {
         Tiles = t;
         Range = rng;
         Cut = cut;
+        Target = targ;
+        AI = ai;
     }
 
     public ActionPhase(ActionPhase ap,ActionScript act)
@@ -266,6 +375,7 @@ public class ActionPhase
         Target = ap.Target;
         Events = ap.Events;
         Cut = ap.Cut;
+        AI = ap.AI;
         UniqueTiles = ap.UniqueTiles;
         Action = act;
         Src = act.Who;
@@ -373,4 +483,13 @@ public enum ActionSlot
     Secondary=3,
     Utility=4,
     Ultimate=5
+}
+
+public enum AITarget
+{
+    None=0,
+    Empty=1,
+    Enemies=2,
+    Allies=3,
+    Anyone=4,
 }

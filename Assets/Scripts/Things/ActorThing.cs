@@ -7,6 +7,7 @@ public class ActorThing : Thing
     public CharClass Class = CharClass.None;
     public GameTile Location;
     public ActorController Body;
+    public GameTeam Team = GameTeam.None;
     
     //These variables handle the Trait subsystem within a Thing
     //Connects enums to the trait's state variables
@@ -50,6 +51,7 @@ public class ActorThing : Thing
         ActorPrefab pre;
         if (Class != CharClass.None) pre = ThingBuilder.ClassDict[Class];
         else pre = ThingBuilder.ActorDict[Type];
+        Team = pre.Team;
         foreach (TraitBuilder t in pre.TraitList)
         {
             AddTrait(t.Type, t.E);
@@ -328,4 +330,20 @@ public class ActorThing : Thing
     {
         return KnownActions.TryGetValue(a, out ActionScript r) ? r : null;
     }
+
+    public bool IsEnemy(ActorThing a)
+    {
+        if (a == null) return false;
+        if (Team == GameTeam.None || a.Team == GameTeam.None || Team == a.Team) return false;
+        return true;
+    }
+}
+
+
+public enum GameTeam
+{
+    None=0,
+    Player=1,
+    Enemy=2,
+    Berserk=3,
 }

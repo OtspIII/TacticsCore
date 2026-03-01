@@ -95,6 +95,7 @@ public enum IntStats{
     DamageTaken=21,
     MoveLeft=22,
     MoveUsed=23,
+    DamageRoll=24,
 }
 
 public enum CTags{

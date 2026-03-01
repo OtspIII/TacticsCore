@@ -9,7 +9,8 @@ public class EventInfo
 {
     public EventTypes Type;
     public bool Abort=false;
-    public Dictionary<string, float> Numbers = new Dictionary<string, float>();
+    public Dictionary<string, Number> Numbers = new Dictionary<string, Number>();
+    // public Dictionary<string, Number> Ns = new Dictionary<string, Number>();
     public Dictionary<string, string> Texts = new Dictionary<string, string>();
     public List<string> Bools = new List<string>();
     public Dictionary<string, ActorThing> Actors = new Dictionary<string, ActorThing>();
@@ -17,6 +18,7 @@ public class EventInfo
     public Dictionary<string, GameTile> Tiles = new Dictionary<string, GameTile>();
     public Dictionary<string, Vector2Int> Vectors = new Dictionary<string, Vector2Int>();
     public Dictionary<string, Traits> TraitI = new Dictionary<string, Traits>();
+    public DieRoll Roll;
 
     public EventInfo(){ }
     
@@ -25,9 +27,9 @@ public class EventInfo
         Type = t;
     }
 
-    public EventInfo(float n)
+    public EventInfo(int n)
     {
-        Numbers.Add("",n);
+        Numbers.Add("",God.N(n));
     }
     
     public EventInfo(EventInfo i){ Clone(i); }
@@ -45,51 +47,61 @@ public class EventInfo
     }
     
     //Numbers
-    public EventInfo Set(string i, float f)
+    public EventInfo Set(string i, int f)
     {
-        return SetFloat(i, f);
+        return SetN(i, f);
     }
-    public EventInfo Set(float f)
+    public EventInfo Set(int f)
     {
-        return SetFloat("", f);
+        return SetN("", f);
     }
-    public EventInfo SetFloat(string i, float f)
+    public EventInfo Set(Number f)
+    {
+        return SetN("", f);
+    }
+    public EventInfo SetN(string i, int f)
+    {
+        SetN(i, God.N(f));
+        return this;
+    }
+    public EventInfo SetN(string i, Number f)
     {
         if (!Numbers.TryAdd(i,f)) Numbers[i]=f;
         return this;
     }
-    public EventInfo SetInt(string i, int f)
+    // public EventInfo SetFloat(string i, float f)
+    // {
+    //     if (!Numbers.TryAdd(i,f)) Numbers[i]=f;
+    //     return this;
+    // }
+    // public EventInfo SetInt(string i, int f)
+    // {
+    //     if (!Numbers.TryAdd(i,f)) Numbers[i]=f;
+    //     return this;
+    // 
+    public Number GetN(string i="",int def=0)
     {
-        if (!Numbers.TryAdd(i,f)) Numbers[i]=f;
-        return this;
+        return GetN(i,new Number(def));
     }
-    public float Get(string i,float def)
+    public Number GetN(string i,Number def)
     {
-        return GetFloat(i,def);
+        if (Numbers.TryGetValue(i, out Number r)) return r;
+        return def != null ? def : new Number(0);
     }
-    public float GetN(string i="",float def=0)
+    
+    public int GetInt(string i="",ActorThing who=null,int def=0)
     {
-        return GetFloat(i,def);
-    }
-    public float GetFloat(string i="",float def=0)
-    {
-        if (Numbers.TryGetValue(i, out float r)) return r;
+        if (Numbers.TryGetValue(i, out Number r)) return r.V(who);
         return def;
     }
-    public int GetInt(string i="",int def=0)
-    {
-        if (Numbers.TryGetValue(i, out float r)) return (int)r;
-        return def;
-    }
-    public float Change(float f)
+    public Number Change(int f)
     {
         return Change("", f);
     }
-    public float Change(string i, float f)
+    public Number Change(string i, int f)
     {
-        float r = GetN(i);
-        r += f;
-        Set(i, r);
+        Number r = GetN(i);
+        r.N += f;
         return r;
     }
     
