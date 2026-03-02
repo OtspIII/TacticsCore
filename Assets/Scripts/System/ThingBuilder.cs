@@ -59,7 +59,7 @@ public static class ThingBuilder
             r.Stats.Add(IntStats.Movespeed,spd);
         }
         r.Stats.Add(IntStats.HP,hp);
-        r.Stats.Add(IntStats.Defense,def);
+        r.Stats.Add(IntStats.Armor,def);
         r.TxtStats.Add(StrStats.Damage,dmg);
         return r;
     }

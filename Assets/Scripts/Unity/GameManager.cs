@@ -232,7 +232,7 @@ public class GameManager : MonoBehaviour
         foreach (TileController t in AllTiles)
         {
             t.Info.BestPDistance = Mathf.Min(t.Info.PDistance.Values.ToArray());
-            t.DebugTxt.text = t.Info.BestPDistance.ToString();
+            // t.DebugTxt.text = t.Info.BestPDistance.ToString();
         }
     }
 }

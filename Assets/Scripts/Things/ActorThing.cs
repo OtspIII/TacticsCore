@@ -316,10 +316,11 @@ public class ActorThing : Thing
         else TxtStats.Add(k,v);
     }
     
-    public void Change(IntStats k, int amt)
+    public int Change(IntStats k, int amt)
     {
         if (Stats.ContainsKey(k)) Stats[k] += amt;
         else Stats.Add(k,amt);
+        return Stats[k];
     }
 
     public override string ToString()

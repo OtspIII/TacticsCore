@@ -54,6 +54,7 @@ public class AliveTrait : TraitThing
     {
         Type = Traits.Alive;
         AddListen(EventTypes.Setup);
+        AddListen(EventTypes.StartTurn);
         AddListen(EventTypes.Damage);
         AddListen(EventTypes.Death);
     }
@@ -66,14 +67,30 @@ public class AliveTrait : TraitThing
             {
                 break;
             }
+            case EventTypes.StartTurn:
+            {
+                i.Who.Set(IntStats.Defense,i.Who.Get(IntStats.Armor));
+                // Debug.Log("SET DEF: " + i.Who.Class + " / " + i.Who.Get(IntStats.Defense));
+                break;
+            }
             case EventTypes.Damage:
             {
-                
                 int hp = i.Who.Get(IntStats.HP);
                 int dmg = e.GetInt();
+                int vul = i.Who.Get(IntStats.Vulnerable);
+                dmg += vul;
+                int def = Mathf.Min(dmg,i.Who.Get(IntStats.Defense));
+                if (e.GetBool("IgnoreArmor")) def = 0;
+                if (def > 0)
+                {
+                    dmg -= def;
+                    int visdef = i.Who.Change(IntStats.Defense, def);
+                    God.GM.AddCut(new HeadtextCut(i.Who, "<" + def + ">", -1, visdef));
+                }
+                if (dmg <= 0 || e.GetBool("ArmorOnly")) return;
                 hp -= dmg;
                 i.Who.Set(IntStats.HP,hp);
-                God.GM.AddCut(new HeadtextCut(i.Who,"-"+dmg));
+                God.GM.AddCut(new HeadtextCut(i.Who,"-"+dmg,hp,-1));
                 if(hp <= 0)
                     i.Who.TakeEvent(EventTypes.Death);
                 break;

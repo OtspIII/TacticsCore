@@ -30,9 +30,9 @@ public class EnemyTurnPhase : PhaseScript
         ActorThing a = Queued.Random();
         Queued.Remove(a);
         ActionScript main= a.GetAct(ActionSlot.BasicAttack);
-        ActionScript act = a.GetAct(ActionSlot.BasicMove);
-        act.AISelect(main);
-        act.Execute();
+        ActionScript move = a.GetAct(ActionSlot.BasicMove);
+        move.AISelect(main);
+        move.Execute();
         main.AISelect();
         main.Execute();
     }
