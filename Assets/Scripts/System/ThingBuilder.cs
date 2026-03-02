@@ -15,17 +15,20 @@ public static class ThingBuilder
     {
         if (IsSetup) return;
         IsSetup = true;
-        AddPlayer(CharClass.Fighter,10,3,4,"1d8");
-        AddPlayer(CharClass.Wizard,5,0,4,"1d4");
-        AddPlayer(CharClass.Cleric,8,2,4,"1d6");
-        AddPlayer(CharClass.Thief,7,1,5,"1d8");
-        AddNPC(CharClass.RatmanCardTosser,4,0,5,"1d3");
-        AddNPC(CharClass.RatmanGourmand,8,0,4,"1d6");
-        AddNPC(CharClass.RatmanPrayerSqueak,4,0,5,"1d3");
-        AddNPC(CharClass.RatmanMutant,4,0,5,"2d4");
+        AddPlayer(CharClass.Fighter,10,3,3,"1d8").Act(Actions.Shield).Act(Actions.Taunt).Act(Actions.ComeAtMe);
+        AddPlayer(CharClass.Wizard,5,0,3,"1d4");
+        AddPlayer(CharClass.Cleric,8,2,3,"1d6");
+        AddPlayer(CharClass.Thief,7,1,4,"1d8");
+        AddNPC(CharClass.RatmanCardTosser,4,0,4,"1d3");
+        AddNPC(CharClass.RatmanGourmand,8,0,3,"1d6");
+        AddNPC(CharClass.RatmanPrayerSqueak,4,0,4,"1d3");
+        AddNPC(CharClass.RatmanMutant,4,0,4,"2d4");
 
         AddAction(Actions.Walk, ActionCost.Move, ActionSlot.BasicMove).Move();
         AddAction(Actions.BasicAttack, ActionCost.Major, ActionSlot.BasicAttack).SingleTarget(1,God.E(EventTypes.Damage).Set("Roll","W"));
+        AddAction(Actions.Shield, ActionCost.Bonus, ActionSlot.Secondary).SingleTarget(1,God.E(EventTypes.Damage).Set("Roll","W"));
+        AddAction(Actions.Taunt, ActionCost.Bonus, ActionSlot.Utility).SingleTarget(1,God.E(EventTypes.Damage).Set("Roll","W"));
+        AddAction(Actions.ComeAtMe, ActionCost.Major, ActionSlot.Ultimate).SingleTarget(1,God.E(EventTypes.Damage).Set("Roll","W"));
     }
 
     public static ClassPrefab AddPlayer(CharClass c,int hp,int def,int spd,string dmg)

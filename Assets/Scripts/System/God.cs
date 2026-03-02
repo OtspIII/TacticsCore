@@ -17,6 +17,8 @@ public static class God
    public static string DebugTxt = "";
 
    public static float CardSize = 1.5f;
+   public static Vector2Int LevelSize = new Vector2Int(8, 8);
+   public static Vector2 LevelOffset = new Vector2(1, 1.5f); 
    
    public static bool CoinFlip(float odds=0.5f)
    {

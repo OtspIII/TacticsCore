@@ -17,6 +17,7 @@ public class EnemyTurnPhase : PhaseScript
         {
             if (!a.Has(Traits.Player)) Queued.Add(a);
         }
+        God.GM.CalcMapPDist();
     }
 
     public override void OnRun()
@@ -28,12 +29,12 @@ public class EnemyTurnPhase : PhaseScript
         }
         ActorThing a = Queued.Random();
         Queued.Remove(a);
+        ActionScript main= a.GetAct(ActionSlot.BasicAttack);
         ActionScript act = a.GetAct(ActionSlot.BasicMove);
-        act.AISelect();
+        act.AISelect(main);
         act.Execute();
-        act = a.GetAct(ActionSlot.BasicAttack);
-        act.AISelect();
-        act.Execute();
+        main.AISelect();
+        main.Execute();
     }
 
     public override PhaseScript NextPhase()

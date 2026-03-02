@@ -8,6 +8,8 @@ public class GameTile : Thing
     public ActorThing Contents;
     public TileController Body;
     public List<TileTint> Tints = new  List<TileTint>();
+    public Dictionary<ActorThing,int> PDistance = new Dictionary<ActorThing, int>();
+    public int BestPDistance = 0;
 
     public GameTile(int x, int y)
     {

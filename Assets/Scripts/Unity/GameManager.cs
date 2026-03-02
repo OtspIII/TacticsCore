@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -184,5 +185,54 @@ public class GameManager : MonoBehaviour
         }
         CardLine.Clear();
         BBCursor.transform.position = CursorStart;
+    }
+
+    public void CalcMapPDist(GameTeam team=GameTeam.Enemy)
+    {
+        foreach (TileController t in AllTiles)
+        {
+            t.Info.PDistance.Clear();
+            t.Info.BestPDistance = 999;
+        }
+        foreach (ActorController ac in AllActors)
+        {
+            ActorThing a = ac.Info;
+            if (a.Team == GameTeam.None || (a.Team == team && team != GameTeam.Berserk)) continue;
+            List<GameTile> active = new List<GameTile>() { a.Location };
+            a.Location.PDistance.Add(a,0);
+            int safety = 999;
+            while (active.Count > 0 && safety > 0)
+            {
+                safety--;
+                GameTile t = active[0];
+                active.RemoveAt(0);
+                int dist = t.PDistance[a];
+                foreach (GameTile n in t.Neighbors())
+                {
+                    if (n.PDistance.ContainsKey(a))
+                    {
+                        if (n.PDistance[a] > dist + 1)
+                        {
+                            if(!active.Contains(n))active.Add(n);
+                            n.PDistance[a] = dist + 1;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        if(!active.Contains(n))active.Add(n);
+                        n.PDistance.Add(a, dist + 1);
+                    }
+                }
+            }
+        }
+        foreach (TileController t in AllTiles)
+        {
+            t.Info.BestPDistance = Mathf.Min(t.Info.PDistance.Values.ToArray());
+            t.DebugTxt.text = t.Info.BestPDistance.ToString();
+        }
     }
 }

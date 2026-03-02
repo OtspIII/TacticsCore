@@ -9,18 +9,27 @@ public class LevelThing
     
     public LevelThing()
     {
-        for(int x=0;x<5;x++)
-            for (int y = 0; y < 5; y++)
+        for(int x=0;x<God.LevelSize.x;x++)
+            for (int y = 0; y < God.LevelSize.y; y++)
                 AddTile(x, y);
         List<GameTile> OpenTiles = new List<GameTile>();
         OpenTiles.AddRange(AllTiles);
         List<CharClass> playerOpts = ThingBuilder.GetPlayers();
-        for (int n = 0; n < 2; n++)
+        List<GameTile> PlayerStart = new List<GameTile>();
+        for(int x=0;x<=1;x++)
+        for (int y = 0; y <= 1; y++)
+            PlayerStart.Add(GetTile(x+(God.LevelSize.x/2)-1,y));
+        foreach (CharClass c in playerOpts)
         {
-            if (OpenTiles.Count == 0) break;
-            GameTile chosen = OpenTiles.Random();
+            if (PlayerStart.Count == 0)
+            {
+                if (OpenTiles.Count == 0) break;
+                PlayerStart.AddRange(OpenTiles);
+            }
+            GameTile chosen = PlayerStart.Random();
             OpenTiles.Remove(chosen);
-            AddActor(playerOpts.RandomE(), chosen);
+            PlayerStart.Remove(chosen);
+            AddActor(c, chosen);
         }
         List<CharClass> classOpts = ThingBuilder.GetClasses(1);
         for (int n = 0; n < 3; n++)

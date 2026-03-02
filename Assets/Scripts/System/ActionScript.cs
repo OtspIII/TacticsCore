@@ -105,13 +105,13 @@ public class ActionScript : Thing
         WipeTint();
     }
     
-    public virtual void AISelect()
+    public virtual void AISelect(ActionScript main=null)
     {
         Begin();
         FindOptions();
         // Info.Opts = Who.Location.Flood(Phase.Range.V(Who), GetNeighborMode(), Who);
         if (Info.GoodOpts.Count == 0) return;
-        Info.Tiles.AddRange(FindBest(Info.GoodOpts,Phase.Tiles));
+        Info.Tiles.AddRange(FindBest(Info.GoodOpts,Phase.Tiles,main));
     }
 
     public void FindOptions()
@@ -151,7 +151,7 @@ public class ActionScript : Thing
         if(!d[e].Contains(t)) d[e].Add(t);                 //If the event doesn't have this trait, add it
     }
 
-    public List<GameTile> FindBest(List<GameTile> opts,int howMany=1)
+    public List<GameTile> FindBest(List<GameTile> opts,int howMany=1,ActionScript main=null)
     {
         List<GameTile> o = new List<GameTile>();
         o.AddRange(opts);

@@ -69,6 +69,7 @@ public class ActorThing : Thing
                 BaseDamage = new DieRoll(pre.TxtStats[s]);
         }
         TakeEvent(EventTypes.Setup);
+        foreach(Actions a in pre.KnownActions) AddAction(a);
         if(!KnownActions.ContainsKey(ActionSlot.BasicMove)) AddAction(Actions.Walk);
         if(!KnownActions.ContainsKey(ActionSlot.BasicAttack)) AddAction(Actions.BasicAttack);
         // if(Actions.Count == 0) Actions.Add(new AttackAction(this));//Placeholder!

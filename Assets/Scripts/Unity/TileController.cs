@@ -1,16 +1,18 @@
 using System;
+using TMPro;
 using UnityEngine;
 
 public class TileController : MonoBehaviour
 {
     public SpriteRenderer SR;
     public GameTile Info;
+    public TextMeshPro DebugTxt;
     
     public void Setup(GameTile src)
     {
         Info = src;
         Info.Body = this;
-        transform.position = new Vector3(src.X, src.Y, 10);
+        transform.position = new Vector3(src.X-(God.LevelSize.x/2)+God.LevelOffset.x, src.Y-(God.LevelSize.y/2)+God.LevelOffset.y, 10);
     }
     
     private void Awake()
@@ -49,5 +51,6 @@ public class TileController : MonoBehaviour
     public void Audit()
     {
         Info.WipeTint(); //IDK, prob too simple
+        DebugTxt.text = "";
     }
 }
