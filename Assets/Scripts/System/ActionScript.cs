@@ -16,6 +16,7 @@ public class ActionScript : Thing
     public Dictionary<EventTypes, List<Traits>> TakeListen = new Dictionary<EventTypes, List<Traits>>();
     public Dictionary<EventTypes, List<Traits>> AuditEvents = new Dictionary<EventTypes, List<Traits>>();
     public List<Traits> TraitList = new List<Traits>();
+    public int Range { get { return Phases.Count > 0 ? Phases[0].Range.V(Who) : 10; } }
 
     public void Imprint(ActionPrefab p)
     {
@@ -153,17 +154,48 @@ public class ActionScript : Thing
 
     public List<GameTile> FindBest(List<GameTile> opts,int howMany=1,ActionScript main=null)
     {
+        //if main is supplied, this is a walk action
         List<GameTile> o = new List<GameTile>();
-        o.AddRange(opts);
+        List<GameTile> backup = new List<GameTile>();
+        float best = 0;
+        foreach (GameTile t in opts)
+        {
+            float v = GetValue(t, main);
+            if (v > best)
+            {
+                backup.AddRange(o);
+                if (Phase.UniqueTiles && howMany > 1 && backup.Count >= howMany)
+                {
+                    backup.RemoveRange(0,backup.Count-howMany+1);
+                }
+                o.Clear();
+                best = v;
+            }
+            if (v >= best) o.Add(t);
+        }
         List<GameTile> r = new List<GameTile>();
         for (int n = 0; n < howMany; n++)
         {
-            if (o.Count == 0) break;
+            if (o.Count == 0)
+            {
+                if(backup.Count == 0) break;
+                o = backup;
+            }
             GameTile chosen = o.Random();
             r.Add(chosen);
             if (Phase.UniqueTiles) o.Remove(chosen);
         }
         return r;
+    }
+
+    public float GetValue(GameTile t,ActionScript main=null)
+    {
+        if (main != null) //main exists only for moves to get a NPC in place for another act
+        {
+            return 10 - Mathf.Abs(t.BestPDistance-main.Range);
+        }
+
+        return 1;
     }
 
     public void Execute()

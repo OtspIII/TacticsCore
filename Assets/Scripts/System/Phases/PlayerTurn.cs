@@ -26,7 +26,7 @@ public class PlayerTurnPhase : PhaseScript
 
     public override void OnRun()
     {
-        if(Players.Count == 0) God.GM.StartPhase();
+        if(Players.Count == 0 || Input.GetKeyDown(KeyCode.Return)) God.GM.StartPhase();
     }
 
     public override void TileClick(GameTile t)
