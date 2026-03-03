@@ -6,6 +6,7 @@ public class LibraryController : MonoBehaviour
     public ActorController ActorPrefab;
     public TileController TilePrefab;
     public CardScript CardPrefab;
+    public HeadtextController HeadtextPrefab;
     
     protected Dictionary<string,Sprite> ClassPortraits = new Dictionary<string, Sprite>();
     
@@ -31,6 +32,16 @@ public class LibraryController : MonoBehaviour
     public Sprite GetPortrait(CharClass a)
     {
 	    return ClassPortraits.TryGetValue(a.ToString(), out Sprite r) ? r : null;
+    }
+
+    public Color GetColor(Colors c)
+    {
+	    switch (c)
+	    {
+		    case Colors.Damage: return Color.red;
+		    case Colors.Resist: return Color.cornflowerBlue;
+	    }
+	    return Color.white;
     }
 }
 

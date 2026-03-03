@@ -84,13 +84,13 @@ public class AliveTrait : TraitThing
                 if (def > 0)
                 {
                     dmg -= def;
-                    int visdef = i.Who.Change(IntStats.Defense, def);
-                    God.GM.AddCut(new HeadtextCut(i.Who, "<" + def + ">", -1, visdef));
+                    int visdef = i.Who.Change(IntStats.Defense, -def);
+                    God.GM.AddCut(new HeadtextCut(i.Who, "<" + def + ">", -1, visdef,Colors.Resist));
                 }
                 if (dmg <= 0 || e.GetBool("ArmorOnly")) return;
                 hp -= dmg;
                 i.Who.Set(IntStats.HP,hp);
-                God.GM.AddCut(new HeadtextCut(i.Who,"-"+dmg,hp,-1));
+                God.GM.AddCut(new HeadtextCut(i.Who,"-"+dmg,hp,-1,Colors.Damage));
                 if(hp <= 0)
                     i.Who.TakeEvent(EventTypes.Death);
                 break;

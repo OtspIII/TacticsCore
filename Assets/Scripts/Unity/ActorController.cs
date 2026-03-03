@@ -8,21 +8,22 @@ public class ActorController : MonoBehaviour
     public SpriteRenderer Portrait;
     public SpriteRenderer Ring;
     public TextMeshPro HeadText;
+    public HPBar HP;
     
     public void Setup(ActorThing src)
     {
         Info = src;
         Info.Body = this;
         TileController loc = God.GM.GetTile(Info.Location);
-        transform.parent = loc.transform;
-        transform.position = loc.GetContentPos(Info);
         // Debug.Log(Info.Class);
         if (Info.Class != CharClass.None)
         {
             Sprite s = God.Library.GetPortrait(Info.Class);
             if (s != null) Portrait.sprite = s;
+            
             // Debug.Log("SPRITE: " + s);
         }
+        Audit();
     }
 
     private void Awake()
@@ -41,6 +42,9 @@ public class ActorController : MonoBehaviour
         TileController loc = God.GM.GetTile(Info.Location);
         transform.parent = loc.transform;
         transform.position = loc.GetContentPos(Info);
+        HP.SetHP(Info.Get(IntStats.HP),Info.Get(IntStats.MaxHP),Info.Get(IntStats.Injury));
+        HP.SetArmor(Info.Get(IntStats.Defense),Info.Get(IntStats.Armor));
+        SetRing();
     }
 
     public void Destruct()
@@ -48,8 +52,21 @@ public class ActorController : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public void SetHeadtext(string txt)
+    public void SetHeadtext(string txt,Colors c,float timer=1)
     {
-        HeadText.text = txt;
+        Instantiate(God.Library.HeadtextPrefab).Setup(this,txt,c,timer);
+    }
+
+    public void SetRing()
+    {
+        Color c = Ring.color;
+        switch (Info.Team)
+        {
+            case GameTeam.None: c = Color.black; break;
+            case GameTeam.Player: c = Color.forestGreen; break;
+            case GameTeam.Enemy: c = Color.red; break;
+            case GameTeam.Berserk: c = Color.darkMagenta; break;
+        }
+        Ring.color = c;
     }
 }

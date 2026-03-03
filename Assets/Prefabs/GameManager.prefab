@@ -161,7 +161,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b4bcff6d6bf4604bac4762dc03c656e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ActorPrefab: {fileID: 8528638710827512730, guid: 74f9ce1e78374b34bbe19d1081f3113c, type: 3}
+  ActorPrefab: {fileID: 114740529478942634, guid: 1ebfb6fb612eb6146ad692703425c88b, type: 3}
   TilePrefab: {fileID: 4252613098120622041, guid: 9fac628e25ab33445922b0dbf2ef6f0e, type: 3}
   CardPrefab: {fileID: 6431233289330033092, guid: b47248e90ea8d7d41b53af828bfc4bb0, type: 3}
 --- !u!1001 &5153925448773817047
