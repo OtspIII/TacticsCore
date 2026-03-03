@@ -15,42 +15,60 @@ public static class ThingBuilder
     {
         if (IsSetup) return;
         IsSetup = true;
-        AddPlayer(CharClass.Fighter,10,3,3,"1d8").Act(Actions.Shield).Act(Actions.Taunt).Act(Actions.ComeAtMe);
+        AddPlayer(CharClass.Fighter,10,3,3,"1d8").Act(Actions.GuardedStrike).Act(Actions.Taunt);
         AddPlayer(CharClass.Wizard,5,0,3,"1d4");
         AddPlayer(CharClass.Cleric,8,2,3,"1d6");
         AddPlayer(CharClass.Thief,7,1,4,"1d8");
-        AddNPC(CharClass.RatmanCardTosser,4,0,4,"1d3");
-        AddNPC(CharClass.RatmanGourmand,8,0,3,"1d6");
-        AddNPC(CharClass.RatmanPrayerSqueak,4,0,4,"1d3");
-        AddNPC(CharClass.RatmanMutant,4,0,4,"2d4");
+        AddNPC(CharClass.RatmanCardTosser,"Ratfolk Card Tosser",4,0,4,"1d3");
+        AddNPC(CharClass.RatmanGourmand,"Ratfolk Gourmand",8,0,3,"1d6");
+        AddNPC(CharClass.RatmanPrayerSqueak,"Ratfolk Prayer-Squeak",4,0,4,"1d3");
+        AddNPC(CharClass.RatmanMutant,"Ratfolk Mutant",4,0,4,"2d4");
 
-        AddAction(Actions.Walk, ActionCost.Move, ActionSlot.BasicMove).Move();
-        AddAction(Actions.BasicAttack, ActionCost.Major, ActionSlot.BasicAttack).SingleTarget(1,God.E(EventTypes.Damage).Set("Roll","W"));
-        AddAction(Actions.Shield, ActionCost.Bonus, ActionSlot.Secondary).SingleTarget(1,God.E(EventTypes.Damage).Set("Roll","W"));
-        AddAction(Actions.Taunt, ActionCost.Bonus, ActionSlot.Utility).SingleTarget(1,God.E(EventTypes.Damage).Set("Roll","W"));
-        AddAction(Actions.ComeAtMe, ActionCost.Major, ActionSlot.Ultimate).SingleTarget(1,God.E(EventTypes.Damage).Set("Roll","W"));
+        AddAction(Actions.Walk, "Walk","Movement",ActionCost.Move, ActionSlot.BasicMove).Move();
+        AddAction(Actions.BasicAttack, "Attack","Melee",ActionCost.Major, ActionSlot.BasicAttack).SingleTarget(1,God.E(EventTypes.Damage).Set("Roll","W"));
+        AddAction(Actions.GuardedStrike, "Guarded Strike", "Melee",ActionCost.Major, ActionSlot.BasicAttack).Set(CharClass.Fighter) //"Melee", 
+            .SingleTarget(1,God.E(EventTypes.Damage).Set("Roll","W")).PAdd(ActEventTarget.Self,God.E(EventTypes.TempDefense).Set(2));
+        AddAction(Actions.Taunt, "Taunt","Mental",ActionCost.Bonus, ActionSlot.Secondary).Set(UsesNum.eConstant).Set(CharClass.Fighter).
+            SingleTarget(4,God.E(EventTypes.Damage).Set(1)); //"Mental",ActAnims.Yell
+        
+        /*
+         
+         Add(new CharAction(Actions.Taunt, "Taunt", , ActMove.Normal, 4,ActAnims.Yell,
+                new EventMsg(GEvents.TakeTaunt)).SetUses(UsesNum.eConstant)
+            .SetAType(ActionTypes.Quick).DImproves(false,false).Improve(AImprovements.Range).Improve(AImprovements.PatternShape,(int)ActPattern.Blast,1)
+            .CreateGear(new ActorPrefab("Ostentatious Helm",CTags.Fighter,EquipSlots.Head)));
+            
+            Add(new CharAction(Actions.GuardedStrike, "Guarded Strike", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                new EventMsg().TakeDamage("W", DamageTypes.Normal),
+                new EventMsg().GainStat(new StatTrait().Add(IntStats.Defense,2)).SetTargets(EventMsg.Targets.Source))
+            .SetUses(UsesNum.dOften).DImproves()
+            .SetAType(ActionTypes.Major).CreateGear(new ActorPrefab("Simple Shield",CTags.Fighter,EquipSlots.OffHand)));
+         
+         */
+        
     }
 
     public static ClassPrefab AddPlayer(CharClass c,int hp,int def,int spd,string dmg)
     {
-        ClassPrefab r = AddClass(c, hp, def, spd, dmg);
+        ClassPrefab r = AddClass(c, c.ToString(),hp, def, spd, dmg);
         PlayerList.Add(r);
         r.Trait(Traits.Player);
         r.Team = GameTeam.Player;
         return r;
     }
     
-    public static ClassPrefab AddNPC(CharClass c,int hp,int def,int spd,string dmg,bool aggro=true)
+    public static ClassPrefab AddNPC(CharClass c,string name,int hp,int def,int spd,string dmg,bool aggro=true)
     {
-        ClassPrefab r = AddClass(c, hp, def, spd, dmg);
+        ClassPrefab r = AddClass(c,name, hp, def, spd, dmg);
         if (aggro) r.Team = GameTeam.Enemy;
         ClassList.Add(r);
         return r;
     }
     
-    public static ClassPrefab AddClass(CharClass c,int hp,int def,int spd,string dmg)
+    public static ClassPrefab AddClass(CharClass c,string name,int hp,int def,int spd,string dmg)
     {
         ClassPrefab r = new ClassPrefab(c);
+        r.Name = name;
         ClassDict.Add(c,r);
         r.Trait(Traits.Alive);
         if (spd > 0)
@@ -65,9 +83,9 @@ public static class ThingBuilder
         return r;
     }
     
-    public static ActionPrefab AddAction(Actions t,ActionCost cost,ActionSlot slot,params Traits[] traits)
+    public static ActionPrefab AddAction(Actions t,string name,string icon,ActionCost cost,ActionSlot slot,params Traits[] traits)
     {
-        ActionPrefab r = new ActionPrefab(t,cost,slot,traits);
+        ActionPrefab r = new ActionPrefab(t,name,icon,cost,slot,traits);
         ActionDict.Add(t,r);
         return r;
     }
@@ -101,6 +119,7 @@ public static class ThingBuilder
 public class ActorPrefab
 {
     public Actors Type;
+    public string Name;
     public List<TraitBuilder> TraitList = new List<TraitBuilder>();
     public Dictionary<IntStats, int> Stats = new Dictionary<IntStats, int>();
     public Dictionary<StrStats, string> TxtStats = new Dictionary<StrStats, string>();
@@ -154,17 +173,34 @@ public class TraitBuilder
 public class ActionPrefab
 {
     public Actions Type;
+    public string Name;
+    public UsesNum Uses = UsesNum.None;
     public ActionCost Cost;
     public ActionSlot Slot;
     public List<ActionPhase> Phases = new List<ActionPhase>();
     public List<Traits> Trait = new List<Traits>();
+    public CharClass Class=CharClass.None;
+    public string Icon="";
 
-    public ActionPrefab(Actions t,ActionCost cost,ActionSlot slot,params Traits[] tr)
+    public ActionPrefab(Actions t,string name,string icon,ActionCost cost,ActionSlot slot,params Traits[] tr)
     {
+        Name = name;
+        Icon = icon;
         Type = t;
         Cost = cost;
         Slot = slot;
         Trait.AddRange(tr);
+    }
+
+    public ActionPrefab Set(UsesNum u)
+    {
+        Uses = u;
+        return this;
+    }
+    public ActionPrefab Set(CharClass c)
+    {
+        Class = c;
+        return this;
     }
 
     public ActionPrefab Phase(ActionPhase p)
@@ -186,6 +222,13 @@ public class ActionPrefab
         ActionPhase p = new ActionPhase(God.N(IntStats.Movespeed),Cutscenes.None,TargetType.EmptyTile,AITarget.Empty);
         p.Add(ActEventTarget.Self, God.E(EventTypes.WalkTo));
         Phases.Add(p);
+        return this;
+    }
+
+    public ActionPrefab PAdd(ActEventTarget t,params EventInfo[] events)
+    {
+        ActionPhase p = Phases[Phases.Count - 1];
+        p.Add(t, events);
         return this;
     }
 }

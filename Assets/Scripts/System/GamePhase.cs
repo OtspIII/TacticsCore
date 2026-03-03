@@ -7,7 +7,7 @@ public class PhaseScript
     public Phases Type;
     public float Duration;
     public float Timer;
-    public List<EventTypes> Listeners = new List<EventTypes>();
+    // public List<EventTypes> Listeners = new List<EventTypes>();
     public Dictionary<TileTints,TileTint> Tints = new Dictionary<TileTints, TileTint>();
 
     public void Run()

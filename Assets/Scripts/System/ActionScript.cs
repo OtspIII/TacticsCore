@@ -17,9 +17,17 @@ public class ActionScript : Thing
     public Dictionary<EventTypes, List<Traits>> AuditEvents = new Dictionary<EventTypes, List<Traits>>();
     public List<Traits> TraitList = new List<Traits>();
     public int Range { get { return Phases.Count > 0 ? Phases[0].Range.V(Who) : 10; } }
+    public string Icon= "";
+    public string Name= "";
+    public int MaxUses = 0;
+    public int Uses = 0;
 
     public void Imprint(ActionPrefab p)
     {
+        Name = p.Name;
+        Icon = p.Icon;
+        MaxUses = (int)p.Uses;
+        Uses = MaxUses;
         Type = p.Type;
         Cost = p.Cost;
         Slot = p.Slot;
@@ -326,7 +334,7 @@ public class ActionScript : Thing
 
     public override void ImprintCard(CardScript c)
     {
-        c.Imprint(null,Type.ToString(),"");
+        c.Imprint(God.Library.GetIcon(Icon),Type.ToString(),"");
     }
 
     public override string ToString()

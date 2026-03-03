@@ -4,6 +4,7 @@ using UnityEngine;
 public class ActorThing : Thing
 {
     public Actors Type;
+    public string Name;
     public CharClass Class = CharClass.None;
     public GameTile Location;
     public ActorController Body;
@@ -53,6 +54,7 @@ public class ActorThing : Thing
         if (Class != CharClass.None) pre = ThingBuilder.ClassDict[Class];
         else pre = ThingBuilder.ActorDict[Type];
         Team = pre.Team;
+        Name = pre.Name;
         foreach (TraitBuilder t in pre.TraitList)
         {
             AddTrait(t.Type, t.E);
@@ -293,6 +295,11 @@ public class ActorThing : Thing
             s = God.Library.GetPortrait(Class);
             name = Class.ToString();
         }
+
+        int inj = Get(IntStats.Injury);
+        desc += "HP: " + Get(IntStats.HP) + " / " + (Get(IntStats.MaxHP)-inj);
+        if (inj > 0) desc += " (" + inj + ")";
+        desc += "\nSpeed: " + Get(IntStats.Movespeed);
         c.Imprint(s,name,desc);
     }
 

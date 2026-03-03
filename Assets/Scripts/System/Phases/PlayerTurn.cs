@@ -9,9 +9,10 @@ public class PlayerTurnPhase : PhaseScript
     public PlayerTurnPhase()
     {
         Type = Phases.PlayerTurn;
-        Listeners.Add(EventTypes.ActionEnd);
-        Listeners.Add(EventTypes.Death);
-        Listeners.Add(EventTypes.SelectCard);
+        // Listeners.Add(EventTypes.ActionEnd);
+        // Listeners.Add(EventTypes.Death);
+        // Listeners.Add(EventTypes.SelectCard);
+        // Listeners.Add(EventTypes.SelectCard);
     }
 
     public override void Begin()
@@ -61,6 +62,7 @@ public class PlayerTurnPhase : PhaseScript
             if (!Selected.KnownActions.ContainsKey(a)) continue;
             God.GM.SpawnCard(Selected.KnownActions[a]);
         }
+        God.GM.SpawnCard(God.E(EventTypes.EndTurn).Set(Selected),"End Turn","Yes");
     }
 
     public void UnselectPlayer()
@@ -118,6 +120,16 @@ public class PlayerTurnPhase : PhaseScript
             {
                 ActorThing t = e.GetActor("Who");
                 Players.Remove(t);
+                break;
+            }
+            case EventTypes.EndTurn:
+            {
+                ActorThing a = e.GetActor();
+                if (a != null && Selected == a)
+                {
+                    UnselectPlayer();
+                    Players.Remove(a);
+                }
                 break;
             }
         }

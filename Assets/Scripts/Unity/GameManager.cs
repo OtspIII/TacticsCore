@@ -162,19 +162,27 @@ public class GameManager : MonoBehaviour
 
     public void TakeEvent(EventInfo e)
     {
-        if(CurrentPhase.Listeners.Contains(e.Type))
-            CurrentPhase.TakeEvent(e);
+        // if(CurrentPhase.Listeners.Contains(e.Type))
+        CurrentPhase.TakeEvent(e);
     }
 
-    public void SpawnCard(Thing t)
+    public CardScript SpawnCard(Thing t)
+    {
+        CardScript c = SpawnCard(God.E(EventTypes.SelectCard).Set(t));
+        t.ImprintCard(c);
+        return c;
+    }
+
+    public CardScript SpawnCard(EventInfo e,string title="",string icon="")
     {
         CardScript c = Instantiate(God.Library.CardPrefab, BBCursor.transform.position, Quaternion.identity);
         c.transform.localScale = new Vector3(God.CardSize, God.CardSize, 1);
         c.transform.parent = transform;
-        t.ImprintCard(c);
-        c.SetEvent(God.E(EventTypes.SelectCard).Set(t));
+        c.SetEvent(e);
+        c.Imprint(God.Library.GetIcon(icon),title);
         BBCursor.transform.position += new Vector3(God.CardSize, 0, 0);
         CardLine.Add(c);
+        return c;
     }
 
     public void WipeCards()

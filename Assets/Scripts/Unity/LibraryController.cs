@@ -9,6 +9,7 @@ public class LibraryController : MonoBehaviour
     public HeadtextController HeadtextPrefab;
     
     protected Dictionary<string,Sprite> ClassPortraits = new Dictionary<string, Sprite>();
+    protected Dictionary<string,Sprite> Icons = new Dictionary<string, Sprite>();
     
     void Awake()
     {
@@ -23,6 +24,11 @@ public class LibraryController : MonoBehaviour
 		    Sprite s = (Sprite)o;
 		    ClassPortraits.Add(s.name,s);
 	    }
+	    res = Resources.LoadAll ("Icons", typeof(Sprite));
+	    foreach (Object o in res) {
+		    Sprite s = (Sprite)o;
+		    Icons.Add(s.name,s);
+	    }
     }
 
     public Sprite GetPortrait(Actors a)
@@ -32,6 +38,11 @@ public class LibraryController : MonoBehaviour
     public Sprite GetPortrait(CharClass a)
     {
 	    return ClassPortraits.TryGetValue(a.ToString(), out Sprite r) ? r : null;
+    }
+    
+    public Sprite GetIcon(string a)
+    {
+	    return Icons.TryGetValue(a.ToString(), out Sprite r) ? r : null;
     }
 
     public Color GetColor(Colors c)

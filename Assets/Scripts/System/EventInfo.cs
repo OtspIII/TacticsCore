@@ -18,6 +18,8 @@ public class EventInfo
     public Dictionary<string, GameTile> Tiles = new Dictionary<string, GameTile>();
     public Dictionary<string, Vector2Int> Vectors = new Dictionary<string, Vector2Int>();
     public Dictionary<string, Traits> TraitI = new Dictionary<string, Traits>();
+    public Dictionary<string, IntStats> Stats = new Dictionary<string, IntStats>();
+    public Dictionary<string, DamageTypes> DTypes = new Dictionary<string, DamageTypes>();
     public DieRoll Roll;
 
     public EventInfo(){ }
@@ -253,6 +255,49 @@ public class EventInfo
         return Vector2Int.zero;
     }
     
+    //Stats
+    public EventInfo Set(IntStats s)
+    {
+        return SetStat("", s);
+    }
+    public EventInfo Set(string i, IntStats s)
+    {
+        return SetStat(i, s);
+    }
+    public EventInfo SetStat(string i, IntStats s)
+    {
+        if (!Stats.TryAdd(i,s)) Stats[i]=s;
+        return this;
+    }
+    public IntStats GetStat(string i="")
+    {
+        if (Stats.TryGetValue(i, out IntStats r)) return r;
+        return IntStats.None;
+    }
+    
+    //DType
+    public EventInfo Set(DamageTypes s)
+    {
+        return SetDType("", s);
+    }
+    public EventInfo Set(string i, DamageTypes s)
+    {
+        return SetDType(i, s);
+    }
+    public EventInfo SetDType(string i, DamageTypes s)
+    {
+        if (!DTypes.TryAdd(i,s)) DTypes[i]=s;
+        return this;
+    }
+    public DamageTypes GetDType(string i="")
+    {
+        if (DTypes.TryGetValue(i, out DamageTypes r)) return r;
+        return DamageTypes.None;
+    }
+    
+    
+    
+    
     public override string ToString()
     {
         return "[EVENT:" + Type + "]("+BuildString()+")";
@@ -283,6 +328,8 @@ public enum EventTypes{
     
     GainTrait       =0210,
     LoseTrait       =0211,
+    ChangeStat      =0220,
+    TempDefense     =0221,
     
     ActionStart     =1000,
     ActionPhaseEnd  =1001,
@@ -295,5 +342,6 @@ public enum EventTypes{
     WalkTo          =3000,
     
     SelectCard      =9000,
+    EndTurn         =9001,
     
 }

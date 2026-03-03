@@ -58,6 +58,7 @@ public class AliveTrait : TraitThing
         AddListen(EventTypes.Damage);
         AddListen(EventTypes.Death);
         AddListen(EventTypes.TrueDeath);
+        AddListen(EventTypes.TempDefense);
     }
     
     public override void TakeEvent(TraitInfo i, EventInfo e)
@@ -70,7 +71,9 @@ public class AliveTrait : TraitThing
             }
             case EventTypes.StartTurn:
             {
-                i.Who.Set(IntStats.Defense,i.Who.Get(IntStats.Armor));
+                int arm = i.Who.Get(IntStats.Armor);
+                i.Who.Set(IntStats.Defense,arm);
+                i.Who.Body.HP.SetArmor(arm,arm);
                 // Debug.Log("SET DEF: " + i.Who.Class + " / " + i.Who.Get(IntStats.Defense));
                 break;
             }
@@ -109,6 +112,13 @@ public class AliveTrait : TraitThing
                 God.GM.AddCut(new HeadtextCut(i.Who,"-"+dmg,hp,-1,mhp,injury,Colors.Damage));
                 if(hp <= 0)
                     i.Who.TakeEvent(EventTypes.Death);
+                break;
+            }
+            case EventTypes.TempDefense:
+            {
+                int amt= e.GetInt();
+                int n = i.Who.Change(IntStats.Defense, amt);
+                God.GM.AddCut(new HeadtextCut(i.Who, "+" + amt, -1,n,-1, -1,Colors.Resist));
                 break;
             }
             case EventTypes.Death:
