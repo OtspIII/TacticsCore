@@ -352,6 +352,31 @@ public static class God
 		}
 		return God.GM.StartCoroutine(c);
 	}
+	
+	//Defaults to 'Up'
+	public static Vector2Int Rotate (Vector2Int p, Directions d)
+	{
+		if (d == Directions.None)
+			return Vector2Int.zero;
+		int x = p.x;
+		int y = p.y;
+		switch (d) {
+			case Directions.Right:
+				x = p.y;
+				y = p.x * -1;
+				break;
+			case Directions.Down:
+				x = p.x * -1;
+				y = p.y * -1;
+				break;
+			case Directions.Left:
+				x = p.y * -1;
+				y = p.x;
+				break;
+		}
+		
+		return new Vector2Int (x, y);
+	}
 }
 
 public enum Directions{

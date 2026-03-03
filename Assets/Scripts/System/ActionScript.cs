@@ -210,31 +210,107 @@ public class ActionScript : Thing
     {
         Execute(Phase,Info);
     }
+
+    public List<GameTile> GetPattern(ActionPhase p, ActionEvent a,GameTile target)
+    {
+        GameTile source = Who.Location;
+        if (a.Target == ActEventTarget.Self) target = source;
+        ActPattern actPattern = a.Pattern;
+        int patternSize=a.Size;
+        Directions rot = God.GetDir(source.Location,target.Location);
+        List<GameTile> r = new List<GameTile>();
+        switch (actPattern)
+        {
+            case ActPattern.None:case ActPattern.TargetOnly:
+                r.Add (target);
+                break;
+            case ActPattern.Blast:
+                r.AddRange (target.Flood (patternSize,NeighborMode.WallsBlock));
+                break;
+            case ActPattern.Cone:
+            {
+                List<GameTile> active = new List<GameTile>(){target};
+				
+                bool left = true;
+                bool right = true;
+                r.Add(target);
+                for (int n = 0; n < patternSize; n++)
+                {
+                    List<GameTile> temp = new List<GameTile>();
+                    //Every existing tile goes forward
+                    foreach (GameTile gt in active)
+                    {
+                        if (gt == null)
+                            continue;
+                        GameTile t = gt.Neighbor(God.Rotate(new Vector2Int(0, 1), rot));
+                        if (t != null && gt.ValidNeighbor(t,NeighborMode.WallsBlock))
+                            temp.Add(t);
+                    }
+
+                    if (left && active.Count > 0)
+                    {
+                        GameTile t = active[0].Neighbor(God.Rotate(new Vector2Int(-1, 1), rot));
+                        if (t != null && active[0].ValidNeighbor(t,NeighborMode.WallsBlock))
+                            temp.Insert(0, t);
+                        else
+                            left = false;
+                    }
+                    if (right && active.Count > 0)
+                    {
+                        GameTile t = active[active.Count-1].Neighbor(God.Rotate(new Vector2Int(1, 1), rot));
+                        if (t != null && active[active.Count-1].ValidNeighbor(t,NeighborMode.WallsBlock ))
+                            temp.Add(t);
+                        else
+                            right = false;
+                    }
+                    foreach(GameTile gt in temp)
+                        r.Add(gt);
+                    active = temp;
+                }
+                break;
+            }
+            default:
+            {
+                God.LogWarning(("UNPROGRAMMED PATTERN: " + actPattern));
+                r.Add(target);
+                break;
+            }
+        }
+        
+        return r;
+    }
     
     public void Execute(ActionPhase p,ActionInfo i)
     {
         foreach (GameTile t in i.Tiles)
         {
-            
+
             Cutscene cut = ActCut(p, t);
             if (cut != null)
             {
                 God.GM.AddCut(cut);
             }
-            ActorThing who = t.Contents;
+
+
+            
             foreach (ActionEvent a in p.Events)
             {
-                ActorThing targ = who;
-                if (a.Target == ActEventTarget.Self) targ = Who;
-                if (targ == null) continue;
-                foreach (EventInfo e in a.Events)
+                List<GameTile> pat = GetPattern(p,a,t);
+                foreach (GameTile tt in pat)
                 {
-                    EventInfo ae = God.E();
-                    ae.Clone(e);
-                    ae.Set("Target", t).Set("Source", Who);
-                    AuditEvent(ae);
-                    targ.TakeEvent(ae);
+                    ActorThing targ = tt.Contents;
+                    // if (a.Target == ActEventTarget.Self) targ = Who;
+                    if (targ == null) continue;
+                    foreach (EventInfo e in a.Events)
+                    {
+                        EventInfo ae = God.E();
+                        ae.Clone(e);
+                        ae.Set("Target", t).Set("Source", Who);
+                        AuditEvent(ae);
+                        targ.TakeEvent(ae);
+                    }
                 }
+
             }
         }
 

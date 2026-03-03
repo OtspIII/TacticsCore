@@ -3,8 +3,9 @@ using UnityEngine;
 
 public class GameTile : Thing
 {
-    public int X;
-    public int Y;
+    public int X { get { return Location.x; } }
+    public int Y { get { return Location.y; } }
+    public Vector2Int Location;
     public ActorThing Contents;
     public TileController Body;
     public List<TileTint> Tints = new  List<TileTint>();
@@ -13,8 +14,7 @@ public class GameTile : Thing
 
     public GameTile(int x, int y)
     {
-        X = x;
-        Y = y;
+        Location = new Vector2Int(x, y);
     }
     
     public GameTile Neighbor(int x, int y)
@@ -22,10 +22,15 @@ public class GameTile : Thing
         return God.GM.Level.GetTile(X + x, Y + y);
     }
     
+    public GameTile Neighbor(Vector2Int d)
+    {
+        return God.GM.Level.GetTile(X + d.x, Y + d.y);
+    }
+    
     public GameTile Neighbor(Directions d)
     {
         Vector2Int dir = God.Dir2Vector2Int(d);
-        return God.GM.Level.GetTile(X + dir.x, Y + dir.y);
+        return Neighbor(dir.x, dir.y);
     }
 
     public Color GetTint()
