@@ -6,11 +6,13 @@ using UnityEngine;
 public class DeathCut : Cutscene
 {
     ActorThing Who;
+    bool TrueDeath;
     
-    public DeathCut(ActorThing who)
+    public DeathCut(ActorThing who,bool trueDeath)
     {
         Type = Cutscenes.Death;
         Who = who;
+        TrueDeath = trueDeath;
     }
     
     public override IEnumerator Script()
@@ -19,10 +21,15 @@ public class DeathCut : Cutscene
         while (t < 1)
         {
             t += Time.deltaTime / 0.2f;
-            Who.Body.transform.rotation = Quaternion.Euler(0,0,t*360);
+            float rot = TrueDeath ? t * 360 : t * 180;
+            Who.Body.transform.rotation = Quaternion.Euler(0,0,rot);
             yield return null;
         }
-        Who.Body.Destruct();
+
+        if (TrueDeath)
+            Who.Body.Destruct();
+        else
+            Who.Body.FakeDie();
         End();
     }
 }

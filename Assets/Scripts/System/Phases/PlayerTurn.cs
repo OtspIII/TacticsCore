@@ -10,13 +10,15 @@ public class PlayerTurnPhase : PhaseScript
     {
         Type = Phases.PlayerTurn;
         Listeners.Add(EventTypes.ActionEnd);
+        Listeners.Add(EventTypes.Death);
+        Listeners.Add(EventTypes.SelectCard);
     }
 
     public override void Begin()
     {
         foreach (ActorThing a in God.GM.GetActors())
         {
-            if (a.Has(Traits.Player))
+            if (a.Has(Traits.Player) && !a.Has(CTags.Corpse))
             {
                 Players.Add(a);
                 a.TakeEvent(EventTypes.StartTurn);
@@ -110,6 +112,12 @@ public class PlayerTurnPhase : PhaseScript
                 {
                     SelectAction((ActionScript)t);
                 }
+                break;
+            }
+            case EventTypes.Death:
+            {
+                ActorThing t = e.GetActor("Who");
+                Players.Remove(t);
                 break;
             }
         }

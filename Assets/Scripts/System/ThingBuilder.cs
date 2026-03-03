@@ -60,6 +60,7 @@ public static class ThingBuilder
         }
         r.Stats.Add(IntStats.HP,hp);
         r.Stats.Add(IntStats.Armor,def);
+        r.Stats.Add(IntStats.InjuryRate,3);
         r.TxtStats.Add(StrStats.Damage,dmg);
         return r;
     }

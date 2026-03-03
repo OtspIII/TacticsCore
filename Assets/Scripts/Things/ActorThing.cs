@@ -32,6 +32,7 @@ public class ActorThing : Thing
     public Dictionary<IntStats, int> Stats = new Dictionary<IntStats, int>();
     public Dictionary<StrStats, string> TxtStats = new Dictionary<StrStats, string>();
     public DieRoll BaseDamage;
+    public List<CTags> Tags = new List<CTags>();
     
     public ActorThing(Actors type,GameTile l)
     {
@@ -217,6 +218,7 @@ public class ActorThing : Thing
             EventQueue.Add(e);
             return;
         }
+        e.Set("Who", this);
         MidEvent = true;
         PreListen.TryGetValue(e.Type, out List<Traits> pre);
         if(pre != null) {
@@ -278,7 +280,7 @@ public class ActorThing : Thing
         if(silent)
             Body.Destruct();
         else
-            God.GM.AddCut(new DeathCut(this));
+            God.GM.AddCut(new DeathCut(this,true));
     }
 
     public override void ImprintCard(CardScript c)
@@ -294,9 +296,14 @@ public class ActorThing : Thing
         c.Imprint(s,name,desc);
     }
 
-    public int Get(IntStats k,int def=0)
+    public int Get(IntStats k,bool raw=false,int def=0)
     {
-        return Stats.TryGetValue(k, out int r) ? r : def;
+        int r = Stats.TryGetValue(k, out int s) ? s : def;
+        // if (!raw)
+        // {
+        //     if (k == IntStats.MaxHP) r -= Get(IntStats.Injury);
+        // }
+        return r;
     }
     
     public string Get(StrStats k, string def = "")
@@ -338,6 +345,11 @@ public class ActorThing : Thing
         if (a == null) return false;
         if (Team == GameTeam.None || a.Team == GameTeam.None || Team == a.Team) return false;
         return true;
+    }
+
+    public bool Has(CTags t)
+    {
+        return Tags.Contains(t);
     }
 }
 

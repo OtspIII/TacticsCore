@@ -44,6 +44,7 @@ public class ActorController : MonoBehaviour
         transform.position = loc.GetContentPos(Info);
         HP.SetHP(Info.Get(IntStats.HP),Info.Get(IntStats.MaxHP),Info.Get(IntStats.Injury));
         HP.SetArmor(Info.Get(IntStats.Defense),Info.Get(IntStats.Armor));
+        FakeDie(Info.Has(CTags.Corpse));
         SetRing();
     }
 
@@ -68,5 +69,19 @@ public class ActorController : MonoBehaviour
             case GameTeam.Berserk: c = Color.darkMagenta; break;
         }
         Ring.color = c;
+    }
+
+    public void FakeDie(bool dead=true)
+    {
+        if (dead)
+        {
+            HP.gameObject.SetActive(false);
+            Portrait.color = Color.gray;
+        }
+        else
+        {
+            HP.gameObject.SetActive(true);
+            Portrait.color = Color.white;
+        }
     }
 }

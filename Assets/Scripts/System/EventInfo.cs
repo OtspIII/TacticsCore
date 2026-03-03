@@ -290,6 +290,7 @@ public enum EventTypes{
     
     Damage          =2000,
     Death           =2001,
+    TrueDeath       =2002,
     
     WalkTo          =3000,
     

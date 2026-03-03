@@ -79,13 +79,13 @@ public class HPBar : MonoBehaviour
     public void Calc()
     {
         Max = Mathf.Max(HPFlatMax, DFlatMax,1);
-        Perc = HPFlat/Max;
-        HealPerc = HPFlatHeal/Max;
-        DPerc = DFlat/Max;
+        Perc = Mathf.Max(0,HPFlat/Max);
+        HealPerc = Mathf.Max(0,HPFlatHeal/Max);
+        DPerc = Mathf.Max(0,DFlat/Max);
         Healable.transform.localScale = new Vector3(HealPerc, 1,1);
         if (HPFlatMax < Max)
         {
-            Injury.transform.localScale = new Vector3(HPFlatMax/Max, 1,1);
+            Injury.transform.localScale = new Vector3(Mathf.Max(0,HPFlatMax/Max), 1,1);
         }
     }
     
