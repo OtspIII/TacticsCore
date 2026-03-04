@@ -75,12 +75,12 @@ public class ActionScript : Thing
         if (e.Texts.ContainsKey("Roll"))
         {
             string dmg = e.GetString("Roll");
-            e.Roll = new DieRoll(dmg,Who);
+            e.DRoll = new DieRoll(dmg,Who);
         }
         AuditEvents.TryGetValue(e.Type, out List<Traits> take);
-        if (!e.Numbers.ContainsKey("") && e.Roll.Setup)
+        if (!e.Numbers.ContainsKey("") && e.DRoll.Setup)
         {
-            e.Set(e.Roll.Roll(Who));
+            e.Set(e.DRoll.Roll(Who));
         }
         if(take != null)
             foreach (Traits t in take)
@@ -269,6 +269,45 @@ public class ActionScript : Thing
                 }
                 break;
             }
+            case ActPattern.Horizontal:
+            {
+                for (int n = 0; n < patternSize; n++)
+                {
+                    r.Add(target.Neighbor(God.Rotate(new Vector2Int(-n, 0), rot)));
+                    if (n != 0)
+                        r.Add(target.Neighbor(God.Rotate(new Vector2Int(n, 0), rot)));
+                }
+
+                break;
+            }
+            case ActPattern.Pierce:
+            {
+                List<GameTile> active = new List<GameTile>() { target };
+                r.Add(target);
+                for (int n = 0; n < patternSize; n++)
+                {
+                    List<GameTile> temp = new List<GameTile>();
+                    //Every existing tile goes forward
+                    foreach (GameTile gt in active)
+                    {
+                        if (gt == null)
+                            continue;
+                        GameTile t = gt.Neighbor(God.Rotate(new Vector2Int(0, 1), rot));
+                        if (t != null && gt.ValidNeighbor(t, NeighborMode.WallsBlock))
+                            temp.Add(t);
+                    }
+
+                    foreach (GameTile gt in temp)
+                        r.Add(gt);
+                    active = temp;
+                }
+                break;
+            }
+            case ActPattern.Source:
+            {
+                r.Add(source);
+                break;
+            }
             default:
             {
                 God.LogWarning(("UNPROGRAMMED PATTERN: " + actPattern));
@@ -276,7 +315,8 @@ public class ActionScript : Thing
                 break;
             }
         }
-        
+        while (r.Contains(null))
+            r.Remove(null);
         return r;
     }
     

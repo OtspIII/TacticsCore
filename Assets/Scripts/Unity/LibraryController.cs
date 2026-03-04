@@ -51,6 +51,7 @@ public class LibraryController : MonoBehaviour
 	    {
 		    case Colors.Damage: return Color.red;
 		    case Colors.Resist: return Color.cornflowerBlue;
+		    case Colors.Healing: return Color.limeGreen;
 	    }
 	    return Color.white;
     }

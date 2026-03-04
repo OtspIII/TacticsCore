@@ -20,7 +20,7 @@ public class EventInfo
     public Dictionary<string, Traits> TraitI = new Dictionary<string, Traits>();
     public Dictionary<string, IntStats> Stats = new Dictionary<string, IntStats>();
     public Dictionary<string, DamageTypes> DTypes = new Dictionary<string, DamageTypes>();
-    public DieRoll Roll;
+    public DieRoll DRoll;
 
     public EventInfo(){ }
     
@@ -108,6 +108,10 @@ public class EventInfo
     }
     
     //Text
+    public EventInfo Roll(string s)
+    {
+        return SetString("Roll", s);
+    }
     public EventInfo Set(string s)
     {
         return SetString("", s);
@@ -338,6 +342,7 @@ public enum EventTypes{
     Damage          =2000,
     Death           =2001,
     TrueDeath       =2002,
+    Heal            =2010,
     
     WalkTo          =3000,
     

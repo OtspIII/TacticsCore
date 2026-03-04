@@ -105,7 +105,7 @@ public class ActionPrefab
     public ActionPrefab Attack(int range, ActPattern pat, int size,string dmg, DamageTypes type = DamageTypes.Normal,
         params EventInfo[] events)
     {
-        List<EventInfo> e = new List<EventInfo>(){God.E(EventTypes.Damage).Set("Roll",dmg).Set(type)};
+        List<EventInfo> e = new List<EventInfo>(){God.E(EventTypes.Damage).Roll(dmg).Set(type)};
         e.AddRange(events);
         ActionPhase p = new ActionPhase(range,Cutscenes.Attack,TargetType.Tile);
         p.Add(pat,size, ActEventTarget.Characters,e.ToArray());

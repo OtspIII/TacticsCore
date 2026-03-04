@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class ActorThing : Thing
 {
@@ -330,11 +331,32 @@ public class ActorThing : Thing
         else TxtStats.Add(k,v);
     }
     
-    public int Change(IntStats k, int amt)
+    public int Change(IntStats k, int amt,Vector2Int minmax=new Vector2Int())
     {
         if (Stats.ContainsKey(k)) Stats[k] += amt;
         else Stats.Add(k,amt);
-        return Stats[k];
+        int r = Stats[k];
+        if (minmax != Vector2Int.zero)
+        {
+            if (r < minmax.x)
+            {
+                r = minmax.x;
+                Stats[k] = r;
+            }
+            else if (r > minmax.y)
+            {
+                r = minmax.y;
+                Stats[k] = r;
+            }
+        }
+        return r;
+    }
+
+    public int GetMaxHP()
+    {
+        int r = Get(IntStats.MaxHP);
+        int inj = Get(IntStats.Injury);
+        return r - inj;
     }
 
     public override string ToString()

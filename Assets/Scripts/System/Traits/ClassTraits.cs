@@ -59,6 +59,7 @@ public class AliveTrait : TraitThing
         AddListen(EventTypes.Death);
         AddListen(EventTypes.TrueDeath);
         AddListen(EventTypes.TempDefense);
+        AddListen(EventTypes.Heal);
     }
     
     public override void TakeEvent(TraitInfo i, EventInfo e)
@@ -119,6 +120,16 @@ public class AliveTrait : TraitThing
                 int amt= e.GetInt();
                 int n = i.Who.Change(IntStats.Defense, amt);
                 God.GM.AddCut(new HeadtextCut(i.Who, "+" + amt, -1,n,-1, -1,Colors.Resist));
+                break;
+            }
+            case EventTypes.Heal:
+            {
+                int amt= e.GetInt();
+                int max = i.Who.GetMaxHP();
+                int now = i.Who.Get(IntStats.HP);
+                if (amt > max - now) amt = max - now;
+                int n = i.Who.Change(IntStats.HP, amt);
+                God.GM.AddCut(new HeadtextCut(i.Who, "+" + amt, n,-1,-1, -1,Colors.Healing));
                 break;
             }
             case EventTypes.Death:
