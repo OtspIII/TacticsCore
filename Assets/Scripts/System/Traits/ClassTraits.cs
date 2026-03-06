@@ -129,6 +129,7 @@ public class AliveTrait : TraitThing
                 int now = i.Who.Get(IntStats.HP);
                 if (amt > max - now) amt = max - now;
                 int n = i.Who.Change(IntStats.HP, amt);
+                //Debug.Log("HEAL: " + amt + " / " + max + " / " + now + " / " + n);
                 God.GM.AddCut(new HeadtextCut(i.Who, "+" + amt, n,-1,-1, -1,Colors.Healing));
                 break;
             }

@@ -64,8 +64,9 @@ public class HPBar : MonoBehaviour
     public void SetHP(float current,float max,float inj)
     {
         HPFlat = current;
-        HPFlatMax = max;
-        HPFlatHeal = max - inj;
+        if (max > 0) HPFlatMax = max;
+        if (inj >= 0) HPFlatHeal = HPFlatMax - inj;
+            
         Calc();
     }
     

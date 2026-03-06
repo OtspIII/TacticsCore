@@ -17,7 +17,7 @@ public static class ThingBuilder
         IsSetup = true;
         AddPlayer(CharClass.Fighter,10,3,3,"1d8").Act(Actions.GuardedStrike).Act(Actions.Taunt);
         AddPlayer(CharClass.Wizard,5,0,3,"1d4").Act(Actions.FireDart).Act(Actions.IcyWind);
-        AddPlayer(CharClass.Cleric,8,2,3,"1d6");//.Act(Actions.KnockbackStrike).Act(Actions.Heal);
+        AddPlayer(CharClass.Cleric,8,2,3,"1d6").Act(Actions.KnockbackStrike).Act(Actions.Heal);
         AddPlayer(CharClass.Thief,7,1,4,"1d8");//.Act(Actions.HitAndRun).Act(Actions.SandInEyes);
         AddNPC(CharClass.RatmanCardTosser,"Ratfolk Card Tosser",4,0,4,"1d3");
         AddNPC(CharClass.RatmanGourmand,"Ratfolk Gourmand",8,0,3,"1d6");
