@@ -18,13 +18,13 @@ public static class ThingBuilder
         AddPlayer(CharClass.Fighter,10,3,3,"1d8").Act(Actions.GuardedStrike).Act(Actions.Taunt);
         AddPlayer(CharClass.Wizard,5,0,3,"1d4").Act(Actions.FireDart).Act(Actions.IcyWind);
         AddPlayer(CharClass.Cleric,8,2,3,"1d6").Act(Actions.KnockbackStrike).Act(Actions.Heal);
-        AddPlayer(CharClass.Thief,7,1,4,"1d8");//.Act(Actions.HitAndRun).Act(Actions.SandInEyes);
+        AddPlayer(CharClass.Thief,7,1,4,"1d8").Act(Actions.HitAndRun).Act(Actions.SandInEyes);
         AddNPC(CharClass.RatmanCardTosser,"Ratfolk Card Tosser",4,0,4,"1d3");
         AddNPC(CharClass.RatmanGourmand,"Ratfolk Gourmand",8,0,3,"1d6");
         AddNPC(CharClass.RatmanPrayerSqueak,"Ratfolk Prayer-Squeak",4,0,4,"1d3");
         AddNPC(CharClass.RatmanMutant,"Ratfolk Mutant",4,0,4,"2d4");
 
-        AddAction(Actions.Walk, "Walk","Movement",ActionCost.Move, ActionSlot.BasicMove).Move();
+        AddAction(Actions.Walk, "Walk","Movement",ActionCost.None, ActionSlot.BasicMove).Move();
         AddAction(Actions.BasicAttack, "Attack","Melee",ActionCost.Major, ActionSlot.BasicAttack).SingleTarget(1,God.E(EventTypes.Damage).Set("Roll","W"));
         //Fighter
         AddAction(Actions.GuardedStrike, "Guarded Strike", "Melee",ActionCost.Major, ActionSlot.BasicAttack).Set(CharClass.Fighter) 
@@ -35,13 +35,17 @@ public static class ThingBuilder
         AddAction(Actions.FireDart, "Fire Dart", "Ranged",ActionCost.Major, ActionSlot.BasicAttack).Set(CharClass.Wizard) 
             .Attack(5,"1d6",DamageTypes.Fire); //Set ground on fire
         AddAction(Actions.IcyWind, "Icy Wind","Ranged",ActionCost.Major, ActionSlot.Secondary).Set(UsesNum.dOften).Set(CharClass.Wizard)
-            .Attack(1,ActPattern.Cone,1,"1d5",DamageTypes.Cold); //-2 movespeed 1d10+5 ; push 3
+            .Attack(1,ActPattern.Cone,1,"1d5",DamageTypes.Cold).PAdd(ActEventTarget.Everything,God.E(EventTypes.Knockback).Set(3)); //-2 movespeed 1d10+5
         //Cleric
         AddAction(Actions.KnockbackStrike, "Knockback Strike", "Melee",ActionCost.Major, ActionSlot.BasicAttack).Set(CharClass.Cleric) 
-            .Attack(1,"W",DamageTypes.Fire); //Push 1
+            .Attack(1,"W").PAdd(ActEventTarget.Characters,God.E(EventTypes.Knockback).Set(1));
         AddAction(Actions.Heal, "Heal","Heal",ActionCost.Bonus, ActionSlot.Secondary).Set(UsesNum.dOften).Set(CharClass.Cleric)
-            .SingleTarget(2,God.E(EventTypes.Heal).Roll("1d6+1")); //heal 1d6+1
+            .SingleTarget(2,God.E(EventTypes.Heal).Roll("1d6+1")); 
         //Thief
+        AddAction(Actions.HitAndRun, "Hit & Run", "Melee",ActionCost.Major, ActionSlot.BasicAttack).Set(CharClass.Thief) 
+            .Attack(1,"W").Move();
+        AddAction(Actions.SandInEyes, "Sand In The Eyes","Mental",ActionCost.Bonus, ActionSlot.Secondary).Set(UsesNum.eConstant).Set(CharClass.Thief)
+            .SingleTarget(2,God.E(EventTypes.Heal).Roll("1d6+1")); //stun 2d6+4
         /*
          
          

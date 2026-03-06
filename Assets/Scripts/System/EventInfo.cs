@@ -336,13 +336,15 @@ public enum EventTypes{
     TempDefense     =0221,
     
     ActionStart     =1000,
-    ActionPhaseEnd  =1001,
+    NewPhase  =1001,
     ActionEnd       =1002,
+    PostAudit       =1003,
     
     Damage          =2000,
     Death           =2001,
     TrueDeath       =2002,
     Heal            =2010,
+    Knockback       =2100,
     
     WalkTo          =3000,
     

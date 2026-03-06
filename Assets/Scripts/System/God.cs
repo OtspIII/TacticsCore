@@ -377,6 +377,18 @@ public static class God
 		
 		return new Vector2Int (x, y);
 	}
+
+	public static Vector2Int RoundDir(Vector2Int d)
+	{
+		int abX = Mathf.Abs(d.x);
+		if (d.y > 0 && d.y > abX) return new Vector2Int(0,1);
+		if (d.y < 0 && d.y < -abX) return new Vector2Int(0,-1);
+		int abY = Mathf.Abs(d.y);
+		if (d.x > 0 && d.x > abY) return new Vector2Int(1,0);
+		if (d.x < 0 && d.x < -abY) return new Vector2Int(-1,0);
+		if (d.x == 0 && d.y == 0) return new Vector2Int(0,0);
+		return new Vector2Int(d.x > 0 ? 1 : -1,d.y > 0 ? 1 : -1);
+	}
 }
 
 public enum Directions{

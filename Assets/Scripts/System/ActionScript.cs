@@ -98,11 +98,11 @@ public class ActionScript : Thing
     
     public virtual void BeginSelect()
     {
-        Begin();
         FindOptions();
         SetTint(TileTints.GoodOption,Info.GoodOpts);
         SetTint(TileTints.OkayOption,Info.BadOpts);
     }
+    
 
     public virtual void RunSelect()
     {
@@ -112,6 +112,7 @@ public class ActionScript : Thing
     public virtual void EndSelect()
     {
         WipeTint();
+        
     }
     
     public virtual void AISelect(ActionScript main=null)
@@ -206,9 +207,9 @@ public class ActionScript : Thing
         return 1;
     }
 
-    public void Execute()
+    public bool Execute()
     {
-        Execute(Phase,Info);
+        return Execute(Phase,Info);
     }
 
     public List<GameTile> GetPattern(ActionPhase p, ActionEvent a,GameTile target)
@@ -320,7 +321,7 @@ public class ActionScript : Thing
         return r;
     }
     
-    public void Execute(ActionPhase p,ActionInfo i)
+    public bool Execute(ActionPhase p,ActionInfo i)
     {
         foreach (GameTile t in i.Tiles)
         {
@@ -353,16 +354,18 @@ public class ActionScript : Thing
 
             }
         }
-
         EndSelect();
         PhaseI++;
         if (PhaseI >= Phases.Count)
         {
             End();
+            return true;
         }
         else
         {
             Info = new ActionInfo(this, PhaseI);
+            God.GM.TakeEvent(God.E(EventTypes.NewPhase).Set(Who).Set(PhaseI));
+            return false;
         }
     }
     
@@ -393,7 +396,6 @@ public class ActionScript : Thing
         if (Info.Tiles.Count >= Phase.Tiles)
         {
             Execute(Phase,Info);
-            PhaseI++;
             if (PhaseI >= Phases.Count)
             {
                 End();

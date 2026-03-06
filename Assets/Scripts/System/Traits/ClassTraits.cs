@@ -31,17 +31,36 @@ public class MobileTrait : TraitThing
     {
         Type = Traits.Mobile;
         AddListen(EventTypes.WalkTo);
+        AddListen(EventTypes.Knockback);
+        AddListen(EventTypes.StartTurn);
     }
     
     public override void TakeEvent(TraitInfo i, EventInfo e)
     {
         switch (e.Type)
         {
+            case EventTypes.StartTurn:
+            {
+                i.Who.Set(IntStats.MoveLeft,i.Who.Get(IntStats.Movespeed));
+                break;
+            }
             case EventTypes.WalkTo:
             {
                 GameTile t = e.GetTile();
                 if (t == null) t = e.GetTile("Target");
                 i.Who.Walk(t);
+                break;
+            }
+            case EventTypes.Knockback:
+            {
+                ActorThing s = e.GetActor("Source");
+                GameTile src = s != null ? s.Location : e.GetTile("Target");
+                GameTile t = s != null ? e.GetTile("Target") : i.Who.Location;
+                if (src == t) t = i.Who.Location;
+                Vector2Int dir = God.RoundDir(t.Location-src.Location) * (e.GetInt("",s,1));
+                GameTile dest = i.Who.Location.Neighbor(dir);
+                if(dest != null) //bug: if pushed against edge should stop at edge, push others they bump into, etc
+                    i.Who.Walk(dest,false);
                 break;
             }
         }

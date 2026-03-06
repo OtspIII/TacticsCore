@@ -5,6 +5,7 @@ public class PlayerTurnPhase : PhaseScript
 {
     public List<ActorThing> Players = new List<ActorThing>();
     public ActorThing Selected;
+    public bool MidEvent=false;
     
     public PlayerTurnPhase()
     {
@@ -81,8 +82,18 @@ public class PlayerTurnPhase : PhaseScript
             God.LogWarning("TRIED TO SET ACTION OF INACTIVE PLAYER: " + a + " / " + a.Who + " / " + Selected);
             return;
         }
+        if (MidEvent && Selected.SelectedAction != a)
+        {
+            Selected.SelectedAction.End();
+        }
+        if (a.Cost != ActionCost.None && !Selected.ActionsLeft.Contains(a.Cost))
+        {
+            //Give some feedback that the select failed
+            return;
+        }
         WipeTint();
         Selected.SelectedAction = a;
+        Selected.SelectedAction?.Begin();
         Selected.SelectedAction?.BeginSelect();
     }
 
@@ -95,6 +106,19 @@ public class PlayerTurnPhase : PhaseScript
     {
         switch (e.Type)
         {
+            case EventTypes.NewPhase: //Only called for phases after the first
+            {
+                MidEvent = true;
+                ActorThing who = e.GetActor();
+                if (Selected != who) break;
+                if(God.GM.Cuts.Count == 0) Selected.SelectedAction?.BeginSelect();
+                break;
+            }
+            case EventTypes.PostAudit: 
+            {
+                if(Selected?.SelectedAction != null) Selected.SelectedAction?.BeginSelect();
+                break;
+            }
             case EventTypes.ActionEnd:
             {
                 ActorThing who = e.GetActor();
@@ -105,6 +129,7 @@ public class PlayerTurnPhase : PhaseScript
                     Players.Remove(Selected);
                     UnselectPlayer();
                 }
+                MidEvent = false;
                 break;
             }
             case EventTypes.SelectCard:

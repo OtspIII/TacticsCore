@@ -95,6 +95,7 @@ public class ActorThing : Thing
             Location.Contents = null;
         }
         Location = l;
+        if (l == null) return;
         l.Contents = this;
     }
     
@@ -269,9 +270,21 @@ public class ActorThing : Thing
         return e;
     }
 
-    public void Walk(GameTile t)
+    public void Walk(GameTile t,bool useMove=true)
     {
+        if (t == null)
+        {
+            God.LogError("Tried to walk to null tile: " + this);
+            return;
+        }
         GameTile o = Location;
+        if (useMove)
+        {
+            int dist = Mathf.Abs(o.X - t.X) + Mathf.Abs(o.Y - t.Y);
+            int left = Change(IntStats.MoveLeft, -dist);
+            if (left <= 0) ActionsLeft.Remove(ActionCost.Move);
+        }
+
         SetLocation(t);
         God.GM.AddCut(new MoveCut(this,o,t));
     }

@@ -89,6 +89,7 @@ public class GameManager : MonoBehaviour
             a.Audit();
         foreach (TileController a in AllTiles)
             a.Audit();
+        CurrentPhase.TakeEvent(God.E(EventTypes.PostAudit));
     }
 
 

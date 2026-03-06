@@ -121,7 +121,7 @@ public class ActionPrefab
     
     public ActionPrefab Move(int range=0)
     {
-        ActionPhase p = new ActionPhase(God.N(IntStats.Movespeed),Cutscenes.None,TargetType.EmptyTile,AITarget.Empty);
+        ActionPhase p = new ActionPhase(God.N(IntStats.MoveLeft),Cutscenes.None,TargetType.EmptyTile,AITarget.Empty);
         p.Add(ActEventTarget.Self, God.E(EventTypes.WalkTo));
         Phases.Add(p);
         return this;
