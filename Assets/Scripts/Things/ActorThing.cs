@@ -32,6 +32,7 @@ public class ActorThing : Thing
     // public ActionScript MoveAction =  new ActionScript();
     public Dictionary<ActionSlot,ActionScript> KnownActions = new  Dictionary<ActionSlot,ActionScript>();
     public Dictionary<IntStats, int> Stats = new Dictionary<IntStats, int>();
+    public Dictionary<IntStats, List<StatMod>> StatMods = new Dictionary<IntStats, List<StatMod>>();
     public Dictionary<StrStats, string> TxtStats = new Dictionary<StrStats, string>();
     public DieRoll BaseDamage;
     public List<CTags> Tags = new List<CTags>();
@@ -320,10 +321,11 @@ public class ActorThing : Thing
     public int Get(IntStats k,bool raw=false,int def=0)
     {
         int r = Stats.TryGetValue(k, out int s) ? s : def;
-        // if (!raw)
-        // {
-        //     if (k == IntStats.MaxHP) r -= Get(IntStats.Injury);
-        // }
+        if (!raw && StatMods.TryGetValue(k,out List<StatMod> mods))
+        {
+            foreach (StatMod mod in mods)
+                r += mod.Amount;
+        }
         return r;
     }
     
@@ -365,6 +367,23 @@ public class ActorThing : Thing
         return r;
     }
 
+    public int AddMod(StatMod s,TraitInfo t=null,int dur=-1)
+    {
+        if(!StatMods.ContainsKey(s.Stat))
+            StatMods.Add(s.Stat,new List<StatMod>());
+        StatMod actual = new StatMod(s, this, dur);
+        StatMods[s.Stat].Add(actual);
+        if(t != null) t.Mods.Add(actual);
+        return Get(s.Stat);
+    }
+
+    public int RemoveMod(StatMod s)
+    {
+        if (!StatMods.ContainsKey(s.Stat)) return Get(s.Stat);
+        StatMods[s.Stat].Remove(s);
+        return Get(s.Stat);
+    }
+
     public int GetMaxHP()
     {
         int r = Get(IntStats.MaxHP);
@@ -402,4 +421,27 @@ public enum GameTeam
     Player=1,
     Enemy=2,
     Berserk=3,
+}
+
+public class StatMod
+{
+    public ActorThing Who;
+    public IntStats Stat;
+    public int Amount;
+    public int Duration=-1;
+
+    public StatMod(IntStats s, int a,int dur=-1)
+    {
+        Stat = s;
+        Amount = a;
+        Duration = dur;
+    }
+
+    public StatMod(StatMod s,ActorThing who,int dur=-1)
+    {
+        Who = who;
+        Stat = s.Stat;
+        Amount = s.Amount;
+        Duration = dur != -1 ? dur : s.Duration;
+    }
 }

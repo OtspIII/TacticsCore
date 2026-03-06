@@ -1,6 +1,36 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+public class UniversalTrait : TraitThing
+{
+    public UniversalTrait()
+    {
+        Type = Traits.Universal;
+        AddListen(EventTypes.StartTurn);
+    }
+
+    public override void TakeEvent(TraitInfo i, EventInfo e)
+    {
+        switch (e.Type)
+        {
+            case EventTypes.StartTurn:
+            {
+                foreach (IntStats st in i.Who.StatMods.Keys)
+                {
+                    foreach (StatMod m in i.Who.StatMods[st].ToArray())
+                    {
+                        if (m.Duration == -1) continue;
+                        m.Duration--;
+                        if (m.Duration <= 0)
+                            i.Who.StatMods[st].Remove(m);
+                    }
+                }
+                break;
+            }
+        }
+    }
+}
+
 public class PlayerTrait : TraitThing
 {
     public PlayerTrait()

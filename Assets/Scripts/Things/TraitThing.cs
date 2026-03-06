@@ -5,6 +5,7 @@ public class TraitInfo : EventInfo
 {
     public Traits Trait;
     public ActorThing Who;
+    public List<StatMod> Mods = new List<StatMod>();
 
     public TraitInfo(Traits t, ActorThing who, EventInfo i)
     {
@@ -62,6 +63,10 @@ public class TraitThing
         foreach (EventTypes e in TakeListen.Keys)
             i.Who.RemoveListen(e,Type,false);
         i.Who.Trait.Remove(Type);
+        foreach (StatMod m in i.Mods)
+        {
+            i.Who.RemoveMod(m);
+        }
         OnRemove(i,n);
     }
     
