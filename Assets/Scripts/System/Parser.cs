@@ -11,6 +11,7 @@ public static class Parser
         Setup = true;
         TraitDict.Add(Traits.Alive, new AliveTrait());
         TraitDict.Add(Traits.Player, new PlayerTrait());
+        TraitDict.Add(Traits.Universal, new UniversalTrait());
         TraitDict.Add(Traits.Mobile, new MobileTrait());
     }
     

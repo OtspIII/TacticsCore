@@ -374,6 +374,10 @@ public class ActorThing : Thing
         StatMod actual = new StatMod(s, this, dur);
         StatMods[s.Stat].Add(actual);
         if(t != null) t.Mods.Add(actual);
+        switch (s.Stat)
+        {
+            case IntStats.Movespeed: Change(IntStats.MoveLeft, s.Amount); break;
+        }
         return Get(s.Stat);
     }
 

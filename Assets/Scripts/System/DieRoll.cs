@@ -65,7 +65,7 @@ public struct DieRoll{
 		if (Rolls.N == 0) Rolls.N = 1;
 		Size = ParseN(sz,who,out int rm,out int bm);
 		Bonus = ParseN(b,who);
-		Bonus.Mult *= bm;
+		Bonus.N += bm * rm; //These mults are maybe weird. Should test once more stuff is in
 		Rolls.Mult *= rm;
 	}
 
@@ -87,6 +87,7 @@ public struct DieRoll{
 			n = dr.Size.V(who);
 			diem = dr.Rolls.V(who);
 			bm = dr.Bonus.V(who);
+			if (bm == 0) bm = 1;
 			s = s.Substring(0,s.IndexOf("W"));
 		}
 		else if (s.Contains("M"))
@@ -137,7 +138,7 @@ public struct DieRoll{
 
 	public override string ToString()
 	{
-		return "Die Roll[" + Desc + "/" + Rolls + " / " + Size + " / " + Bonus + "]";
+		return "Die Roll[" + Desc +" / " + Rolls.V() + " / " + Size.V() + " / " + Bonus.V() + "\n/" + Rolls + " / " + Size + " / " + Bonus + "]";
 	}
 }
 

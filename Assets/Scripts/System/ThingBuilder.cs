@@ -35,7 +35,8 @@ public static class ThingBuilder
         AddAction(Actions.FireDart, "Fire Dart", "Ranged",ActionCost.Major, ActionSlot.BasicAttack).Set(CharClass.Wizard) 
             .Attack(5,"1d6",DamageTypes.Fire); //Set ground on fire
         AddAction(Actions.IcyWind, "Icy Wind","Ranged",ActionCost.Major, ActionSlot.Secondary).Set(UsesNum.dOften).Set(CharClass.Wizard)
-            .Attack(1,ActPattern.Cone,1,"1d5",DamageTypes.Cold).PAdd(ActEventTarget.Everything,God.E(EventTypes.Knockback).Set(3)); //-2 movespeed 1d10+5
+            .Attack(1,ActPattern.Cone,1,"1d5",DamageTypes.Cold).EAdd(God.E(EventTypes.ChangeStat).Set(IntStats.Movespeed).Set(-2).Set("Resist","1d10+5"))
+            .PAdd(ActPattern.Cone,1,ActEventTarget.Everything,God.E(EventTypes.Knockback).Set(3));
         //Cleric
         AddAction(Actions.KnockbackStrike, "Knockback Strike", "Melee",ActionCost.Major, ActionSlot.BasicAttack).Set(CharClass.Cleric) 
             .Attack(1,"W").PAdd(ActEventTarget.Characters,God.E(EventTypes.Knockback).Set(1));
@@ -76,6 +77,7 @@ public static class ThingBuilder
         ClassPrefab r = new ClassPrefab(c);
         r.Name = name;
         ClassDict.Add(c,r);
+        r.Trait(Traits.Universal);
         r.Trait(Traits.Alive);
         if (spd > 0)
         {

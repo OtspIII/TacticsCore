@@ -22,7 +22,7 @@ public class UniversalTrait : TraitThing
                         if (m.Duration == -1) continue;
                         m.Duration--;
                         if (m.Duration <= 0)
-                            i.Who.StatMods[st].Remove(m);
+                            i.Who.RemoveMod(m);
                     }
                 }
                 break;
@@ -109,6 +109,7 @@ public class AliveTrait : TraitThing
         AddListen(EventTypes.TrueDeath);
         AddListen(EventTypes.TempDefense);
         AddListen(EventTypes.Heal);
+        AddListen(EventTypes.ChangeStat);
     }
     
     public override void TakeEvent(TraitInfo i, EventInfo e)
@@ -197,6 +198,30 @@ public class AliveTrait : TraitThing
             case EventTypes.TrueDeath:
             {
                 i.Who.Destruct();
+                break;
+            }
+            case EventTypes.ChangeStat:
+            {
+                IntStats st = e.GetStat();
+                int amt = e.GetInt();
+                int dur = e.GetInt("Duration",null,1);
+                string resist = e.GetString("Resist");
+                Debug.Log("CHANGE STAT: " + st + " / " + amt + " / " + dur + " / " + resist);
+                if(resist != "")
+                {
+                    int hp = i.Who.Get(IntStats.HP);
+                    DieRoll die = new DieRoll(resist, e.GetActor("Source"));
+                    int roll = die.Roll();
+                    Debug.Log("ROLL STAT CHANGE: " + resist + " / " + roll + " / " + hp + " / " + die);
+                    if (hp > roll)
+                    {
+                        God.GM.AddCut(new HeadtextCut(i.Who,"RESIST",Colors.Resist));
+                        break;
+                    }
+                }
+                string txt = st + (amt >= 0 ? " +" : " ") + amt;
+                God.GM.AddCut(new HeadtextCut(i.Who,txt,Colors.StatusEffect));
+                i.Who.AddMod(new StatMod(st, amt, dur));
                 break;
             }
         }

@@ -64,9 +64,7 @@ public class TraitThing
             i.Who.RemoveListen(e,Type,false);
         i.Who.Trait.Remove(Type);
         foreach (StatMod m in i.Mods)
-        {
             i.Who.RemoveMod(m);
-        }
         OnRemove(i,n);
     }
     

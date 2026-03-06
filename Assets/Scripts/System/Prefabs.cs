@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using UnityEngine;
 
 public class ActorPrefab
 {
@@ -127,10 +128,31 @@ public class ActionPrefab
         return this;
     }
 
+    public ActionPrefab PAdd(ActPattern pat, int size,ActEventTarget t, params EventInfo[] events)
+    {
+        ActionPhase p = Phases[Phases.Count - 1];
+        p.Add(pat, size, t, events);
+        return this;
+    }
+    
     public ActionPrefab PAdd(ActEventTarget t,params EventInfo[] events)
     {
         ActionPhase p = Phases[Phases.Count - 1];
         p.Add(t, events);
+        return this;
+    }
+    
+    public ActionPrefab EAdd(params EventInfo[] events)
+    {
+        ActionPhase p = Phases[Phases.Count - 1];
+        if (p.Events.Count == 0)
+        {
+            God.LogWarning("EADD ON A PHASE WITH NO EVENTS: " + Name);
+            p.Events.Add(new ActionEvent(events));
+            return this;
+        }
+        ActionEvent e = p.Events[p.Events.Count - 1];
+        e.Events.AddRange(events);
         return this;
     }
 }

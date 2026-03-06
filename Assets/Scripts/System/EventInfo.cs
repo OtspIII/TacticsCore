@@ -44,8 +44,12 @@ public class EventInfo
         foreach(string n in i.Texts.Keys) Texts.Add(n,i.Texts[n]);
         foreach(string n in i.Bools) Bools.Add(n);
         foreach(string n in i.Things.Keys) Things.Add(n,i.Things[n]);
+        foreach(string n in i.Actors.Keys) Actors.Add(n,i.Actors[n]);
         foreach(string n in i.Vectors.Keys) Vectors.Add(n,i.Vectors[n]);
         foreach(string n in i.TraitI.Keys) TraitI.Add(n,i.TraitI[n]);
+        foreach(string n in i.Stats.Keys) Stats.Add(n,i.Stats[n]);
+        foreach(string n in i.Tiles.Keys) Tiles.Add(n,i.Tiles[n]);
+        foreach(string n in i.DTypes.Keys) DTypes.Add(n,i.DTypes[n]);
     }
     
     //Numbers
