@@ -22,4 +22,8 @@ public class BuildLevelPhase : PhaseScript
         God.GM.StartPhase();
     }
 
+    public override PhaseScript NextPhase()
+    {
+        return new TurnStartPhase();
+    }
 }

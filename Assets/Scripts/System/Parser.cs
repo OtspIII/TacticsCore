@@ -13,6 +13,7 @@ public static class Parser
         TraitDict.Add(Traits.Player, new PlayerTrait());
         TraitDict.Add(Traits.Universal, new UniversalTrait());
         TraitDict.Add(Traits.Mobile, new MobileTrait());
+        TraitDict.Add(Traits.Stunned, new StunTrait());
     }
     
     public static TraitThing Get(Traits t)

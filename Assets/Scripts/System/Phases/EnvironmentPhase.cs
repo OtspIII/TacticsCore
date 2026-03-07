@@ -2,22 +2,24 @@
 using NUnit.Framework;
 using UnityEngine;
 
-public class EnvironmentPhase : PhaseScript
+public class TurnStartPhase : PhaseScript
 {
-    public List<ActorThing> Queued = new List<ActorThing>();
-    
-    public EnvironmentPhase()
+    public TurnStartPhase()
     {
         Type = Phases.Environment;
     }
 
     public override void Begin()
     {
+        foreach (ActorThing a in God.GM.GetActors())
+        {
+            a.TakeEvent(EventTypes.StartTurn);
+        }
     }
 
     public override void OnRun()
     {
-        if(Queued.Count == 0) God.GM.StartPhase();
+        God.GM.StartPhase();
     }
 
     public override PhaseScript NextPhase()

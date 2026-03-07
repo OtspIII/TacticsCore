@@ -114,6 +114,22 @@ public class ActionPrefab
         return this;
     }
     
+    public ActionPrefab GTrait(int range,Traits tr,string res, int dur,params EventInfo[] events)
+    {
+        GTrait(range, ActPattern.TargetOnly,1,tr, res,dur);
+        return this;
+    }
+    
+    public ActionPrefab GTrait(int range, ActPattern pat, int size,Traits tr,string res, 
+        int dur=-1,int amt=0,ActEventTarget targ=ActEventTarget.Characters)
+    {
+        List<EventInfo> e = new List<EventInfo>(){God.E(EventTypes.GainTrait).Resist(res).Set(tr).Set("Duration",dur).Set(amt)};
+        ActionPhase p = new ActionPhase(range,Cutscenes.Attack,TargetType.Tile);
+        p.Add(pat,size, targ,e.ToArray());
+        Phases.Add(p);
+        return this;
+    }
+    
     public ActionPrefab Attack(int range,string dmg,DamageTypes type=DamageTypes.Normal,params EventInfo[] events)
     {
         Attack(range, ActPattern.TargetOnly,1,dmg, type, events);

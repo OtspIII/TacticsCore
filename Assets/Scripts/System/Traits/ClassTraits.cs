@@ -7,6 +7,8 @@ public class UniversalTrait : TraitThing
     {
         Type = Traits.Universal;
         AddListen(EventTypes.StartTurn);
+        AddListen(EventTypes.GainTrait);
+        AddListen(EventTypes.LoseTrait);
     }
 
     public override void TakeEvent(TraitInfo i, EventInfo e)
@@ -25,6 +27,33 @@ public class UniversalTrait : TraitThing
                             i.Who.RemoveMod(m);
                     }
                 }
+                break;
+            }
+            case EventTypes.GainTrait:
+            {
+                Traits tr = i.GetTrait();
+                string res = e.GetString("Resist");
+                int dur = e.GetInt("Duration", -1);
+                int amt = e.GetInt();
+                if (res != "" && i.Who.Resist(res, e.GetActor("Source"))) break;
+                God.GM.AddCut(new HeadtextCut(i.Who,tr.ToString(),Colors.StatusEffect));
+                i.Who.AddTrait(tr,new EventInfo(amt).Set("Duration",dur));
+                break;
+            }
+            case EventTypes.LoseTrait:
+            {
+                Traits tr = i.GetTrait();
+                int dur = e.GetInt("Duration", 0);
+                int amt = e.GetInt("",0);
+                TraitInfo ti = i.Who.Get(tr);
+                bool remove = true;
+                if (dur > 0 || amt > 0)
+                {
+                    remove = false;
+                    if (dur > 0 && ti.Change("Duration", -dur).V() <= 0) remove = true;
+                    if (amt > 0 && ti.Change("", -amt).V() <= 0) remove = true;
+                }
+                if (remove) i.Who.RemoveTrait(tr);
                 break;
             }
         }
@@ -87,7 +116,7 @@ public class MobileTrait : TraitThing
                 GameTile src = s != null ? s.Location : e.GetTile("Target");
                 GameTile t = s != null ? e.GetTile("Target") : i.Who.Location;
                 if (src == t) t = i.Who.Location;
-                Vector2Int dir = God.RoundDir(t.Location-src.Location) * (e.GetInt("",s,1));
+                Vector2Int dir = God.RoundDir(t.Location-src.Location) * (e.GetInt("",1,s));
                 GameTile dest = i.Who.Location.Neighbor(dir);
                 if(dest != null) //bug: if pushed against edge should stop at edge, push others they bump into, etc
                     i.Who.Walk(dest,false);
@@ -110,6 +139,7 @@ public class AliveTrait : TraitThing
         AddListen(EventTypes.TempDefense);
         AddListen(EventTypes.Heal);
         AddListen(EventTypes.ChangeStat);
+        AddListen(EventTypes.CanAct,1);
     }
     
     public override void TakeEvent(TraitInfo i, EventInfo e)
@@ -204,24 +234,18 @@ public class AliveTrait : TraitThing
             {
                 IntStats st = e.GetStat();
                 int amt = e.GetInt();
-                int dur = e.GetInt("Duration",null,1);
+                int dur = e.GetInt("Duration",1,e.GetActor("Source"));
                 string resist = e.GetString("Resist");
                 Debug.Log("CHANGE STAT: " + st + " / " + amt + " / " + dur + " / " + resist);
-                if(resist != "")
-                {
-                    int hp = i.Who.Get(IntStats.HP);
-                    DieRoll die = new DieRoll(resist, e.GetActor("Source"));
-                    int roll = die.Roll();
-                    Debug.Log("ROLL STAT CHANGE: " + resist + " / " + roll + " / " + hp + " / " + die);
-                    if (hp > roll)
-                    {
-                        God.GM.AddCut(new HeadtextCut(i.Who,"RESIST",Colors.Resist));
-                        break;
-                    }
-                }
+                if (resist != "" && i.Who.Resist(resist, e.GetActor("Source"))) break;
                 string txt = st + (amt >= 0 ? " +" : " ") + amt;
                 God.GM.AddCut(new HeadtextCut(i.Who,txt,Colors.StatusEffect));
                 i.Who.AddMod(new StatMod(st, amt, dur));
+                break;
+            }
+            case EventTypes.CanAct:
+            {
+                e.Set(!i.Who.Has(CTags.Corpse));
                 break;
             }
         }

@@ -95,7 +95,7 @@ public class EventInfo
         return def != null ? def : new Number(0);
     }
     
-    public int GetInt(string i="",ActorThing who=null,int def=0)
+    public int GetInt(string i="",int def=0,ActorThing who=null)
     {
         if (Numbers.TryGetValue(i, out Number r)) return r.V(who);
         return def;
@@ -115,6 +115,10 @@ public class EventInfo
     public EventInfo Roll(string s)
     {
         return SetString("Roll", s);
+    }
+    public EventInfo Resist(string s)
+    {
+        return SetString("Resist", s);
     }
     public EventInfo Set(string s)
     {
@@ -351,6 +355,8 @@ public enum EventTypes{
     Knockback       =2100,
     
     WalkTo          =3000,
+    
+    CanAct          =4000,
     
     SelectCard      =9000,
     EndTurn         =9001,

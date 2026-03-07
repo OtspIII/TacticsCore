@@ -15,7 +15,7 @@ public class EnemyTurnPhase : PhaseScript
     {
         foreach (ActorThing a in God.GM.GetActors())
         {
-            if (!a.Has(Traits.Player)) Queued.Add(a);
+            if (!a.Has(Traits.Player) && a.Ask(EventTypes.CanAct).GetBool()) Queued.Add(a);
         }
         God.GM.CalcMapPDist();
     }
@@ -32,14 +32,26 @@ public class EnemyTurnPhase : PhaseScript
         if (a == null || a.Destroyed) return;
         ActionScript main= a.GetAct(ActionSlot.BasicAttack);
         ActionScript move = a.GetAct(ActionSlot.BasicMove);
-        move.AISelect(main);
-        move.Execute();
-        main.AISelect();
-        main.Execute();
+        ActionScript bonus = null;
+        if (move != null && a.ActionsLeft.Contains(ActionCost.Move))
+        {
+            move.AISelect(main);
+            move.Execute();
+        }
+        if (bonus != null && a.ActionsLeft.Contains(ActionCost.Bonus))
+        {
+            bonus.AISelect(main);
+            bonus.Execute();
+        }
+        if (main != null && a.ActionsLeft.Contains(ActionCost.Major))
+        {
+            main.AISelect();
+            main.Execute();
+        }
     }
 
     public override PhaseScript NextPhase()
     {
-        return new EnvironmentPhase();
+        return new TurnStartPhase();
     }
 }

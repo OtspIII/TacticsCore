@@ -46,7 +46,7 @@ public static class ThingBuilder
         AddAction(Actions.HitAndRun, "Hit & Run", "Melee",ActionCost.Major, ActionSlot.BasicAttack).Set(CharClass.Thief) 
             .Attack(1,"W").Move();
         AddAction(Actions.SandInEyes, "Sand In The Eyes","Mental",ActionCost.Bonus, ActionSlot.Secondary).Set(UsesNum.eConstant).Set(CharClass.Thief)
-            .SingleTarget(2,God.E(EventTypes.Heal).Roll("1d6+1")); //stun 2d6+4
+            .GTrait(2,Traits.Stunned,"2d6+4",1);
         /*
          
          

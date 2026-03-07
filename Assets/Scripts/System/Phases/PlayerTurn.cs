@@ -20,10 +20,9 @@ public class PlayerTurnPhase : PhaseScript
     {
         foreach (ActorThing a in God.GM.GetActors())
         {
-            if (a.Has(Traits.Player) && !a.Has(CTags.Corpse))
+            if (a.Has(Traits.Player) && a.Ask(EventTypes.CanAct).GetBool())
             {
                 Players.Add(a);
-                a.TakeEvent(EventTypes.StartTurn);
             }
         }
     }

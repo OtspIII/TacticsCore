@@ -253,13 +253,13 @@ public class ActorThing : Thing
         }
     }
 
-    public EventInfo Ask(EventTypes e, bool wpn = false)
+    public EventInfo Ask(EventTypes e)
     {
         EventInfo r = God.E(e);
-        return Ask(r, wpn);
+        return Ask(r);
     }
     
-    public EventInfo Ask(EventInfo e,bool wpn=false,int safety=99)
+    public EventInfo Ask(EventInfo e,int safety=99)
     {
         safety--;
         if (safety <= 0)
@@ -415,6 +415,21 @@ public class ActorThing : Thing
     public bool Has(CTags t)
     {
         return Tags.Contains(t);
+    }
+
+    public bool Resist(string resist,ActorThing src=null,bool silent=false)
+    {
+        int hp = Get(IntStats.HP);
+        DieRoll die = new DieRoll(resist, src);
+        int roll = die.Roll();
+        Debug.Log("ROLL RESIST: " + resist + " / " + roll + " / " + hp + " / " + die);
+        if (hp > roll)
+        {
+            if(!silent) God.GM.AddCut(new HeadtextCut(this,"RESIST",Colors.Resist));
+            return true;
+        }
+
+        return false;
     }
 }
 
