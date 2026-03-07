@@ -360,5 +360,5 @@ public enum EventTypes{
     
     SelectCard      =9000,
     EndTurn         =9001,
-    
+    BecomeIncap     =9002,
 }

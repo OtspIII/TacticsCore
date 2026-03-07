@@ -33,12 +33,13 @@ public class TraitThing
     public Dictionary<EventTypes,float> TakeListen = new Dictionary<EventTypes,float>();
     public Dictionary<EventTypes,float> Audit = new Dictionary<EventTypes,float>();
 
-    public void Init(TraitInfo i)
+    public void Init(TraitInfo i,EventInfo ev=null)
     {
         foreach (EventTypes e in PreListen.Keys)
             i.Who.AddListen(e, Type, true);
         foreach (EventTypes e in TakeListen.Keys)
             i.Who.AddListen(e, Type, false);
+        OnAdd(i,ev);
     }
 
     public void Init(ActionScript a)
@@ -49,6 +50,10 @@ public class TraitThing
             a.AddListen(e, Type,true);
     }
 
+    public virtual void OnAdd(TraitInfo i,EventInfo e=null)
+    {
+        
+    }
 
     public virtual void ReUp(TraitInfo old,EventInfo n)
     {

@@ -140,7 +140,7 @@ public class PlayerTurnPhase : PhaseScript
                 }
                 break;
             }
-            case EventTypes.Death:
+            case EventTypes.Death:case EventTypes.BecomeIncap:
             {
                 ActorThing t = e.GetActor("Who");
                 Players.Remove(t);

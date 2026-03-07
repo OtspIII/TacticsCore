@@ -26,4 +26,10 @@ public class StunTrait : TraitThing
             }
         }
     }
+
+    public override void OnAdd(TraitInfo i, EventInfo e = null)
+    {
+        i.Who.ActionsLeft.Clear();
+        God.GM.TakeEvent(God.E(EventTypes.BecomeIncap).Set(i.Who));
+    }
 }

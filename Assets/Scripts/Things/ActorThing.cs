@@ -422,7 +422,7 @@ public class ActorThing : Thing
         int hp = Get(IntStats.HP);
         DieRoll die = new DieRoll(resist, src);
         int roll = die.Roll();
-        Debug.Log("ROLL RESIST: " + resist + " / " + roll + " / " + hp + " / " + die);
+        // Debug.Log("ROLL RESIST: " + resist + " / " + roll + " / " + hp + " / " + die);
         if (hp > roll)
         {
             if(!silent) God.GM.AddCut(new HeadtextCut(this,"RESIST",Colors.Resist));

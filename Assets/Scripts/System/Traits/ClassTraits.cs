@@ -31,7 +31,7 @@ public class UniversalTrait : TraitThing
             }
             case EventTypes.GainTrait:
             {
-                Traits tr = i.GetTrait();
+                Traits tr = e.GetTrait();
                 string res = e.GetString("Resist");
                 int dur = e.GetInt("Duration", -1);
                 int amt = e.GetInt();
