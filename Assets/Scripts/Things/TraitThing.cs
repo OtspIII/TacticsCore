@@ -103,4 +103,14 @@ public class TraitThing
     {
         PreListen.Add(e,prio);
     }
+
+    public virtual Cutscene GainCut(EventInfo i, EventInfo e,ActorThing who)
+    {
+        return new HeadtextCut(who, i.Type.ToString(), Colors.StatusEffect);
+    }
+    
+    public virtual Cutscene LoseCut(EventInfo i, EventInfo e,ActorThing who)
+    {
+        return new HeadtextCut(who, i.Type.ToString() + " Ends", Colors.StatusEffect);
+    }
 }

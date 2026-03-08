@@ -205,13 +205,13 @@ public class ActionScript : Thing
         {
             r = 10 - Mathf.Abs(t.BestPDistance-main.Range);
         }
-        Debug.Log("GET VALUE: " + Who + " / " + Type + " / " + r + " / " + mod);
+        // Debug.Log("GET VALUE: " + Who + " / " + Type + " / " + r + " / " + mod);
         EventInfo e = God.E(EventTypes.ActionValue).Set(t).SetF(r).SetF("Mod",mod).Set("Main Action",main).Set(this);
         TakeEvent(e);
         Who.TakeEvent(e);
         r = e.GetF();
         mod = e.GetF("Mod");
-        Debug.Log("END VAL: " + Who + " / " + Type + " / " + r + " / " + mod);
+        // Debug.Log("END VAL: " + Who + " / " + Type + " / " + r + " / " + mod);
         return r + mod;
     }
 

@@ -50,6 +50,7 @@ public class GameManager : MonoBehaviour
 
     public void AddCut(Cutscene c)
     {
+        if (c == null) return;
         if (Cuts.Count > 0)
         {
             if (Cuts[Cuts.Count - 1].Merge(c)) return;

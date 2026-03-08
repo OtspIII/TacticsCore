@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class UniversalTrait : TraitThing
@@ -6,7 +7,7 @@ public class UniversalTrait : TraitThing
     public UniversalTrait()
     {
         Type = Traits.Universal;
-        AddListen(EventTypes.StartTurn);
+        AddListen(EventTypes.StartTurn,4);
         AddListen(EventTypes.GainTrait);
         AddListen(EventTypes.LoseTrait);
     }
@@ -27,6 +28,18 @@ public class UniversalTrait : TraitThing
                             i.Who.RemoveMod(m);
                     }
                 }
+                foreach (TraitInfo ti in i.Who.Trait.Values.ToArray())
+                {
+                    int dur = ti.GetInt("Duration", 0);
+                    if(dur <= 0) continue;
+                    int d = ti.Change("Duration", -1).V();
+                    if (d <= 0)
+                    {
+                        God.GM.AddCut(Parser.Get(ti.Trait).LoseCut(ti,e,i.Who));
+                        i.Who.RemoveTrait(ti.Trait);
+                    }
+                }
+                
                 break;
             }
             case EventTypes.GainTrait:
@@ -36,8 +49,9 @@ public class UniversalTrait : TraitThing
                 int dur = e.GetInt("Duration", -1);
                 int amt = e.GetInt();
                 if (res != "" && i.Who.Resist(res, e.GetActor("Source"))) break;
-                God.GM.AddCut(new HeadtextCut(i.Who,tr.ToString(),Colors.StatusEffect));
-                i.Who.AddTrait(tr,new EventInfo(amt).Set("Duration",dur),e);
+                EventInfo seed = new EventInfo(amt).Set("Duration", dur);
+                God.GM.AddCut(Parser.Get(tr).GainCut(seed,e,i.Who));
+                i.Who.AddTrait(tr,seed,e);
                 break;
             }
             case EventTypes.LoseTrait:
@@ -53,6 +67,7 @@ public class UniversalTrait : TraitThing
                     if (dur > 0 && ti.Change("Duration", -dur).V() <= 0) remove = true;
                     if (amt > 0 && ti.Change("", -amt).V() <= 0) remove = true;
                 }
+                God.GM.AddCut(Parser.Get(tr).LoseCut(ti,e,i.Who));
                 if (remove) i.Who.RemoveTrait(tr);
                 break;
             }
