@@ -14,6 +14,7 @@ public static class Parser
         TraitDict.Add(Traits.Universal, new UniversalTrait());
         TraitDict.Add(Traits.Mobile, new MobileTrait());
         TraitDict.Add(Traits.Stunned, new StunTrait());
+        TraitDict.Add(Traits.Taunted, new TauntedTrait());
     }
     
     public static TraitThing Get(Traits t)

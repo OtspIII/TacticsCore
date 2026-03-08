@@ -67,6 +67,7 @@ public enum Traits
 	Paralyzed		=7013,		//Ghoul paralysiz
 	TrollRegen		=7014,		//Full health regen every turn, hurt by fire
 	LashOut			=7015,		//Instant effect, attack a random gsquare
+	Taunted			=7016,
 	//Buffs			#8000
 	GearReward		=8001,
 	GearPowerup		=8002,

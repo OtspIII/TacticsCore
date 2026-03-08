@@ -10,6 +10,7 @@ public class EventInfo
     public EventTypes Type;
     public bool Abort=false;
     public Dictionary<string, Number> Numbers = new Dictionary<string, Number>();
+    public Dictionary<string, float> Floats = new Dictionary<string, float>();
     // public Dictionary<string, Number> Ns = new Dictionary<string, Number>();
     public Dictionary<string, string> Texts = new Dictionary<string, string>();
     public List<string> Bools = new List<string>();
@@ -50,6 +51,7 @@ public class EventInfo
         foreach(string n in i.Stats.Keys) Stats.Add(n,i.Stats[n]);
         foreach(string n in i.Tiles.Keys) Tiles.Add(n,i.Tiles[n]);
         foreach(string n in i.DTypes.Keys) DTypes.Add(n,i.DTypes[n]);
+        foreach(string n in i.Floats.Keys) Floats.Add(n,i.Floats[n]);
     }
     
     //Numbers
@@ -137,6 +139,26 @@ public class EventInfo
     {
         if (Texts.TryGetValue(i, out string r)) return r;
         return "";
+    }
+    
+    public EventInfo SetF(float s)
+    {
+        return SetF("", s);
+    }
+    public EventInfo Set(string i, float s)
+    {
+        return SetF(i, s);
+    }
+    public EventInfo SetF(string i, float s)
+    {
+        if (!Floats.TryAdd(i,s)) Floats[i]=s;
+        return this;
+    }
+
+    public float GetF(string i="",float def=0)
+    {
+        if (Floats.TryGetValue(i, out float r)) return r;
+        return def;
     }
     
     
@@ -357,6 +379,8 @@ public enum EventTypes{
     WalkTo          =3000,
     
     CanAct          =4000,
+    
+    ActionValue     =5000,
     
     SelectCard      =9000,
     EndTurn         =9001,

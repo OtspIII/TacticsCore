@@ -199,12 +199,20 @@ public class ActionScript : Thing
 
     public float GetValue(GameTile t,ActionScript main=null)
     {
+        float r = 1;   //The value of the tile in and of itself
+        float mod = 0; //For things like how dangerous it is to stand there
         if (main != null) //main exists only for moves to get a NPC in place for another act
         {
-            return 10 - Mathf.Abs(t.BestPDistance-main.Range);
+            r = 10 - Mathf.Abs(t.BestPDistance-main.Range);
         }
-
-        return 1;
+        Debug.Log("GET VALUE: " + Who + " / " + Type + " / " + r + " / " + mod);
+        EventInfo e = God.E(EventTypes.ActionValue).Set(t).SetF(r).SetF("Mod",mod).Set("Main Action",main).Set(this);
+        TakeEvent(e);
+        Who.TakeEvent(e);
+        r = e.GetF();
+        mod = e.GetF("Mod");
+        Debug.Log("END VAL: " + Who + " / " + Type + " / " + r + " / " + mod);
+        return r + mod;
     }
 
     public bool Execute()

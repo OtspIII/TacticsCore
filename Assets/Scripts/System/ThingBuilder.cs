@@ -30,7 +30,7 @@ public static class ThingBuilder
         AddAction(Actions.GuardedStrike, "Guarded Strike", "Melee",ActionCost.Major, ActionSlot.BasicAttack).Set(CharClass.Fighter) 
             .Attack(1,"W").PAdd(ActEventTarget.Self,God.E(EventTypes.TempDefense).Set(2));
         AddAction(Actions.Taunt, "Taunt","Mental",ActionCost.Bonus, ActionSlot.Secondary).Set(UsesNum.eConstant).Set(CharClass.Fighter)
-            .Attack(4,"1"); //ActAnims.Yell
+            .GTrait(2,Traits.Taunted,"",1); //ActAnims.Yell
         //Wizard
         AddAction(Actions.FireDart, "Fire Dart", "Ranged",ActionCost.Major, ActionSlot.BasicAttack).Set(CharClass.Wizard) 
             .Attack(5,"1d6",DamageTypes.Fire); //Set ground on fire

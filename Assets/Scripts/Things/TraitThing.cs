@@ -14,7 +14,7 @@ public class TraitInfo : EventInfo
         Who= who;
     }
 
-    public void Init() { Parser.Get(Trait).Init(this); }
+    public void Init(EventInfo e) { Parser.Get(Trait).Init(this,e); }
     public void ReUp(EventInfo i) { Parser.Get(Trait).ReUp(this,i); }
     public void Remove(EventInfo e) { Parser.Get(Trait).Remove(this,e); }
     public void PreEvent(EventInfo e) { Parser.Get(Trait).PreEvent(this,e); }

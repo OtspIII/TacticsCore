@@ -130,7 +130,7 @@ public class ActorThing : Thing
             //Make new trait info and add it to us/set it up
             r = new TraitInfo(t, this, i);
             Trait.Add(t,r);
-            r.Init();
+            r.Init(e);
         }
         return r; //Return the trait info
     }

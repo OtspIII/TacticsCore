@@ -37,7 +37,7 @@ public class UniversalTrait : TraitThing
                 int amt = e.GetInt();
                 if (res != "" && i.Who.Resist(res, e.GetActor("Source"))) break;
                 God.GM.AddCut(new HeadtextCut(i.Who,tr.ToString(),Colors.StatusEffect));
-                i.Who.AddTrait(tr,new EventInfo(amt).Set("Duration",dur));
+                i.Who.AddTrait(tr,new EventInfo(amt).Set("Duration",dur),e);
                 break;
             }
             case EventTypes.LoseTrait:
@@ -65,21 +65,17 @@ public class PlayerTrait : TraitThing
     public PlayerTrait()
     {
         Type = Traits.Player;
-        AddListen(EventTypes.StartTurn);
+        // AddListen(EventTypes.StartTurn);
     }
 
     public override void TakeEvent(TraitInfo i, EventInfo e)
     {
         switch (e.Type)
         {
-            case EventTypes.StartTurn:
-            {
-                i.Who.ActionsLeft.Clear();
-                i.Who.ActionsLeft.Add(ActionCost.Major);
-                i.Who.ActionsLeft.Add(ActionCost.Bonus);
-                i.Who.ActionsLeft.Add(ActionCost.Move);
-                break;
-            }
+            // case EventTypes.StartTurn:
+            // {
+            //     break;
+            // }
         }
     }
 }
@@ -152,6 +148,10 @@ public class AliveTrait : TraitThing
             }
             case EventTypes.StartTurn:
             {
+                i.Who.ActionsLeft.Clear();
+                i.Who.ActionsLeft.Add(ActionCost.Major);
+                i.Who.ActionsLeft.Add(ActionCost.Bonus);
+                i.Who.ActionsLeft.Add(ActionCost.Move);
                 int arm = i.Who.Get(IntStats.Armor);
                 i.Who.Set(IntStats.Defense,arm);
                 i.Who.Body.HP.SetArmor(arm,arm);
