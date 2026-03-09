@@ -146,6 +146,7 @@ public class Number
 {
 	public int N = 0;
 	public IntStats Stat = IntStats.None;
+	public IntStats StatAlt = IntStats.None;
 	public ActorThing Who=null;
 	public int Mult = 1;
 
@@ -155,17 +156,19 @@ public class Number
 		Mult = m;
 	}
 
-	public Number(ActorThing who,IntStats s,int m=1)
+	public Number(ActorThing who,IntStats s,int m=1,IntStats salt=IntStats.None)
 	{
 		Stat = s;
 		Who = who;
 		Mult = m;
+		StatAlt = salt;
 	}
 	
-	public Number(IntStats s,int m=1)
+	public Number(IntStats s,int m=1,IntStats salt=IntStats.None)
 	{
 		Stat = s;
 		Mult = m;
+		StatAlt = salt;
 	}
 
 	
@@ -174,6 +177,7 @@ public class Number
 	{
 		if (who == null) who = Who;
 		int st = Stat != IntStats.None ? who.Get(Stat) : 0;
+		if (StatAlt != IntStats.None) st += who.Get(StatAlt);
 		return (N + st) * Mult;
 	}
 	
@@ -184,6 +188,6 @@ public class Number
 
 	public override string ToString()
 	{
-		return "N[" + N + " / " + Stat + " / " + Mult + " / " + (Who != null ? Who.Class : "")+"]";
+		return "N[" + N + " / " + Stat + " / " + Mult + " / " + StatAlt + " / " + (Who != null ? Who.Class : "")+"]";
 	}
 }

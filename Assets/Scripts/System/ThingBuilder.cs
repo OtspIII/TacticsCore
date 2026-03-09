@@ -25,6 +25,7 @@ public static class ThingBuilder
         AddNPC(CharClass.RatmanMutant,"Ratfolk Mutant",4,0,4,"2d4");
 
         AddAction(Actions.Walk, "Walk","Movement",ActionCost.None, ActionSlot.BasicMove).Move();
+        AddAction(Actions.Sprint, "Sprint","Movement",ActionCost.Major, ActionSlot.Sprint).Move(God.N(IntStats.MoveLeft,1,IntStats.Movespeed));
         AddAction(Actions.BasicAttack, "Attack","Melee",ActionCost.Major, ActionSlot.BasicAttack).SingleTarget(1,God.E(EventTypes.Damage).Set("Roll","W"));
         //Fighter
         AddAction(Actions.GuardedStrike, "Guarded Strike", "Melee",ActionCost.Major, ActionSlot.BasicAttack).Set(CharClass.Fighter) 

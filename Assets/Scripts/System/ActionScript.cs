@@ -648,7 +648,8 @@ public enum ActionSlot
     BasicAttack=2,
     Secondary=3,
     Utility=4,
-    Ultimate=5
+    Ultimate=5,
+    Sprint=6,
 }
 
 public enum AITarget

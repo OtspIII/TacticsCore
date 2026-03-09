@@ -77,6 +77,7 @@ public class ActorThing : Thing
         foreach(Actions a in pre.KnownActions) AddAction(a);
         if(!KnownActions.ContainsKey(ActionSlot.BasicMove)) AddAction(Actions.Walk);
         if(!KnownActions.ContainsKey(ActionSlot.BasicAttack)) AddAction(Actions.BasicAttack);
+        if(!KnownActions.ContainsKey(ActionSlot.Sprint)) AddAction(Actions.Sprint);
         // if(Actions.Count == 0) Actions.Add(new AttackAction(this));//Placeholder!
         SetLocation(l);
     }
@@ -241,7 +242,7 @@ public class ActorThing : Thing
         if(take != null)
             foreach (Traits t in take)
             {
-                Get(t).TakeEvent(e);
+                Get(t)?.TakeEvent(e);
                 if(e.Abort) break;
             }
         MidEvent = false;

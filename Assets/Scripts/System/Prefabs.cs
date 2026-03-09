@@ -136,10 +136,15 @@ public class ActionPrefab
         return this;
     }
     
-    public ActionPrefab Move(int range=0)
+    public ActionPrefab Move(Number range=null,List<EventInfo> preE=null,List<EventInfo> postE=null)
     {
-        ActionPhase p = new ActionPhase(God.N(IntStats.MoveLeft),Cutscenes.None,TargetType.EmptyTile,AITarget.Empty);
-        p.Add(ActEventTarget.Self, God.E(EventTypes.WalkTo));
+        if (range == null) range = God.N(IntStats.MoveLeft);
+        ActionPhase p = new ActionPhase(range,Cutscenes.None,TargetType.EmptyTile,AITarget.Empty);
+        List<EventInfo> evs = new List<EventInfo>();
+        if(preE!=null) evs.AddRange(preE);
+        evs.Add(God.E(EventTypes.WalkTo));
+        if(postE!=null) evs.AddRange(postE);
+        p.Add(ActEventTarget.Self, evs.ToArray());
         Phases.Add(p);
         return this;
     }
