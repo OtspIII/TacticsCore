@@ -85,13 +85,13 @@ public class PlayerTrait : TraitThing
 
     public override void TakeEvent(TraitInfo i, EventInfo e)
     {
-        switch (e.Type)
-        {
-            // case EventTypes.StartTurn:
-            // {
-            //     break;
-            // }
-        }
+        // switch (e.Type)
+        // {
+        //     case EventTypes.StartTurn:
+        //     {
+        //         break;
+        //     }
+        // }
     }
 }
 
@@ -251,7 +251,7 @@ public class AliveTrait : TraitThing
                 int amt = e.GetInt();
                 int dur = e.GetInt("Duration",1,e.GetActor("Source"));
                 string resist = e.GetString("Resist");
-                Debug.Log("CHANGE STAT: " + st + " / " + amt + " / " + dur + " / " + resist);
+                // Debug.Log("CHANGE STAT: " + st + " / " + amt + " / " + dur + " / " + resist);
                 if (resist != "" && i.Who.Resist(resist, e.GetActor("Source"))) break;
                 string txt = st + (amt >= 0 ? " +" : " ") + amt;
                 God.GM.AddCut(new HeadtextCut(i.Who,txt,Colors.StatusEffect));

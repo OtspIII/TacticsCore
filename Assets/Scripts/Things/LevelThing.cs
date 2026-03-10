@@ -32,13 +32,20 @@ public class LevelThing
             AddActor(c, chosen);
         }
         List<CharClass> classOpts = ThingBuilder.GetClasses(1);
-        for (int n = 0; n < 3; n++)
+        foreach (CharClass c in classOpts)
         {
             if (OpenTiles.Count == 0) break;
             GameTile chosen = OpenTiles.Random();
             OpenTiles.Remove(chosen);
-            AddActor(classOpts.RandomE(), chosen);
+            AddActor(c, chosen);
         }
+        // for (int n = 0; n < 3; n++)
+        // {
+        //     if (OpenTiles.Count == 0) break;
+        //     GameTile chosen = OpenTiles.Random();
+        //     OpenTiles.Remove(chosen);
+        //     AddActor(classOpts.RandomE(), chosen);
+        // }
     }
 
     public GameTile AddTile(int x, int y)

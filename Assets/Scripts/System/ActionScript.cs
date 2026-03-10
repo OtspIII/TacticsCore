@@ -120,6 +120,11 @@ public class ActionScript : Thing
     public virtual void AISelect(ActionScript main=null)
     {
         Begin();
+        if (Phase.Target == TargetType.Self)
+        {
+            Info.Tiles.Add(Who.Location);
+            return;
+        }
         FindOptions();
         // Info.Opts = Who.Location.Flood(Phase.Range.V(Who), GetNeighborMode(), Who);
         if (Info.GoodOpts.Count == 0) return;
@@ -149,8 +154,11 @@ public class ActionScript : Thing
         {
             case AITarget.Enemies: return Who.IsEnemy(o.Contents);
             case AITarget.Allies: return o.Contents != null && Who.Team == o.Contents.Team;
+            case AITarget.HurtAllies: return o.Contents != null && Who.Team == o.Contents.Team && Who.HPPerc() < 1;
             case AITarget.Empty: return o.Contents == null;
+            case AITarget.EmptyByEnemy: return o.Contents == null && o.BestPDistance == 1;
             case AITarget.Anyone: return o.Contents != null;
+            case AITarget.Self: return o == Who.Location;
         }
         return true;
     }
@@ -358,6 +366,7 @@ public class ActionScript : Thing
                     {
                         tt.TakeEvent(e,a.Target,Who,this);
                         if (targ == null) continue;
+                        if (targ == Who && e.GetBool("IgnoreSelf")) continue;
                         EventInfo ae = God.E();
                         ae.Clone(e);
                         ae.Set("Target", t).Set("Source", Who);
@@ -667,6 +676,8 @@ public enum ActionSlot
     Utility=4,
     Ultimate=5,
     Sprint=6,
+    Reaction=7,
+    BeforePlayers=8,
 }
 
 public enum AITarget
@@ -678,4 +689,5 @@ public enum AITarget
     Anyone=4,
     EmptyByEnemy=5,
     Self=6,
+    HurtAllies=7,
 }

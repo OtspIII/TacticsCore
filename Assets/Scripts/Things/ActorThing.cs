@@ -57,6 +57,7 @@ public class ActorThing : Thing
         else pre = ThingBuilder.ActorDict[Type];
         Team = pre.Team;
         Name = pre.Name;
+        Tags.AddRange(pre.Tags);
         foreach (TraitBuilder t in pre.TraitList)
         {
             AddTrait(t.Type, t.E);
@@ -79,6 +80,7 @@ public class ActorThing : Thing
         if(!KnownActions.ContainsKey(ActionSlot.BasicMove)) AddAction(Actions.Walk);
         if(!KnownActions.ContainsKey(ActionSlot.BasicAttack)) AddAction(Actions.BasicAttack);
         if(!KnownActions.ContainsKey(ActionSlot.Sprint)) AddAction(Actions.Sprint);
+        if(!KnownActions.ContainsKey(ActionSlot.Reaction)) AddAction(Actions.BasicAttack);
         // if(Actions.Count == 0) Actions.Add(new AttackAction(this));//Placeholder!
         SetLocation(l);
     }
@@ -89,6 +91,8 @@ public class ActorThing : Thing
         act.Who = this;
         if(KnownActions.ContainsKey(act.Slot)) KnownActions[act.Slot] = act;
         else KnownActions.Add(act.Slot, act);
+        if(a.Tags.Contains(ATags.ReactionOK) && !KnownActions.ContainsKey(ActionSlot.Reaction))
+            KnownActions.Add(ActionSlot.Reaction,act);
     }
     public void AddAction(Actions a)
     {
@@ -452,8 +456,10 @@ public class ActorThing : Thing
     public ActionScript PickAction(ActionCost c = ActionCost.Major, ActionScript main = null)
     {
         Dictionary<ActionScript, float> opts = new Dictionary<ActionScript, float>();
-        foreach (ActionScript a in KnownActions.Values)
+        foreach (ActionSlot slot in KnownActions.Keys)
         {
+            if (!God.ActSlots.Contains(slot)) continue;
+            ActionScript a = KnownActions[slot];
             if (a.Cost != c) continue;
             opts.Add(a,a.GetActionValue(main));
         }

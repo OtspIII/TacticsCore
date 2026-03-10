@@ -197,6 +197,7 @@ public enum ATags{
 	LoseWhenTransform=21,//For lycanthropes, lose these abilities when you transform
 	RequireBloodied=22,//You only want to do this move if you've been hurt
 	Slow=23,		//#Go after all other monsters have acted
+	ReactionOK=24,  //Can be used as a reaction
 //	IgnoreChosenTarg=24,//Don't bother setting a chosen target for this, just use it on the most appropriate at the time
 }
 

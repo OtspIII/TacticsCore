@@ -12,6 +12,7 @@ public class ActorPrefab
     public List<Actions> KnownActions = new List<Actions>();
     public List<ActionPrefab> ActionPs = new List<ActionPrefab>();
     public GameTeam Team = GameTeam.None;
+    public List<CTags> Tags = new List<CTags>();
     public int Level = 0;
 
     public ActorPrefab() { }
@@ -35,9 +36,17 @@ public class ActorPrefab
         return this;
     }
     
-    public ActorPrefab Act(ActionPrefab a)
+    public ActorPrefab Act(ActionPrefab a,bool react=false)
     {
+        if(react) a.Tags.Add(ATags.ReactionOK);
         ActionPs.Add(a);
+        
+        return this;
+    }
+    
+    public ActorPrefab Tag(params CTags[] a)
+    {
+        Tags.AddRange(a);
         return this;
     }
 }
@@ -128,7 +137,34 @@ public class ActionPrefab
         Phases.Add(p);
         return this;
     }
+    
+    public ActionPrefab PTarg(TargetType tt=TargetType.None,AITarget at=AITarget.None,Cutscenes cut=Cutscenes.None,bool unique=false)
+    {
+        if (Phases.Count == 0)
+        {
+            God.LogWarning("NO PHASE ADDED YET BUT TRIED TOA DD PTARG: " + Name);
+            return this;
+        }
+        ActionPhase p = Phases[Phases.Count - 1];
+        if(tt != TargetType.None) p.Target = tt;
+        if(cut != Cutscenes.None) p.Cut = cut;
+        if(at != AITarget.None) p.AI = at;
+        p.UniqueTiles = unique;
+        return this;
+    }
 
+    public ActionPrefab AttackTag(int range, ActPattern pat, int size,string dmg="W", DamageTypes type = DamageTypes.Normal,
+        params string[] tags)
+    {
+        EventInfo atk = God.E(EventTypes.Damage).Roll(dmg).Set(type);
+        foreach (string t in tags) atk.Set(t, true);
+        List<EventInfo> e = new List<EventInfo>(){atk};
+        ActionPhase p = new ActionPhase(range,Cutscenes.Attack,TargetType.Tile);
+        p.Add(pat,size, ActEventTarget.Characters,e.ToArray());
+        Phases.Add(p);
+        return this;
+    }
+    
     public ActionPrefab Attack(int range, ActPattern pat, int size,string dmg="W", DamageTypes type = DamageTypes.Normal,
         params EventInfo[] events)
     {

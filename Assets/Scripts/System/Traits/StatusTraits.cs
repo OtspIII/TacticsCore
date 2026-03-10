@@ -91,3 +91,20 @@ public class TauntedTrait : TraitThing
 
 
 }
+
+public class RatBiteFeverTrait : TraitThing
+{
+    public RatBiteFeverTrait()
+    {
+        Type = Traits.RatBiteFever;
+    }
+
+    public override void TakeEvent(TraitInfo i, EventInfo e)
+    {
+        switch (e.Type)
+        {
+            
+        }
+    }
+
+}
