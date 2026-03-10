@@ -80,7 +80,7 @@ public class ActorThing : Thing
         if(!KnownActions.ContainsKey(ActionSlot.BasicMove)) AddAction(Actions.Walk);
         if(!KnownActions.ContainsKey(ActionSlot.BasicAttack)) AddAction(Actions.BasicAttack);
         if(!KnownActions.ContainsKey(ActionSlot.Sprint)) AddAction(Actions.Sprint);
-        if(!KnownActions.ContainsKey(ActionSlot.Reaction)) AddAction(Actions.BasicAttack);
+        if(!KnownActions.ContainsKey(ActionSlot.Reaction)) AddAction(Actions.BasicAttack,ActionSlot.Reaction);
         // if(Actions.Count == 0) Actions.Add(new AttackAction(this));//Placeholder!
         SetLocation(l);
     }
@@ -94,12 +94,13 @@ public class ActorThing : Thing
         if(a.Tags.Contains(ATags.ReactionOK) && !KnownActions.ContainsKey(ActionSlot.Reaction))
             KnownActions.Add(ActionSlot.Reaction,act);
     }
-    public void AddAction(Actions a)
+    public void AddAction(Actions a,ActionSlot slot=ActionSlot.None)
     {
         ActionScript act = ThingBuilder.MakeAction(a);
         act.Who = this;
-        if(KnownActions.ContainsKey(act.Slot)) KnownActions[act.Slot] = act;
-        else KnownActions.Add(act.Slot, act);
+        if (slot == ActionSlot.None) slot = act.Slot;
+        if(KnownActions.ContainsKey(slot)) KnownActions[slot] = act;
+        else KnownActions.Add(slot, act);
     }
 
     public void SetLocation(GameTile l)
@@ -327,7 +328,10 @@ public class ActorThing : Thing
         int inj = Get(IntStats.Injury);
         desc += "HP: " + Get(IntStats.HP) + " / " + (Get(IntStats.MaxHP)-inj);
         if (inj > 0) desc += " (" + inj + ")";
-        desc += "\nSpeed: " + Get(IntStats.Movespeed);
+        desc += "\nDef: " + Get(IntStats.Defense) + " / " + Get(IntStats.Armor);
+        desc += "\nSpeed: " + Get(IntStats.MoveLeft) + " / " + Get(IntStats.Movespeed);
+        desc += "\nDmg: " + BaseDamage.Desc;
+        if(SelectedAction != null) desc += "\nAction: " + SelectedAction.Name;
         c.Imprint(s,name,desc);
     }
 

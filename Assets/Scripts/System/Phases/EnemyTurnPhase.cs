@@ -30,8 +30,8 @@ public class EnemyTurnPhase : PhaseScript
         ActorThing a = Queued.Random();
         Queued.Remove(a);
         if (a == null || a.Destroyed) return;
-        
-        ActionScript main= a.PickAction(ActionCost.Major);
+
+        ActionScript main = a.SelectedAction;
         ActionScript move = a.PickAction(ActionCost.Move,main);
         ActionScript bonus = a.PickAction(ActionCost.Bonus);
         if (move != null && a.ActionsLeft.Contains(ActionCost.Move))

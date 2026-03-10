@@ -15,10 +15,13 @@ public static class ThingBuilder
     {
         if (IsSetup) return;
         IsSetup = true;
-        AddPlayer(CharClass.Fighter,10,3,3,"1d8").Act(Actions.GuardedStrike).Act(Actions.Taunt).Act(new ActionPrefab("Snack Break","Melee",ActionSlot.Secondary).Self(God.E(EventTypes.Heal).Roll("2d4+2")));
+        AddPlayer(CharClass.Fighter,10,3,3,"1d8").Act(Actions.GuardedStrike).Act(Actions.Taunt);//.Act(new ActionPrefab("Snack Break","Melee",ActionSlot.Secondary).Self(God.E(EventTypes.Heal).Roll("2d4+2")));
         AddPlayer(CharClass.Wizard,5,0,3,"1d4").Act(Actions.FireDart).Act(Actions.IcyWind);
         AddPlayer(CharClass.Cleric,8,2,3,"1d6").Act(Actions.KnockbackStrike).Act(Actions.Heal);
         AddPlayer(CharClass.Thief,7,1,4,"1d8").Act(Actions.HitAndRun).Act(Actions.SandInEyes);
+        
+        //---Level 1---
+        //Ratfolk
         AddNPC(CharClass.RatmanCardTosser,1,"Ratfolk Card-Tosser",4,0,4,"1d3")
             .Act(new ActionPrefab("Card Spray","Ranged",ActionSlot.BasicAttack).Attack(1,ActPattern.Cone,1,"1d4"),true)
             .Act(new ActionPrefab("Summon Rat","Item",ActionSlot.Secondary).Tag(ATags.Unsafe,ATags.Quick).EmptyTile(4,God.E(EventTypes.Summon).Set(CharClass.GiantRat)).Tag(ATags.NearEnemy));
@@ -31,7 +34,9 @@ public static class ThingBuilder
             .Act(new ActionPrefab("Plague Prayer", "Ranged", ActionSlot.Secondary).SingleTarget(4,God.E(EventTypes.Heal).Roll("2d4+2"),
                 God.E(EventTypes.ChangeStat).Set(IntStats.Vulnerable).Set(1),God.E(EventTypes.ChangeStat).Set(IntStats.Damage).Set(1)).PTarg(TargetType.Character,AITarget.HurtAllies));
         AddNPC(CharClass.RatmanMutant,1,"Ratfolk Mutant",4,0,4,"2d4")
-            .Act(new ActionPrefab("Flailing Claws","Melee",ActionSlot.BasicAttack).AttackTag(1,ActPattern.Blast,1,"W",DamageTypes.Normal,"IgnoreSelf").PTarg(TargetType.Self),true);
+            .Act(new ActionPrefab("Flailing Claws","Melee",ActionSlot.BasicAttack).AttackTag(1,ActPattern.Blast,1,"W",DamageTypes.Normal,"IgnoreSelf").PTarg(TargetType.Self),true)
+            .Act(new ActionPrefab("Pounce","Movement",ActionSlot.BeforePlayers,ActionCost.Move).Move(God.N(IntStats.Movespeed)),true);
+        //Vermin
         AddNPC(CharClass.GiantRat,1,"Giant Rat",3,0,5,"1d4").Tag(CTags.Beast)
             .Act(new ActionPrefab("Filthy Nibble","Melee",ActionSlot.BasicAttack).Attack(1).EAdd(God.E(EventTypes.GainTrait).Set(Traits.RatBiteFever).Resist("2d6-6")),true);
         

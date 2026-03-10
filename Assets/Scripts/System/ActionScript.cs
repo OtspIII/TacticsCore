@@ -211,9 +211,10 @@ public class ActionScript : Thing
     {
         float r = 1;   //The value of the tile in and of itself
         float mod = 0; //For things like how dangerous it is to stand there
-        int idealRange = main != null ? main.Range : 1;
-        if (main != null || Tags.Contains(ATags.NearEnemy)) //main exists only for moves to get a NPC in place for another act
+        if (Phase.Target == TargetType.EmptyTile) //main exists only for moves to get a NPC in place for another act
         {
+            int idealRange = main != null ? main.Range : 1;
+            if (Tags.Contains(ATags.NearEnemy)) idealRange = 1;
             r = 10 - Mathf.Abs(t.BestPDistance-idealRange);
         }
         // Debug.Log("GET VALUE: " + Who + " / " + Type + " / " + r + " / " + mod);
@@ -399,7 +400,7 @@ public class ActionScript : Thing
     
     public void End()
     {
-        Who.SelectedAction = null;
+        if(Who.SelectedAction == this) Who.SelectedAction = null;
         if(Cost == ActionCost.Major) Who.ActionsLeft.Clear();
         else Who.ActionsLeft.Remove(Cost);
         God.GM.TakeEvent(God.E(EventTypes.ActionEnd).Set(Who));
