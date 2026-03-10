@@ -10,6 +10,7 @@ public class ActorPrefab
     public Dictionary<IntStats, int> Stats = new Dictionary<IntStats, int>();
     public Dictionary<StrStats, string> TxtStats = new Dictionary<StrStats, string>();
     public List<Actions> KnownActions = new List<Actions>();
+    public List<ActionPrefab> ActionPs = new List<ActionPrefab>();
     public GameTeam Team = GameTeam.None;
 
     public ActorPrefab() { }
@@ -32,11 +33,18 @@ public class ActorPrefab
         KnownActions.Add(a);
         return this;
     }
+    
+    public ActorPrefab Act(ActionPrefab a)
+    {
+        ActionPs.Add(a);
+        return this;
+    }
 }
 
 public class ClassPrefab : ActorPrefab
 {
     public CharClass Class;
+    public float Cost=1;
 
     public ClassPrefab(CharClass t)
     {
@@ -67,8 +75,19 @@ public class ActionPrefab
     public List<Traits> Trait = new List<Traits>();
     public CharClass Class=CharClass.None;
     public string Icon="";
+    public List<ATags> Tags = new List<ATags>();
 
-    public ActionPrefab(Actions t,string name,string icon,ActionCost cost,ActionSlot slot,params Traits[] tr)
+    public ActionPrefab(string name,string icon,ActionSlot slot,ActionCost cost=ActionCost.Major,params Traits[] tr)
+    {
+        Name = name;
+        Icon = icon;
+        Type = Actions.None;
+        Cost = cost;
+        Slot = slot;
+        Trait.AddRange(tr);
+    }
+    
+    public ActionPrefab(Actions t,string name,string icon,ActionSlot slot,ActionCost cost=ActionCost.Major,params Traits[] tr)
     {
         Name = name;
         Icon = icon;
@@ -78,6 +97,12 @@ public class ActionPrefab
         Trait.AddRange(tr);
     }
 
+    public ActionPrefab Tag(params ATags[] tags)
+    {
+        Tags.AddRange(tags);
+        return this;
+    }
+    
     public ActionPrefab Set(UsesNum u)
     {
         Uses = u;
@@ -145,6 +170,14 @@ public class ActionPrefab
         evs.Add(God.E(EventTypes.WalkTo));
         if(postE!=null) evs.AddRange(postE);
         p.Add(ActEventTarget.Self, evs.ToArray());
+        Phases.Add(p);
+        return this;
+    }
+    
+    public ActionPrefab EmptyTile(int range, params EventInfo[] events)
+    {
+        ActionPhase p = new ActionPhase(range,Cutscenes.Attack,TargetType.EmptyTile,AITarget.EmptyByEnemy);
+        p.Add(ActEventTarget.Tile, events);
         Phases.Add(p);
         return this;
     }

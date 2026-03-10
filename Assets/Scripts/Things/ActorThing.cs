@@ -75,6 +75,7 @@ public class ActorThing : Thing
         }
         TakeEvent(EventTypes.Setup);
         foreach(Actions a in pre.KnownActions) AddAction(a);
+        foreach(ActionPrefab a in pre.ActionPs) AddAction(a);
         if(!KnownActions.ContainsKey(ActionSlot.BasicMove)) AddAction(Actions.Walk);
         if(!KnownActions.ContainsKey(ActionSlot.BasicAttack)) AddAction(Actions.BasicAttack);
         if(!KnownActions.ContainsKey(ActionSlot.Sprint)) AddAction(Actions.Sprint);
@@ -82,6 +83,13 @@ public class ActorThing : Thing
         SetLocation(l);
     }
 
+    public void AddAction(ActionPrefab a)
+    {
+        ActionScript act = ThingBuilder.MakeAction(a);
+        act.Who = this;
+        if(KnownActions.ContainsKey(act.Slot)) KnownActions[act.Slot] = act;
+        else KnownActions.Add(act.Slot, act);
+    }
     public void AddAction(Actions a)
     {
         ActionScript act = ThingBuilder.MakeAction(a);

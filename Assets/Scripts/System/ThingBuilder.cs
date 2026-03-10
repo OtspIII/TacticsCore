@@ -15,14 +15,26 @@ public static class ThingBuilder
     {
         if (IsSetup) return;
         IsSetup = true;
-        AddPlayer(CharClass.Fighter,10,3,3,"1d8").Act(Actions.GuardedStrike).Act(Actions.Taunt);
+        AddPlayer(CharClass.Fighter,10,3,3,"1d8").Act(Actions.GuardedStrike).Act(Actions.Taunt);//.Act(new ActionPrefab("Summon Rat","Item",ActionSlot.Ultimate).Tag(ATags.Unsafe,ATags.Quick).EmptyTile(4,God.E(EventTypes.Summon).Set(CharClass.GiantRat)));//enemyAdjacent;
         AddPlayer(CharClass.Wizard,5,0,3,"1d4").Act(Actions.FireDart).Act(Actions.IcyWind);
         AddPlayer(CharClass.Cleric,8,2,3,"1d6").Act(Actions.KnockbackStrike).Act(Actions.Heal);
         AddPlayer(CharClass.Thief,7,1,4,"1d8").Act(Actions.HitAndRun).Act(Actions.SandInEyes);
-        AddNPC(CharClass.RatmanCardTosser,"Ratfolk Card Tosser",4,0,4,"1d3");
+        AddNPC(CharClass.RatmanCardTosser,"Ratfolk Card-Tosser",4,0,4,"1d3")
+            .Act(new ActionPrefab("Card Spray","Ranged",ActionSlot.BasicAttack).Attack(1,ActPattern.Cone,1,"1d4"))
+            .Act(new ActionPrefab("Summon Rat","Item",ActionSlot.Secondary).Tag(ATags.Unsafe,ATags.Quick).EmptyTile(4,God.E(EventTypes.Summon).Set(CharClass.GiantRat)));//enemyAdjacent
         AddNPC(CharClass.RatmanGourmand,"Ratfolk Gourmand",8,0,3,"1d6");
         AddNPC(CharClass.RatmanPrayerSqueak,"Ratfolk Prayer-Squeak",4,0,4,"1d3");
         AddNPC(CharClass.RatmanMutant,"Ratfolk Mutant",4,0,4,"2d4");
+        AddNPC(CharClass.GiantRat,"Giant Rat",4,0,4,"1d3");
+        
+        
+        /*
+         Add(new ClassPrefab(CharClass.RatmanCardTosser, "Ratman Card-Tosser", "RatmanCardTosser", 1)
+            .SetStats(4, "1d3",0,5).AddAdj("Sly", "Quick Fingered", "Card Shark")
+            .AddAction(new CharAction("Summon Rat", "toss a card with a rat bound inside", "Item", ActMove.Normal, 5,ActAnims.Magic,
+                new EventMsg().Spawn(CharClass.GiantRat).SetAmount(6)).SetAType(ActionTypes.Quick).AddTags(ATags.Unsafe)
+                .AddFilters(TargetType.EnemyAdjacent))
+         */
 
         AddAction(Actions.Walk, "Walk","Movement",ActionCost.None, ActionSlot.BasicMove).Move();
         AddAction(Actions.Sprint, "Sprint","Movement",ActionCost.Major, ActionSlot.Sprint).Move(God.N(IntStats.MoveLeft,1,IntStats.Movespeed));
@@ -65,10 +77,11 @@ public static class ThingBuilder
         return r;
     }
     
-    public static ClassPrefab AddNPC(CharClass c,string name,int hp,int def,int spd,string dmg,bool aggro=true)
+    public static ClassPrefab AddNPC(CharClass c,string name,int hp,int def,int spd,string dmg,float cost=1,bool aggro=true)
     {
         ClassPrefab r = AddClass(c,name, hp, def, spd, dmg);
         if (aggro) r.Team = GameTeam.Enemy;
+        r.Cost = cost;
         ClassList.Add(r);
         return r;
     }
@@ -94,7 +107,7 @@ public static class ThingBuilder
     
     public static ActionPrefab AddAction(Actions t,string name,string icon,ActionCost cost,ActionSlot slot,params Traits[] traits)
     {
-        ActionPrefab r = new ActionPrefab(t,name,icon,cost,slot,traits);
+        ActionPrefab r = new ActionPrefab(t,name,icon,slot,cost,traits);
         ActionDict.Add(t,r);
         return r;
     }
@@ -119,6 +132,13 @@ public static class ThingBuilder
     {
         ActionScript r = new ActionScript();
         ActionPrefab p = ActionDict[a];
+        r.Imprint(p);
+        return r;
+    }
+    
+    public static ActionScript MakeAction(ActionPrefab p)
+    {
+        ActionScript r = new ActionScript();
         r.Imprint(p);
         return r;
     }

@@ -179,7 +179,8 @@ public enum ATags{
 	ExtraMove=2,
 	SafeMove=3,
 	Flee=5,			//The target runs away, probably should be moved to trait
-	Unsafe=8,		//Provokes AoO
+	Quick=4,		//##Goes before players
+	Unsafe=8,		//##Provokes AoO
 	FromItem=10,	//Grants this action to those who carry it
 	FromEquip=11,	//Grants this action to those who equip it
 	Consumable=12,	//Destroys the item that grants it

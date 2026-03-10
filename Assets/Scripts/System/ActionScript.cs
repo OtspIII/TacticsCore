@@ -21,6 +21,7 @@ public class ActionScript : Thing
     public string Name= "";
     public int MaxUses = 0;
     public int Uses = 0;
+    public List<ATags> Tags = new List<ATags>();
 
     public void Imprint(ActionPrefab p)
     {
@@ -31,6 +32,7 @@ public class ActionScript : Thing
         Type = p.Type;
         Cost = p.Cost;
         Slot = p.Slot;
+        Tags.AddRange(p.Tags);
         foreach (ActionPhase ap in p.Phases) Phases.Add(new ActionPhase(ap,this));
         foreach (Traits t in p.Trait) AddTrait(t);
         foreach (EventTypes e in TakeListen.Keys) SortListen(e);
@@ -349,9 +351,20 @@ public class ActionScript : Thing
                 {
                     ActorThing targ = tt.Contents;
                     // if (a.Target == ActEventTarget.Self) targ = Who;
-                    if (targ == null) continue;
+                    
                     foreach (EventInfo e in a.Events)
                     {
+                        if (e.Type == EventTypes.Summon && targ == null)
+                        {
+                            CharClass cc = e.GetClass();
+                            if (cc != CharClass.None)
+                            {
+                                ActorThing sum = new ActorThing(e.GetClass(), tt);
+                                God.GM.SpawnActor(sum);    
+                            }
+                            continue;
+                        }
+                        if (targ == null) continue;
                         EventInfo ae = God.E();
                         ae.Clone(e);
                         ae.Set("Target", t).Set("Source", Who);
@@ -659,4 +672,5 @@ public enum AITarget
     Enemies=2,
     Allies=3,
     Anyone=4,
+    EmptyByEnemy=5,
 }

@@ -21,6 +21,7 @@ public class EventInfo
     public Dictionary<string, Traits> TraitI = new Dictionary<string, Traits>();
     public Dictionary<string, IntStats> Stats = new Dictionary<string, IntStats>();
     public Dictionary<string, DamageTypes> DTypes = new Dictionary<string, DamageTypes>();
+    public Dictionary<string, CharClass> Classes = new Dictionary<string, CharClass>();
     public DieRoll DRoll;
 
     public EventInfo(){ }
@@ -52,6 +53,7 @@ public class EventInfo
         foreach(string n in i.Tiles.Keys) Tiles.Add(n,i.Tiles[n]);
         foreach(string n in i.DTypes.Keys) DTypes.Add(n,i.DTypes[n]);
         foreach(string n in i.Floats.Keys) Floats.Add(n,i.Floats[n]);
+        foreach(string n in i.Classes.Keys) Classes.Add(n,i.Classes[n]);
     }
     
     //Numbers
@@ -264,6 +266,25 @@ public class EventInfo
         return null;
     }
     
+    //Classes
+    public EventInfo Set(CharClass a)
+    {
+        return SetClass("", a);
+    }
+    public EventInfo Set(string i, CharClass a)
+    {
+        return SetClass(i, a);
+    }
+    public EventInfo SetClass(string i, CharClass a)
+    {
+        if (!Classes.TryAdd(i,a)) Classes[i]=a;
+        return this;
+    }
+    public CharClass GetClass(string i="")
+    {
+        return Classes.GetValueOrDefault(i, CharClass.None);
+    }
+    
     
     //Vector
     public EventInfo Set(Vector2Int a)
@@ -377,6 +398,7 @@ public enum EventTypes{
     Knockback       =2100,
     
     WalkTo          =3000,
+    Summon          =3100,
     
     CanAct          =4000,
     
