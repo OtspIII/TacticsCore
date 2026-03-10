@@ -12,6 +12,7 @@ public class ActorPrefab
     public List<Actions> KnownActions = new List<Actions>();
     public List<ActionPrefab> ActionPs = new List<ActionPrefab>();
     public GameTeam Team = GameTeam.None;
+    public int Level = 0;
 
     public ActorPrefab() { }
     
@@ -128,7 +129,7 @@ public class ActionPrefab
         return this;
     }
 
-    public ActionPrefab Attack(int range, ActPattern pat, int size,string dmg, DamageTypes type = DamageTypes.Normal,
+    public ActionPrefab Attack(int range, ActPattern pat, int size,string dmg="W", DamageTypes type = DamageTypes.Normal,
         params EventInfo[] events)
     {
         List<EventInfo> e = new List<EventInfo>(){God.E(EventTypes.Damage).Roll(dmg).Set(type)};
@@ -155,7 +156,7 @@ public class ActionPrefab
         return this;
     }
     
-    public ActionPrefab Attack(int range,string dmg,DamageTypes type=DamageTypes.Normal,params EventInfo[] events)
+    public ActionPrefab Attack(int range,string dmg="W",DamageTypes type=DamageTypes.Normal,params EventInfo[] events)
     {
         Attack(range, ActPattern.TargetOnly,1,dmg, type, events);
         return this;
@@ -170,6 +171,14 @@ public class ActionPrefab
         evs.Add(God.E(EventTypes.WalkTo));
         if(postE!=null) evs.AddRange(postE);
         p.Add(ActEventTarget.Self, evs.ToArray());
+        Phases.Add(p);
+        return this;
+    }
+    
+    public ActionPrefab Self(params EventInfo[] events)
+    {
+        ActionPhase p = new ActionPhase(0,Cutscenes.None,TargetType.Self,AITarget.Self);
+        p.Add(ActEventTarget.Self, events);
         Phases.Add(p);
         return this;
     }

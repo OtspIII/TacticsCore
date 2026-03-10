@@ -7,12 +7,16 @@ public class AttackCut : Cutscene
 {
     ActorThing Src;
     GameTile Targ;
+    ActionScript Act;
+    ActionPhase Phase;
     
-    public AttackCut(ActorThing src,GameTile targ)
+    public AttackCut(ActorThing src,GameTile targ,ActionScript act,ActionPhase ph)
     {
         Type = Cutscenes.Attack;
         Src = src;
         Targ = targ;
+        Act = act;
+        Phase = ph;
     }
     
     public override IEnumerator Script()

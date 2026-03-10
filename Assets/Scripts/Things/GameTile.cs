@@ -112,14 +112,31 @@ public class GameTile : Thing
         return true;
     }
 
-    public void TakeEvent(EventInfo e)
+    public void TakeEvent(EventInfo e,ActEventTarget t,ActorThing src,ActionScript act)
     {
-        if (Contents != null)
+        switch (e.Type)
         {
-            EventInfo ee = new EventInfo();
-            ee.Clone(e);
-            Contents.TakeEvent(ee);
+            case EventTypes.Summon:
+            {
+                if (Contents != null)
+                {
+                    God.LogWarning("TRIED TO SUMMON INTO NON-EMPTY TILE: " + Location + " / " + e + " / " + src + " / " + act);
+                    break;
+                }
+                CharClass cc = e.GetClass();
+                if (cc != CharClass.None)
+                {
+                    God.GM.Summon(cc,this,e);    
+                }
+                break;
+            }
         }
+        // if (Contents != null)
+        // {
+        //     EventInfo ee = new EventInfo();
+        //     ee.Clone(e);
+        //     Contents.TakeEvent(ee);
+        // }
     }
 
     public Thing GetThing()

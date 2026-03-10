@@ -171,7 +171,7 @@ public class ActionScript : Thing
         float best = 0;
         foreach (GameTile t in opts)
         {
-            float v = GetValue(t, main);
+            float v = GetTileValue(t, main);
             if (v > best)
             {
                 backup.AddRange(o);
@@ -199,13 +199,14 @@ public class ActionScript : Thing
         return r;
     }
 
-    public float GetValue(GameTile t,ActionScript main=null)
+    public float GetTileValue(GameTile t,ActionScript main=null)
     {
         float r = 1;   //The value of the tile in and of itself
         float mod = 0; //For things like how dangerous it is to stand there
-        if (main != null) //main exists only for moves to get a NPC in place for another act
+        int idealRange = main != null ? main.Range : 1;
+        if (main != null || Tags.Contains(ATags.NearEnemy)) //main exists only for moves to get a NPC in place for another act
         {
-            r = 10 - Mathf.Abs(t.BestPDistance-main.Range);
+            r = 10 - Mathf.Abs(t.BestPDistance-idealRange);
         }
         // Debug.Log("GET VALUE: " + Who + " / " + Type + " / " + r + " / " + mod);
         EventInfo e = God.E(EventTypes.ActionValue).Set(t).SetF(r).SetF("Mod",mod).Set("Main Action",main).Set(this);
@@ -333,6 +334,7 @@ public class ActionScript : Thing
     
     public bool Execute(ActionPhase p,ActionInfo i)
     {
+        if(Name != "Walk") Who.Body.SetHeadtext(Name,Colors.DoAction);
         foreach (GameTile t in i.Tiles)
         {
 
@@ -354,16 +356,7 @@ public class ActionScript : Thing
                     
                     foreach (EventInfo e in a.Events)
                     {
-                        if (e.Type == EventTypes.Summon && targ == null)
-                        {
-                            CharClass cc = e.GetClass();
-                            if (cc != CharClass.None)
-                            {
-                                ActorThing sum = new ActorThing(e.GetClass(), tt);
-                                God.GM.SpawnActor(sum);    
-                            }
-                            continue;
-                        }
+                        tt.TakeEvent(e,a.Target,Who,this);
                         if (targ == null) continue;
                         EventInfo ae = God.E();
                         ae.Clone(e);
@@ -487,10 +480,18 @@ public class ActionScript : Thing
         {
             case Cutscenes.Attack:
             {
-                return new AttackCut(Who, i);
+                return new AttackCut(Who, i,this,p);
             }
         }
         return null;
+    }
+    
+    public float GetActionValue(ActionScript main=null)
+    {
+        float r = 1;
+        if (Tags.Contains(ATags.RequireBloodied) && Who.HPPerc() > 0.5f) return 0.1f;
+        if (Type == Actions.Sprint) return 0.5f;
+        return r; //Will eventually be AI for knowing if this move is worth it or not
     }
 }
 
@@ -623,6 +624,8 @@ public class ActionEvent
     {
         Events.AddRange(events);
     }
+
+    
 }
 
 
@@ -640,6 +643,7 @@ public enum TargetType
     Character=1,
     Tile=2,
     EmptyTile=3,
+    Self=4,
 }
 
 public enum ActEventTarget
@@ -673,4 +677,5 @@ public enum AITarget
     Allies=3,
     Anyone=4,
     EmptyByEnemy=5,
+    Self=6,
 }

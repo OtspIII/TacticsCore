@@ -404,6 +404,14 @@ public class ActorThing : Thing
         return r - inj;
     }
 
+    public float HPPerc()
+    {
+        float a =  Get(IntStats.HP);
+        float b = GetMaxHP();
+        if (b == 0) return 0;
+        return a / b;
+    }
+
     public override string ToString()
     {
         return "Actor[" + Class + "]";
@@ -439,6 +447,32 @@ public class ActorThing : Thing
         }
 
         return false;
+    }
+
+    public ActionScript PickAction(ActionCost c = ActionCost.Major, ActionScript main = null)
+    {
+        Dictionary<ActionScript, float> opts = new Dictionary<ActionScript, float>();
+        foreach (ActionScript a in KnownActions.Values)
+        {
+            if (a.Cost != c) continue;
+            opts.Add(a,a.GetActionValue(main));
+        }
+        List<ActionScript> r = new List<ActionScript>();
+        float best = 0;
+        foreach (ActionScript a in opts.Keys)
+        {
+            if (opts[a] > best)
+            {
+                r.Clear();
+                best =  opts[a];
+            }
+            if (opts[a] == best)
+            {
+                r.Add(a);
+            }
+        }
+        if (r.Count == 0 && c == ActionCost.Move) return GetAct(ActionSlot.BasicMove);
+        return r.Random();
     }
 }
 

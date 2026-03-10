@@ -245,4 +245,17 @@ public class GameManager : MonoBehaviour
             // t.DebugTxt.text = t.Info.BestPDistance.ToString();
         }
     }
+
+    public ActorThing Summon(CharClass cc, GameTile t, EventInfo e=null)
+    {
+        ActorThing r = new ActorThing(cc, t);
+        ActorThing src = e?.GetActor("Source");
+        if (src != null)
+        {
+            r.Team = src.Team;
+        }
+        r.Tags.Add(CTags.Summoned);
+        ActorController ac = SpawnActor(r);
+        return r;
+    }
 }

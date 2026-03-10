@@ -176,10 +176,12 @@ public enum DamageTypes{
 
 public enum ATags{
 	None=0,
+	DontMove=1,		//#Tells the NPC not to move before the action
 	ExtraMove=2,
 	SafeMove=3,
-	Flee=5,			//The target runs away, probably should be moved to trait
 	Quick=4,		//##Goes before players
+	Flee=5,			//The target runs away, probably should be moved to trait
+	NearEnemy=6,	//For actions like movement and summons that should be done near enemies
 	Unsafe=8,		//##Provokes AoO
 	FromItem=10,	//Grants this action to those who carry it
 	FromEquip=11,	//Grants this action to those who equip it
@@ -194,7 +196,7 @@ public enum ATags{
 	Aggressive=20,	//Makes sure you try to move next to an enemy, even if this isn't an attack
 	LoseWhenTransform=21,//For lycanthropes, lose these abilities when you transform
 	RequireBloodied=22,//You only want to do this move if you've been hurt
-	Slow=23,		//Go after all other monsters have acted
+	Slow=23,		//#Go after all other monsters have acted
 //	IgnoreChosenTarg=24,//Don't bother setting a chosen target for this, just use it on the most appropriate at the time
 }
 

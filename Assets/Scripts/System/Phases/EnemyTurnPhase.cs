@@ -17,7 +17,6 @@ public class EnemyTurnPhase : PhaseScript
         {
             if (!a.Has(Traits.Player) && a.Ask(EventTypes.CanAct).GetBool()) Queued.Add(a);
         }
-        Debug.Log("ENEMIES: " + Queued.Count);
         God.GM.CalcMapPDist();
     }
 
@@ -32,9 +31,9 @@ public class EnemyTurnPhase : PhaseScript
         Queued.Remove(a);
         if (a == null || a.Destroyed) return;
         
-        ActionScript main= a.GetAct(ActionSlot.BasicAttack);
-        ActionScript move = a.GetAct(ActionSlot.BasicMove);
-        ActionScript bonus = null;
+        ActionScript main= a.PickAction(ActionCost.Major);
+        ActionScript move = a.PickAction(ActionCost.Move,main);
+        ActionScript bonus = a.PickAction(ActionCost.Bonus);
         if (move != null && a.ActionsLeft.Contains(ActionCost.Move))
         {
             move.AISelect(main);

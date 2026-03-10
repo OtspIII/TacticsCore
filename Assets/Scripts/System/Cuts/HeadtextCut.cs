@@ -37,6 +37,11 @@ public class HeadtextCut : Cutscene
 
     public override void OnBegin()
     {
+        if (Who?.Body == null)
+        {
+            End();
+            return;
+        }
         Who.Body.SetHeadtext(Text,C,Duration);
         if(HP != -1) Who.Body.HP.SetHP(HP,MaxHP,Injury);
         if(Def != -1) Who.Body.HP.SetArmor(Def,Who.Get(IntStats.Armor));
