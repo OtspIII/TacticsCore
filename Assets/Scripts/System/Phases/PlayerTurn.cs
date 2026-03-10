@@ -30,6 +30,7 @@ public class PlayerTurnPhase : PhaseScript
     public override void OnRun()
     {
         if(Players.Count == 0 || Input.GetKeyDown(KeyCode.Return)) God.GM.StartPhase();
+        if(Input.GetKeyDown(KeyCode.Tilde) && Selected != null) Selected.DebugText();
     }
 
     public override void TileClick(GameTile t)
@@ -81,14 +82,14 @@ public class PlayerTurnPhase : PhaseScript
             God.LogWarning("TRIED TO SET ACTION OF INACTIVE PLAYER: " + a + " / " + a.Who + " / " + Selected);
             return;
         }
-        if (MidEvent && Selected.SelectedAction != a)
-        {
-            Selected.SelectedAction.End();
-        }
         if (a.Cost != ActionCost.None && !Selected.ActionsLeft.Contains(a.Cost))
         {
             //Give some feedback that the select failed
             return;
+        }
+        if (MidEvent && Selected.SelectedAction != a)
+        {
+            Selected.SelectedAction.End();
         }
         WipeTint();
         Selected.SelectedAction = a;

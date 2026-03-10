@@ -679,6 +679,7 @@ public enum ActionSlot
     Sprint=6,
     Reaction=7,
     BeforePlayers=8,
+    OnDeath=9,
 }
 
 public enum AITarget

@@ -39,20 +39,17 @@ public static class ThingBuilder
         //Vermin
         AddNPC(CharClass.GiantRat,1,"Giant Rat",3,0,5,"1d4").Tag(CTags.Beast)
             .Act(new ActionPrefab("Filthy Nibble","Melee",ActionSlot.BasicAttack).Attack(1).EAdd(God.E(EventTypes.GainTrait).Set(Traits.RatBiteFever).Resist("2d6-6")),true);
-        
+        AddNPC(CharClass.GoblinDog,1,"Goblin Dog",4,1,4,"1d4").Tag(CTags.Beast)
+            .Act(new ActionPrefab("Heel Gnaw","Melee",ActionSlot.BasicAttack).Attack(1).EAdd(God.E(EventTypes.ChangeStat).Set(IntStats.Movespeed).Set(-2)));
+        AddNPC(CharClass.GiantBat,1,"Evil Bat",6,0,5,"1d6").Tag(CTags.Beast)
+            .Act(new ActionPrefab("Blood Drink","Heal",ActionSlot.BasicAttack).Attack(1,"1d4"),true)//Lifedrain
+            .Act(new ActionPrefab("Dive Attack","Melee",ActionSlot.Secondary).Attack(1).Move())
+            .Act(new ActionPrefab("Guano Explosion","Interact",ActionSlot.OnDeath).AttackTag(1,ActPattern.Blast,1,"1",DamageTypes.Normal,"IgnoreSelf").PTarg(TargetType.Self));//Spawn Guano Instead
+        AddNPC(CharClass.GiantCentipede,1,"Giant Centipede",3,1,4,"1d3").Tag(CTags.Beast)
+            .Act(new ActionPrefab("Nauseating Bite","Melee",ActionSlot.BasicAttack).Attack(1).EAdd(God.E(EventTypes.ChangeStat).Set(IntStats.MaxDamage).Set(-1).Resist("1d6+1")),true);//Maybe last one full extra round?
         
         /*
-                 
-         Add(new ClassPrefab(CharClass.RatmanMutant, "Ratman Mutant", "RatmanMutant", 1)
-            .SetStats(4, "2d4",0,5).AddAdj("Frenzied", "Slashy", "Erratic")
-            .AddAction(new CharAction("Pounce", "leap at vulnerable prey for a strong bite", "Ranged", ActMove.Normal, 4,ActAnims.None,
-                    new EventMsg().DoMove(Point.Invalid, false).SetTargets(EventMsg.Targets.Source)).SetAType(ActionTypes.Quick)
-                .AddFilters(TargetType.EnemyAdjacent,TargetFilters.Furthest).AddTags(ATags.SafeMove,ATags.Aggressive)
-                .AddSub(new CharAction("Bite", ActMove.Normal, 1,ActAnims.Dagger,God.E().TakeDamage("W",DamageTypes.Normal))
-                    .AddFilters(TargetType.Enemy,TargetFilters.LowestAC)))
-            .AddAction(new CharAction("Flailing Claws", "flail wildly with its many claws","Melee", ActMove.Normal, 1,ActAnims.Dagger,
-                new EventMsg().TakeDamage("W", DamageTypes.Normal).SetTargets(EventMsg.Targets.Source).SetTag(EventTags.IgnoreSelf).SetPattern(ActPattern.Blast, 1)
-                ).AddTags(ATags.Aggressive).AddFilters(TargetType.Enemy),true)
+                
          */
 
         AddAction(Actions.Walk, "Walk","Movement",ActionCost.None, ActionSlot.BasicMove).Move();
@@ -60,7 +57,7 @@ public static class ThingBuilder
         AddAction(Actions.BasicAttack, "Attack","Melee",ActionCost.Major, ActionSlot.BasicAttack).SingleTarget(1,God.E(EventTypes.Damage).Set("Roll","W"));
         //Fighter
         AddAction(Actions.GuardedStrike, "Guarded Strike", "Melee",ActionCost.Major, ActionSlot.BasicAttack).Set(CharClass.Fighter) 
-            .Attack(1,"W").PAdd(ActEventTarget.Self,God.E(EventTypes.TempDefense).Set(2));
+            .Attack(1).PAdd(ActEventTarget.Self,God.E(EventTypes.TempDefense).Set(2));
         AddAction(Actions.Taunt, "Taunt","Mental",ActionCost.Bonus, ActionSlot.Secondary).Set(UsesNum.eConstant).Set(CharClass.Fighter)
             .GTrait(2,Traits.Taunted,"",1); //ActAnims.Yell
         //Wizard
@@ -71,12 +68,12 @@ public static class ThingBuilder
             .PAdd(ActPattern.Cone,1,ActEventTarget.Everything,God.E(EventTypes.Knockback).Set(3));
         //Cleric
         AddAction(Actions.KnockbackStrike, "Knockback Strike", "Melee",ActionCost.Major, ActionSlot.BasicAttack).Set(CharClass.Cleric) 
-            .Attack(1,"W").PAdd(ActEventTarget.Characters,God.E(EventTypes.Knockback).Set(1));
+            .Attack(1).PAdd(ActEventTarget.Characters,God.E(EventTypes.Knockback).Set(1));
         AddAction(Actions.Heal, "Heal","Heal",ActionCost.Bonus, ActionSlot.Secondary).Set(UsesNum.dOften).Set(CharClass.Cleric)
             .SingleTarget(2,God.E(EventTypes.Heal).Roll("1d6+1")); 
         //Thief
         AddAction(Actions.HitAndRun, "Hit & Run", "Melee",ActionCost.Major, ActionSlot.BasicAttack).Set(CharClass.Thief) 
-            .Attack(1,"W").Move();
+            .Attack(1).Move();
         AddAction(Actions.SandInEyes, "Sand In The Eyes","Mental",ActionCost.Bonus, ActionSlot.Secondary).Set(UsesNum.eConstant).Set(CharClass.Thief)
             .GTrait(2,Traits.Stunned,"2d6+4",1);
         /*

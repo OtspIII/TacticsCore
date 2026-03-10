@@ -425,6 +425,23 @@ public class ActorThing : Thing
         return "Actor[" + Class + "]";
     }
 
+    public void DebugText()
+    {
+        God.Log("Actor: " + Name);
+        foreach (IntStats i in Stats.Keys)
+        {
+            Debug.Log(i+": " + Stats[i] + " / " + Get(i));
+        }
+
+        foreach (IntStats i in StatMods.Keys)
+        {
+            foreach (StatMod sm in StatMods[i])
+            {
+                Debug.Log("STAT MOD: " + sm);
+            }
+        }
+    }
+
     public ActionScript GetAct(ActionSlot a)
     {
         return KnownActions.TryGetValue(a, out ActionScript r) ? r : null;
@@ -515,5 +532,10 @@ public class StatMod
         Stat = s.Stat;
         Amount = s.Amount;
         Duration = dur != -1 ? dur : s.Duration;
+    }
+
+    public override string ToString()
+    {
+        return "["+Stat + " / " + Amount + " / " + Duration + " / " + Who?.Name+"]";
     }
 }

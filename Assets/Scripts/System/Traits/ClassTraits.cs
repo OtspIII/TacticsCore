@@ -22,7 +22,7 @@ public class UniversalTrait : TraitThing
                 {
                     foreach (StatMod m in i.Who.StatMods[st].ToArray())
                     {
-                        if (m.Duration == -1) continue;
+                        if (m.Duration < 0) continue;
                         m.Duration--;
                         if (m.Duration <= 0)
                             i.Who.RemoveMod(m);
@@ -249,7 +249,7 @@ public class AliveTrait : TraitThing
             {
                 IntStats st = e.GetStat();
                 int amt = e.GetInt();
-                int dur = e.GetInt("Duration",1,e.GetActor("Source"));
+                int dur = e.GetInt("Duration",-1,e.GetActor("Source"));
                 string resist = e.GetString("Resist");
                 // Debug.Log("CHANGE STAT: " + st + " / " + amt + " / " + dur + " / " + resist);
                 if (resist != "" && i.Who.Resist(resist, e.GetActor("Source"))) break;
