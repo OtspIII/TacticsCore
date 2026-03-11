@@ -36,6 +36,7 @@ public class ActorThing : Thing
     public Dictionary<StrStats, string> TxtStats = new Dictionary<StrStats, string>();
     public DieRoll BaseDamage;
     public List<CTags> Tags = new List<CTags>();
+    public List<WatchInfo> Watches = new List<WatchInfo>();
     
     public ActorThing(Actors type,GameTile l)
     {
@@ -381,9 +382,20 @@ public class ActorThing : Thing
         return r;
     }
 
-    public void AddWatch(EventType e, params GameTile[] tiles)
+    public void AddWatch(EventType e, TraitInfo tr,params GameTile[] tiles)
     {
-        //##INCOMPLETE
+        WatchInfo i = new WatchInfo(this, e, tr);
+        Watches.Add(i);
+        foreach (GameTile t in tiles)
+        {
+            t.AddWatch(i);
+        }
+        if(tr != null) tr.Watches.Add(i);
+    }
+    
+    public void RemoveWatch(WatchInfo i)
+    {
+        //###INCOMPLETE
     }
 
     public int AddMod(StatMod s,TraitInfo t=null,int dur=-1)
@@ -545,12 +557,12 @@ public class StatMod
 public class WatchInfo
 {
     public ActorThing Who;
-    public EventInfo Event;
+    public EventType Event;
     public TraitInfo Trait;
     public List<GameTile> Tiles =  new List<GameTile>();
     public List<ActorThing> Watched =  new List<ActorThing>();
 
-    public WatchInfo(ActorThing who, EventInfo e,TraitInfo t=null)
+    public WatchInfo(ActorThing who, EventType e,TraitInfo t=null)
     {
         Who = who;
         Event = e;
