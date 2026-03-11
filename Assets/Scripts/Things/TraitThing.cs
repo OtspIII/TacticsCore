@@ -6,6 +6,7 @@ public class TraitInfo : EventInfo
     public Traits Trait;
     public ActorThing Who;
     public List<StatMod> Mods = new List<StatMod>();
+    public List<WatchInfo> Watches = new List<WatchInfo>();
 
     public TraitInfo(Traits t, ActorThing who, EventInfo i)
     {
@@ -91,6 +92,11 @@ public class TraitThing
     }
     
     public virtual void TakeEvent(ActionScript a, EventInfo e)
+    {
+        
+    }
+    
+    public virtual void TakeWatch(TraitInfo a, EventInfo e)
     {
         
     }

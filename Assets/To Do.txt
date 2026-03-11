@@ -800,3 +800,13 @@
                                  .AddFilters(TargetType.Enemy, TargetFilters.LowestHP)
                                  .CreateGear(new ActorPrefab("Some Rocks",CTags.None,EquipSlots.Tool),false));
                          }
+                         
+                         
+                         
+                         AddPrefab(new ClassPrefab(CharClass.Villager, "Villager", "Villager",-1,Actions.RunAway,Actions.ThrowRock).SetStats(4, "1d4")
+                                     .AddAdj("Human", "Helpless", "Hapless"));
+                                 AddPrefab(new ClassPrefab(CharClass.PhantomServant, "Phantom Servant", "PhantomServant",-1).AddTags(CTags.RemoteControl,CTags.NonCombatant)
+                                     .AddSpecialAction(SpecialActions.DefaultMove,new CharAction("Flit", "Movement", ActMove.Normal, 1,ActAnims.None)
+                                         .AddFilters(TargetType.Self).AddTags(ATags.SafeMove).SetAType(ActionTypes.Move,ActMove.Normal))
+                                     .AddSpecialAction(SpecialActions.Interact,Prefabs.GetAction(Actions.Interact)).SetStats(1, "",0,6).SetStat(IntStats.Reactions,0)
+                                     );

@@ -56,39 +56,14 @@ public static class ThingBuilder
         AddNPC(CharClass.GoblinBigmouth,1,"Goblin Bigmouth",4,0,3,"1d4").Tag(CTags.Support)
             .Act(new ActionPrefab("Slap","Melee",ActionSlot.BasicAttack).Attack(1,"1").PAdd(ActEventTarget.Characters,God.E(EventTypes.Knockback).Set(1)).Tag(ATags.LowPriority))
             .Act(new ActionPrefab("Goad On", "Mental", ActionSlot.Secondary).SingleTarget(5,God.E(EventTypes.ChangeStat).Set(IntStats.Damage).Set(2))
-                .PTarg(TargetType.Character,AITarget.HurtAllies).Tag(ATags.Fast,ATags.Buff));
-        
+                .PTarg(TargetType.Character,AITarget.HurtAllies).Tag(ATags.Fast,ATags.Buff))
+            .Act(new ActionPrefab("Hurl Insult", "Mental", ActionSlot.Secondary).SingleTarget(5,God.E(EventTypes.Knockback).Set(-3)).Tag(ATags.Fast));
+        AddNPC(CharClass.GoblinBeasttamer,1,"Goblin Ratwhipper",4,1,3,"1d4")
+            .Act(new ActionPrefab("Goblin Whip","Melee",ActionSlot.BasicAttack).Attack(2),true)
+            .Act(new ActionPrefab("Throw Bait","Ranged",ActionSlot.Secondary).Attack(4,"1",DamageTypes.Fire).EAdd(God.E(EventTypes.TakeAoO)).Tag(ATags.Slow));//##need to implement takeAoO and maybe ai trait
         /*
-                         
-        //Goblin Bigmouth -- Hurl Insult -- Goad On
-        Add(new ClassPrefab(CharClass.GoblinBigmouth, "Goblin Bigmouth", "GoblinBigmouth",1).SetStats(4, "1d4")
-            .AddAdj("Crude", "Loud", "Cowardly").AddTags(CTags.Support)
-        //Goad On
-            .AddAction(new CharAction("Goad On", "yell encouraging insults at their allies", "Buff", ActMove.Normal,
-                5,ActAnims.Yell,God.E().GainStat(new StatTrait("DMG #").Add(IntStats.Damage,2)).SetTag(EventTags.AlliesOnly)).AddTags(ATags.Fast,ATags.Buff)
-            .AddFilters(TargetType.Ally, TargetFilters.Attacking))
-        //Slap
-        .AddAction(new CharAction("Slap", "try to slap you away", "Mental"
-                , ActMove.Normal, 1,ActAnims.Dagger,God.E().TakeDamage("1",DamageTypes.Normal), God.E().TakePush(Point.Up, "1"))
-            .AddFilters(TargetType.Enemy, TargetFilters.Closest).SetPriority(AIPriority.RatherNot,20))
-        //Hurl Insult
-            .AddAction(new CharAction("Hurl Insult", "shout questionable statements about your mother", "Mental"
-                , ActMove.Normal, 5,ActAnims.Yell,God.E().TakePush(Point.Down, "1d3")).AddTags(ATags.Fast,ATags.Buff)
-            .AddFilters(TargetType.Enemy, TargetFilters.LowestAC))
-        );
+                  
         
-        //Goblin Ratwhipper -- Throw Bait -- Whip
-        Add(new ClassPrefab(CharClass.GoblinBeasttamer, "Goblin Ratwhipper", "GoblinBeasttamer",1)
-            .SetStats(4, "1d4",1).AddAdj("Smelly", "Yelly", "Vermin Loving")
-        //Goblin Whip
-            .AddAction(new CharAction("Goblin Whip", "lash you with a soggy leather whip", "Melee", ActMove.Normal, 2,ActAnims.Dagger,
-                God.E().TakeDamage("W", DamageTypes.Normal))
-            .AddFilters(TargetType.Enemy, TargetFilters.LowestAC),true)
-        //Throw Bait
-            .AddAction(new CharAction("Throw Bait", "throw fragrant fat at you, driving its allies into a feeding frenzy", "Ranged", ActMove.Normal, 4,ActAnims.Dagger,
-                God.E().TakeDamage("1", DamageTypes.Normal),God.E(GEvents.TakeAoO)).AddTags(ATags.Buff,ATags.Slow)
-            .AddFilters(TargetType.Enemy, TargetFilters. MostAoOThreat))
-        );
          */
 
         AddAction(Actions.Walk, "Walk","Movement",ActionCost.None, ActionSlot.BasicMove).Move();

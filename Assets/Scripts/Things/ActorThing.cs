@@ -320,7 +320,6 @@ public class ActorThing : Thing
         if (Class != CharClass.None)
         {
             s = God.Library.GetPortrait(Class);
-            name = Class.ToString();
         }
 
         int inj = Get(IntStats.Injury);
@@ -380,6 +379,11 @@ public class ActorThing : Thing
             }
         }
         return r;
+    }
+
+    public void AddWatch(EventType e, params GameTile[] tiles)
+    {
+        //##INCOMPLETE
     }
 
     public int AddMod(StatMod s,TraitInfo t=null,int dur=-1)
@@ -535,5 +539,21 @@ public class StatMod
     public override string ToString()
     {
         return "["+Stat + " / " + Amount + " / " + Duration + " / " + Who?.Name+"]";
+    }
+}
+
+public class WatchInfo
+{
+    public ActorThing Who;
+    public EventInfo Event;
+    public TraitInfo Trait;
+    public List<GameTile> Tiles =  new List<GameTile>();
+    public List<ActorThing> Watched =  new List<ActorThing>();
+
+    public WatchInfo(ActorThing who, EventInfo e,TraitInfo t=null)
+    {
+        Who = who;
+        Event = e;
+        Trait = t;
     }
 }
