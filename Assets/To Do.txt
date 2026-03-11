@@ -1,0 +1,802 @@
+//-----------------------------Level Two-----------------------------
+            //-------------------------Fungal--------------------------------
+        
+            
+        //Elven Farmer -- pitchfork, summons Mini Mushrooms
+        Add(new ClassPrefab(CharClass.ElvenFarmer, "Elven Farmer", "ElvenFarmer", 2)
+            .SetStats(6, "1d4",1,4).AddAdj("Hearty", "Nature-Loving", "Pastoral")
+            .AddAction(new CharAction("Plant Shrooms", "plant a bunch of little mushroom friends", "Item", ActMove.Normal, 0,ActAnims.Heal,
+                    new EventMsg().Spawn(CharClass.MiniMushroom).SetAmount(6).SetTargets(EventMsg.Targets.Source).SetPattern(ActPattern.Blast,1))
+                .SetPriority(AIPriority.BreadAndButter,5).AddFilters(TargetType.Self))
+            .AddAction(new CharAction("Pitchfork","skewer you with a pitchfork", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                new EventMsg().TakeDamage("W", DamageTypes.Normal)).SetPattern(ActPattern.Pierce,1),true)
+        );
+        //Mushroom Man -- heavy hitter, cone of spores on punch (blinding?)
+        Add(new ClassPrefab(CharClass.MushroomMan, "Mushroom Man", "MushroomMan",2)
+                .SetStats(10, "2d3",0,3).AddAdj("Thick", "Woody", "Fungal")
+                .AddAction(new CharAction("Spore Fist", "slam you with a fist covered in blinding spores", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                    God.E().TakeDamage("W", DamageTypes.Normal),God.E().TakeStat(new StatTrait().Add(IntStats.Vision,-99),"2d6").SetPattern(ActPattern.Cone,1)))
+            ,0.5f);
+        //Spore Corpse -- status effect X bite, explode into stunning spores on death
+
+        //Pixie
+        Add(new ClassPrefab(CharClass.Pixie, "Pixie", "Pixie",2)
+                .SetStats(3, "1d3",0,6).AddAdj("Playful", "Prankful", "Mocking").AddTags(CTags.Support).AddDanger(3)
+                .AddAction(new CharAction("Pixie Dust", "dance and shake magical dust, invigorating allies and confusing enemies", "Heal", ActMove.Normal, 3,ActAnims.Heal,
+                        God.E(GEvents.Heal).SetAmount("1d4+2").SetTag(EventTags.AlliesOnly),God.E().GainStat(new StatTrait().Add(IntStats.MaxDamage,1)).SetTag(EventTags.AlliesOnly),
+                        God.E().TakeStatus(Traits.Confused,"2d4").SetTag(EventTags.IgnoreAllies)).SetPattern(ActPattern.Blast,1)
+                    .AddTags(ATags.Buff,ATags.Fast).AddFilters(TargetType.Ally,TargetFilters.MostHurt,TargetFilters.Attacking))
+                .AddAction(new CharAction("Needle Arrow", "fire a tiny arrow laced with psychadelic venom at you", "Mental", ActMove.Normal, 4,ActAnims.Magic,
+                    God.E().TakeDamage("W",DamageTypes.Poison), God.E().TakeStatus(Traits.Confused,"2d4")).AddTags(ATags.Unsafe))
+            ,1);
+        
+        //-------------------------Bugs--------------------------------
+        
+        //Giant Spider -- Spider Bite -- Spray Web
+        Add(new ClassPrefab(CharClass.GiantSpider, "Venomweb Spider", "GiantSpider",2).SetStats(8, "1d2", 1, 4)
+                .AddAdj("Venomous", "Webwalking", "Patient").AddTags(CTags.Webwalker,CTags.Beast)
+                //Venom Bite
+                .AddAction(new CharAction("Vemon Bite", "jab its poison fangs into your ankle", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                        God.E().GainStatus(Traits.Poisoned, "1d4"))
+                    .AddFilters(TargetType.Enemy, TargetFilters.Adjacent, TargetFilters.Closest),true)
+                //Web Spray
+                .AddAction(new CharAction("Web Spray", "spray a flurry of webs from its abdomen", "Mental", ActMove.Normal, 1,ActAnims.Dagger,
+                        God.E().TakeStatus(Traits.Bound, "2d8"),God.E().Spawn(ActorP.Web)).SetUses(UsesNum.aOnce).SetPattern(ActPattern.Cone,1)
+                    .AddFilters(TargetType.Enemy, TargetFilters.Adjacent, TargetFilters.Closest)).AddDanger(3)
+            ,1);
+        
+        //Dreameater Spider -- Slumber Bite -- Eat Dreams
+        Add(new ClassPrefab(CharClass.DreameaterSpider, "Dreameater Spider", "DreameaterSpider",2).SetStats(6, "1d2", 1, 6).AddAdj("Quick", "Psychic", "Ravenous")
+            .AddTags(CTags.Webwalker,CTags.Beast)
+            //Slumber Bite
+            .AddAction(new CharAction("Slumber Bite", "put the biggest of you to sleep", "Mental", ActMove.Normal, 1,ActAnims.Dagger,
+                    God.E().TakeStatus(Traits.Asleep, "3d6"))
+                .AddFilters(TargetType.Enemy,TargetFilters.HighestMaxHP),true)
+            //Dream Eat
+            .AddAction(new CharAction("Dream Eat", "devour the mind of the most helpless", "Mental", ActMove.Normal, 1,ActAnims.Yell,
+                    new EventMsg(GEvents.Dreameat).SetAmount("2d8")).SetPriority(AIPriority.Opportunity,5)
+                .AddFilters(TargetType.Enemy, TargetFilters.HighestMaxHP)
+                .SetTargetMustBe(Traits.Asleep)).AddDanger(2)
+        );
+        
+        //Bomb Beetle
+        Add(new ClassPrefab(CharClass.BombBeetle, "Bomb Beetle", "BombBeetle",2)
+            .SetStats(6, "2d3",3).AddAdj("Chittering", "Spraying", "Blistering").AddTags(CTags.Beast)
+            .AddAction(new CharAction("Chemical Spray", "spray you with a hot blast of thorax chemicals", "Melee", ActMove.Normal, 1,ActAnims.Magic,
+                God.E().TakeDamage("W", DamageTypes.Normal),God.E().GainStat(new StatTrait("","",4).Add(IntStats.Armor,-2))).SetPattern(ActPattern.Wave,3))
+        );
+        
+        //Fire Beetle
+        Add(new ClassPrefab(CharClass.FireBeetle, "Fire Beetle", "FireBeetle",2)
+            .SetStats(4, "2d3",2).AddAdj("Glowing", "Chewing", "Flashing").AddGear(ActorP.FireBeetleAss).AddTags(CTags.Beast)
+            .AddAction(new CharAction("Glowing Chew", "distract you with a flash of light while they chew on your leg", "Melee", ActMove.Normal, 1,ActAnims.Magic,
+                God.E().TakeDamage("W", DamageTypes.Normal),
+                God.E().GainStat(new StatTrait().Add(IntStats.Damage,-1)).SetPattern(ActPattern.Blast,1).SetTargets(EventMsg.Targets.Source).SetTag(EventTags.IgnoreAllies)))
+        );
+        
+        //-------------------------Statues--------------------------------
+        
+        //Living Boulder  -- fire self as projectile, difficult terrain on death
+        //Gargoyle  -- fly over defenders to attack, turn to stone to heal
+        
+        //Living Statue
+        Add(new ClassPrefab(CharClass.LivingStatue, "Living Statue", "LivingStatue",2)
+                .SetStats(4, "2d3",4,3).AddAdj("Still", "Heavy", "Hammering")
+                .AddAction(new CharAction("Hammering Fist", "pound at you with heavy stone fists", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                    God.E().TakeDamage("W", DamageTypes.Normal),God.E().TakePush(Point.Up, "1")))
+                .AddAction(new CharAction("Stunning Blow", "send you reeling with a stunning blow to the head", "Mental", ActMove.Normal, 1,ActAnims.Dagger,
+                    God.E().TakeDamage("W", DamageTypes.Normal),God.E().TakeStatus(Traits.Stunned,"1d10")))
+            ,0.5f);
+        
+        //StoneAngel
+        Add(new ClassPrefab(CharClass.StoneAngel, "Stone Angel", "StoneAngel",2)
+                .SetStats(2, "1d4",4,5).AddAdj("Cherubic", "Granite", "Uncanny").AddTags(CTags.Support)
+                .AddAction(new CharAction("Stone Arrow", "pepper you with heavy stone arrows", "Ranged", ActMove.Normal, 5,ActAnims.Dagger,
+                    God.E().TakeDamage("W", DamageTypes.Normal),God.E().GainStat(new StatTrait().Add(IntStats.Movespeed,-1))).AddTags(ATags.Unsafe))
+                .AddAction(new CharAction("Song of Solidity", "sing a song of solidity, hardening an ally", "Buff", ActMove.Normal,
+                    6,ActAnims.Yell,God.E().GainStat(new StatTrait().Add(IntStats.Defense,3))).SetAType(ActionTypes.Quick).AddTags(ATags.Buff).AddFilters(TargetType.Ally,TargetFilters.Attacking))
+            ,0.5f);
+        
+        //-----------------------------Level Three-----------------------------
+            //-------------------------Monsters--------------------------------
+        
+        //Witch -- turn into frog, grant vampirism
+        
+        //Ogre
+        Add(new ClassPrefab(CharClass.Ogre, "Ogre", "Ogre",3)
+            .SetStats(14, "1d10",0,3).AddAdj("Big", "Dumb", "Strong")
+            .AddAction(new CharAction("Oversized Club", "hit you with an enormous club", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                God.E().TakeDamage("W", DamageTypes.Normal),God.E().TakePush(Point.Up, "4")),true)
+        );
+        
+        //Troll
+        Add(new ClassPrefab(CharClass.Troll, "Troll", "Troll",3)
+            .SetStats(10, "1d6",0,4).AddAdj("Regenerating", "Sadistic", "Warty").AddTraits(Traits.TrollRegen)
+            .AddAction(new CharAction("Rending Claw", "twist and tear your meat with its claws, leaving you vulnerable", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                God.E().TakeDamage("W", DamageTypes.Normal),God.E().GainStat(new StatTrait("","",4).Add(IntStats.Vulnerable,1))),true)
+        );
+        
+        //Werewolf
+        Add(new ClassPrefab(CharClass.Werewolf, "Werewolf", "Wereman",3).SetStats(8, "1d4", 0, 4)
+                .AddAdj("Hairy", "Angry", "Volatile").AddTraits(Traits.Lycanthrope).AddAltApp(CTags.Transformed,"Werewolf")
+                .AddAction(new CharAction("Human Punch", "punch you with a human fist",
+                    "Melee", ActMove.Normal, 1,ActAnims.Dagger,God.E().TakeDamage("W",DamageTypes.Normal),God.E().TakePush(Point.Up,"1")).AddTags(ATags.LoseWhenTransform),true)
+                .AddSpecialAction(SpecialActions.HiddenAbility, new CharAction("Furious Claw", "lash out with a wide and bloodthirsty claw",
+                    "Melee", ActMove.Normal, 1,ActAnims.Dagger,God.E().TakeDamage("W",DamageTypes.Normal),God.E().TakeStatus(Traits.Afraid,"1d6")).SetPattern(ActPattern.Horizontal,2))
+            ,1);
+        
+        //-------------------------Frogmen--------------------------------
+        
+        //Frogman Hucker -- throw orbs of poison
+        //Frogman Spewer -- cone of damage and move debuff
+        //Frogman Croaker -- cone of pull, mass armor buff
+        //Frogman Hulker -- jump and aoe damage, something else
+        
+        //-------------------------Animals--------------------------------
+        
+        //Were-Lamb -- turn into a wolf on damage
+        //Wolf -- movement debuff
+        
+        //Bear
+        Add(new ClassPrefab(CharClass.Bear, "Bear", "Bear",3).SetStats(18, "3d4", 0, 4)
+            .AddAdj("Lumbering", "Big-Pawed", "Irritable").AddTags(CTags.Beast)
+        //Bear Claw
+            .AddAction(new CharAction("Bear Claw", "swipe a huge claw at anyone in front of it", "Melee",
+                ActMove.Normal, 1,ActAnims.Dagger, God.E().TakeDamage("W", DamageTypes.Normal)).SetPattern(ActPattern.Horizontal, 2)
+            .AddFilters(TargetType.Enemy, TargetFilters.Closest))
+        //Bear Fury
+            .AddAction(new CharAction("Bear Fury", "attack everything nearby in a berserk rage", "Melee",
+                ActMove.None, 0,ActAnims.Dagger, God.E().TakeDamage("2W", DamageTypes.Normal).SetTag(EventTags.IgnoreSelf)).SetPattern(ActPattern.Blast, 1)
+            .AddFilters(TargetType.Enemy, TargetFilters.Closest).SetPriority(AIPriority.BreadAndButter,10))
+        );
+        
+        //Frog
+        Add(new ClassPrefab(CharClass.GiantFrog, "Giant Frog", "Frog",3)
+            .SetStats(6, "1d4",0,5).AddAdj("Hoppy", "Happy", "Hungry").AddTags(CTags.Beast)
+            .AddAction(new CharAction("Tongue Attack", "pull you in with a sticky barbed tongue", "Ranged", ActMove.Normal, 3,ActAnims.Dagger,
+                God.E().TakeDamage("W", DamageTypes.Normal),new EventMsg().TakePush(Point.Down,"2")))
+            .AddAction(new CharAction("Hurried Hop", "hop at you with incredible speed for a bite", "Melee", ActMove.Normal, 0,ActAnims.None)
+                .AddFilters(TargetType.Self).AddTags(ATags.SafeMove,ATags.Aggressive).SetAType(ActionTypes.Quick).SetPriority(AIPriority.BreadAndButter,10)
+                .AddSub(new CharAction("Froggy Chomp", ActMove.Normal, 1,ActAnims.Dagger,God.E().TakeDamage("W+1",DamageTypes.Normal))))
+        );
+
+        //-----------------------------Level Four-----------------------------
+            //-------------------------Undead--------------------------------
+        
+        //Wight
+        Add(new ClassPrefab(CharClass.Wight, "Wight", "Wight",4).SetStats(16, "1d6", 2, 4).AddAdj("Undead", "Soulsucking", "Hellpriest")
+            .AddTraits(Traits.Undead)
+        //Draining Touch
+            .AddAction(new CharAction("Draining Touch", "suck out your soul through its cold dead fingers",
+                "Melee", ActMove.Normal, 1,ActAnims.Dagger,God.E().TakeDamage("W",DamageTypes.Evil)).AddTags(ATags.FriendlyFireOk)
+            .AddFilters(TargetType.Enemy, TargetFilters.Closest),true)
+        //Evil Cloud
+            .AddAction(new CharAction("Evil Cloud", "cast out a cloud of evil magic, helping the undead and hurting its foes",
+                "Ranged", ActMove.Normal, 3,ActAnims.Magic,God.E().TakeDamage("1d3",DamageTypes.Evil)).SetPattern(ActPattern.Blast,1)
+            .AddTags(ATags.FriendlyFireOk))
+            ,0.25f);
+        
+        //Skeleton
+        Add(new ClassPrefab(CharClass.Skeleton, "Skeleton", "Skeleton",4).SetStats(6, "1d6", 2, 4)
+            .AddAdj("Bones", "Bones", "Bones").AddTraits(Traits.Undead)
+        //Bone Claw
+            .AddAction(new CharAction("Bone Claw", "claw away your skin with its skeletal claws",
+                "Melee", ActMove.Normal, 1,ActAnims.Dagger,God.E().TakeDamage("W",DamageTypes.Normal),
+                God.E().TakeStatus(Traits.Afraid,"1d4"))
+            .AddFilters(TargetType.Enemy, TargetFilters.Closest),true)
+            ,0.5f);
+        
+        //Zombie
+        Add(new ClassPrefab(CharClass.Zombie, "Zombie", "Zombie",4).SetStats(10, "1d6", 0, 3)
+            .AddAdj("Grabbing", "Biting", "Moaning").AddTags(CTags.Beast).AddTraits(Traits.Undead)
+            .AddAction(new CharAction("Zombie Grasp", "grasp at you with hungry hands, holding you in place",
+                    "Movement", ActMove.Normal, 1,ActAnims.Dagger,God.E().TakeDamage("W",DamageTypes.Normal),
+                    God.E().TakeStat(new StatTrait().Add(IntStats.Movespeed,"-2d3"),"1d10+4"))
+                .SetAType(ActionTypes.Major))
+            .AddAction(new CharAction("Swarm", "team up with its allies to tear you apart",
+                    "Melee", ActMove.Normal, 1,ActAnims.Dagger,God.E().TakeDamage("W",DamageTypes.Normal))
+                .AddTrait(ATraits.TeamDmg,1).SetAType(ActionTypes.Major),true)
+        );
+        
+        //Ghoul
+        Add(new ClassPrefab(CharClass.Ghoul, "Ghoul", "Ghoul",4).SetStats(5, "1d4", 0, 5)
+                .AddAdj("Grotesque", "Hungry", "Paralyzing").AddTraits(Traits.Undead)
+                .AddAction(new CharAction("Ghoul Claw", "tear at you with paralyzing claws",
+                        "Melee", ActMove.Normal, 1,ActAnims.Dagger,God.E().TakeDamage("W",DamageTypes.Normal),
+                        God.E().TakeStatus(Traits.Paralyzed,"1d10"))
+                    .SetAType(ActionTypes.Major),true)
+                .AddAction(new CharAction("Devour", "eat the dead",
+                        "Heal", ActMove.Normal, 1,ActAnims.Dagger,God.E().TakeDamage("1d4",DamageTypes.Normal).SetTag(EventTags.Lifedrain))
+                    .SetTargetMustBe(Traits.Paralyzed)).AddDanger(4)
+            ,1);
+        
+            //-------------------------Goatmen--------------------------------
+        
+        //Goatman Berserker -- revenge strike when hit, high damage
+        //Goatman Screamer -- vuln screams, fear screams
+        //Goatman Summoner -- summon demon, killing self
+        //Goatman Charger -- direct line move, knockback
+        
+            //-------------------------Abberations--------------------------------
+        
+        //Basilisk -- poison, deals damage when attacked
+        //Beholder -- random special effects, hits multiple targets
+        //Owlbear -- high damage swipe
+        //Ooze -- splits when killed
+        
+        
+        //-----------------------------Level Five-----------------------------
+            //-------------------------Devils--------------------------------
+        
+        //Imp -- strip armor, hit and run, poison
+        //Reaper -- big swipe, vuln
+        //Pitchfork Devil -- pierce, fire, vampirism
+        //Fallen Angel -- fly behind lines, deadly strikes
+        
+            //-------------------------Demons--------------------------------
+        
+        //Lemure -- summons another lemure when attacks a target
+        //Hellhound -- cone fire attack
+        //Fiend -- grab and run away
+        //Succubus -- charm
+        
+            //-------------------------Sinners--------------------------------
+        
+        //Serial Killer -- mark victim, strike for big damage
+        //False Propher -- heal, dmg boost, aoe attack spell
+        //Toppled Tyrant -- provoke aoe, drain hp
+        //Lost Soul -- teleport when attacked, force blink on attack
+        
+        
+         //Goblin Chief -- Incite Frenzy
+                Add(new ClassPrefab(CharClass.GoblinChief, "Goblin Chief", "GoblinChief",1).SetStats(12, "1d6+2",2)
+                    .AddAdj("Swollen", "Petulant", "Bloodthirsty").AddTags(CTags.Boss)
+                    //Incite Frenzy
+                    .AddAction(new CharAction("Incite Frenzy", "cajole their followers into a reckless frenzy", "Buff", ActMove.Normal, 0,ActAnims.Yell,
+                            God.E().GainStat(new StatTrait("Frenzied","",1,GEvents.CombatEnd).Add(IntStats.Damage,2).Add(IntStats.Vulnerable,2)).SetTag(EventTags.IgnoreSelf,EventTags.AlliesOnly))
+                        //God.E().GainStatus(Traits.Frenzied,1).SetTag(EventTags.AlliesOnly)
+                        .SetUses(UsesNum.aOnce).SetPattern(ActPattern.Blast,6).AddFilters(TargetType.Self).AddTags(ATags.Fast,ATags.Buff)) 
+                    //Goblin Swipe
+                    .AddAction(new CharAction("Goblin Swipe", "swipe a meaty claw at everyone in front of them", "Melee", ActMove.Normal, 1, ActAnims.Dagger,
+                            God.E().TakeDamage("W", DamageTypes.Normal)).SetPattern(ActPattern.Horizontal, 2)
+                        .AddFilters(TargetType.Enemy,TargetFilters.LowestHP).SetAType(ActionTypes.Major),true)
+                );
+                
+                //Dragon
+                Add(new ClassPrefab(CharClass.Dragon, "Dragon", "Dragon",4).SetStats(40, "1d8", 6, 4).AddAdj("Grand", "Terrible", "Firebreathing").AddTags(CTags.Boss)
+                    //Dragon Breath
+                    .AddAction(new CharAction("Dragon Breath", "exhale a terrible gout of flame", "Ranged",
+                            ActMove.Normal, 1,ActAnims.Magic, God.E().TakeDamage("4d6", DamageTypes.Fire)).SetPattern(ActPattern.Cone,4)
+                        .AddFilters(TargetType.Enemy, TargetFilters.Closest))
+                    //Dragon Fury
+                    .AddAction(new CharAction("Dragon Fury", "lash out with four claws and a whirling tail", "Melee",
+                            ActMove.Normal, 1,ActAnims.Dagger, God.E().TakeDamage("W", DamageTypes.Normal),God.E().TakeDamage("W", DamageTypes.Normal),
+                            God.E().TakeDamage("W", DamageTypes.Normal).SetPattern(ActPattern.Horizontal,1),God.E().TakeDamage("W", DamageTypes.Normal).SetPattern(ActPattern.Horizontal,1),
+                            God.E().TakeDamage("W", DamageTypes.Normal).SetTag(EventTags.IgnoreSelf).SetPattern(ActPattern.Blast,1))
+                        .AddFilters(TargetType.Enemy, TargetFilters.Closest))
+                );
+                 Add(new ClassPrefab(CharClass.Dog, "Dog", "Dog",-1).SetStats(5, "1d6",0,5).AddAdj("Barky","Bitey","Loyal").AddTags(CTags.Beast)
+                            .AddAction(new CharAction("Heel Bite", "bite at the heels of their enemies", "Melee",
+                                    ActMove.Normal, 1,ActAnims.Dagger, God.E().TakeDamage("W",DamageTypes.Normal),
+                                    God.E().TakeStat(new StatTrait().Add(IntStats.Movespeed,"-1d4"),"1d10+4"))
+                                ),0
+                        );
+                        //Mini Mushroom -- 1hp suicide bomber summons
+                        Add(new ClassPrefab(CharClass.MiniMushroom, "Mini Mushroom", "MiniMushroom",-1).SetStats(1, "1",0,4).AddAdj("Small","Screaming","Ready To Burst").AddTags(CTags.Beast)
+                                .AddAction(new CharAction("Suicide Attack", "splatter violently against you", "Melee",
+                                    ActMove.Normal, 1,ActAnims.Dagger, God.E().TakeDamage("1",DamageTypes.Normal),
+                                    God.E(GEvents.Die).SetTargets(EventMsg.Targets.Source)),true
+                                ),0
+                        );
+                        
+                        
+                     static void FighterGear()
+                         {
+                     //----MAIN HAND----
+                             //Sure Strike
+                             Add(new CharAction(Actions.SureStrike, "Sure Strike", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("W", DamageTypes.Normal)).AddTraits(ATraits.RerollDmg)
+                                 .SetAType(ActionTypes.Major).DImproves(true)
+                                 .CreateGear(new ActorPrefab("Sure Blade",CTags.Fighter,EquipSlots.Held)));
+                             //Flaming Strike
+                             Add(new CharAction(Actions.FlamingStrike, "Flaming Strike", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("W+1", DamageTypes.Fire),new EventMsg(GEvents.TakeFire).SetAmount(1).SetPattern(ActPattern.Blast))
+                                 .DImproves(true)
+                                 .SetAType(ActionTypes.Major).CreateGear(new ActorPrefab("Flaming Sword",CTags.Fighter,EquipSlots.Held)));//.SetStat(IntStats.MaxDamage,2)
+                             //Hammer - Pressing Blow
+                             Add(new CharAction(Actions.PressingBlow, "Pressing Blow", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("W", DamageTypes.Normal),new EventMsg().TakePush(Point.Up, "1"),new EventMsg().TakePush(Point.Up, "1").SetTag(EventTags.NoAoO).SetTargets(EventMsg.Targets.Source))    
+                                 .DImproves(true)
+                                 .SetAType(ActionTypes.Major).CreateGear(new ActorPrefab("Hammer",CTags.Fighter,EquipSlots.Held)));
+                             Add(new CharAction(Actions.PiercingStrike, "Piercing Strike", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("W", DamageTypes.Normal)).SetPattern(ActPattern.Pierce,1)
+                                 .SetAType(ActionTypes.Major).DImproves(true).Improve(new ActLU(AImprovements.PatternSize,1),2)
+                                 .CreateGear(new ActorPrefab("Long Spear",CTags.Fighter,EquipSlots.Held)));
+                             //Shield - Guarded Strike
+                             Add(new CharAction(Actions.GuardedStrike, "Guarded Strike", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("W", DamageTypes.Normal),
+                                     new EventMsg().GainStat(new StatTrait().Add(IntStats.Defense,2)).SetTargets(EventMsg.Targets.Source))
+                                 .SetUses(UsesNum.dOften).DImproves()
+                                 .SetAType(ActionTypes.Major).CreateGear(new ActorPrefab("Simple Shield",CTags.Fighter,EquipSlots.OffHand)));
+                             //Cleave
+                             Add(new CharAction(Actions.Cleave, "Cleave", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("W", DamageTypes.Normal)).SetPattern(ActPattern.Horizontal, 2)
+                                 .SetAType(ActionTypes.Major).SetUses(UsesNum.dOften).DImproves()
+                                 .CreateGear(new ActorPrefab("Cleaving Blade",CTags.Fighter,EquipSlots.OffHand)));
+                             //Grab
+                             Add(new CharAction(Actions.Grab, "Grab", "Movement", ActMove.Normal, 1,ActAnims.Dagger,
+                                     new EventMsg().TakeStat(new StatTrait().Add(IntStats.Movespeed,-4),"1d10+5"),
+                                     God.E().GainStat(new StatTrait().Add(IntStats.Vulnerable,1)))
+                                 .SetAType(ActionTypes.Quick).SetUses(UsesNum.dOften).DImproves(false,false)
+                                 .CreateGear(new ActorPrefab("Grapple Glove",CTags.Fighter,EquipSlots.OffHand).AddTags(CTags.UtilityGear)));
+                             //Yank
+                             Add(new CharAction(Actions.Yank, "Yank", "Ranged", ActMove.Normal, 3,ActAnims.Dagger,
+                                     new EventMsg().TakePush(Point.Down, "5"))    
+                                 .SetUses(UsesNum.dOften).DImproves(false,false).Improve(AImprovements.Range,1,2).Improve(AImprovements.PatternShape,(int)ActPattern.Pierce,1)
+                                 .SetAType(ActionTypes.Quick).CreateGear(new ActorPrefab("Yanking Chain",CTags.Fighter,EquipSlots.OffHand)));
+                             
+                             //Taunt
+                             Add(new CharAction(Actions.Taunt, "Taunt", "Mental", ActMove.Normal, 4,ActAnims.Yell,
+                                     new EventMsg(GEvents.TakeTaunt)).SetUses(UsesNum.eConstant)
+                                 .SetAType(ActionTypes.Quick).DImproves(false,false).Improve(AImprovements.Range).Improve(AImprovements.PatternShape,(int)ActPattern.Blast,1)
+                                 .CreateGear(new ActorPrefab("Ostentatious Helm",CTags.Fighter,EquipSlots.Head)));
+                             
+                             
+                             //Come At Me
+                             Add(new CharAction(Actions.ComeAtMe, "Come At Me", "Mental", ActMove.Normal, 0,ActAnims.Yell,
+                                     new EventMsg(GEvents.TakeTaunt).SetPattern(ActPattern.Blast,6),
+                                     new EventMsg().GainStat(new StatTrait().Add(IntStats.Defense,5)).SetTargets(EventMsg.Targets.Source)).SetUses(UsesNum.aOnce)
+                                 .SetAType(ActionTypes.Quick)
+                                 .CreateGear(new ActorPrefab("Ostentatious Chestplate",CTags.Fighter,EquipSlots.Body)));
+                             
+                             //Lure to Slaughter
+                             Add(new CharAction(Actions.LureToSlaughter, "Lure to Slaughter", "Melee", ActMove.Normal, 1,ActAnims.Yell,
+                                     new EventMsg().TakePush(Point.Down,"2").SetPattern(ActPattern.Cone,3),
+                                     new EventMsg().TakeDamage("2W",DamageTypes.Normal)).SetUses(UsesNum.aOnce)
+                                 .SetAType(ActionTypes.Major).SetPattern(ActPattern.Wave,2).DImproves(false,false)
+                                 .Improve(AImprovements.Damage,4).Improve(AImprovements.MaxDamage,2)
+                                 .CreateGear(new ActorPrefab("Plate of Blood",CTags.Fighter,EquipSlots.Body)));
+                             
+                             //Shout
+                             Add(new CharAction(Actions.Shout, "Shout", "Ranged", ActMove.Normal, 0,ActAnims.Yell,
+                                     new EventMsg().TakeDamage("1",DamageTypes.Normal).SetTag(EventTags.IgnoreAllies),
+                                     new EventMsg().TakeStatus(Traits.Afraid,"1d4").SetTag(EventTags.IgnoreAllies)).SetUses(UsesNum.bTwice)
+                                 .SetAType(ActionTypes.Major).SetPattern(ActPattern.Blast,6).DImproves(false,false).Improve(AImprovements.Damage,1,2)
+                                 .CreateGear(new ActorPrefab("Bare Chest Straps",CTags.Fighter,EquipSlots.Body)));
+                             //MightyBlow
+                             Add(new CharAction(Actions.MightyBlow, "Mighty Blow", "Ranged", ActMove.Normal, 1,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("2W",DamageTypes.Normal)).SetUses(UsesNum.cSometimes)
+                                 .SetAType(ActionTypes.Major).DImproves(false,false).Improve(AImprovements.Damage,4).Improve(AImprovements.MaxDamage,2)
+                                 .CreateGear(new ActorPrefab("Power Plate",CTags.Fighter,EquipSlots.Body)));
+                             
+                             //Block
+                             Add(new CharAction(Actions.Block, "Block", "Mental", ActMove.Normal, 0,ActAnims.Dagger,
+                                     new EventMsg().GainStat(new StatTrait().Add(IntStats.Defense,2)).SetTargets(EventMsg.Targets.Source).SetTag(EventTags.IgnoreAllies))
+                                 .SetUses(UsesNum.dOften).AddFilters(TargetType.Self).SetAType(ActionTypes.Quick)
+                                 .DImproves(false,false).Improve(AImprovements.PatternShape,(int)ActPattern.Blast)
+                                 .CreateGear(new ActorPrefab("Buckler",CTags.Fighter,EquipSlots.Hand)));
+                             
+                             //Second Wind
+                             Add(new CharAction(Actions.SecondWind, "Second Wind", "Heal", ActMove.Normal, 0,ActAnims.Yell,
+                                     new EventMsg(GEvents.Heal).SetAmount("1d3+2").SetTargets(EventMsg.Targets.Source)).SetUses(UsesNum.cSometimes)
+                                 .AddFilters(TargetType.Self).SetAType(ActionTypes.Quick).DImproves(false,false)
+                                 .CreateGear(new ActorPrefab("Resolute Gauntlet",CTags.Fighter,EquipSlots.Hand)));
+                             
+                             //Yell Command
+                             Add(new CharAction(Actions.YellCommand, "Yell Command", "Interact", ActMove.Normal, 5,ActAnims.Yell,
+                                     new EventMsg().GainStat(new StatTrait().Add(IntStats.Defense,"1")),new EventMsg(GEvents.Interact).SetVerb("Command")).SetUses(UsesNum.eConstant)
+                                 .AddFilters(TargetType.Ally).SetAType(ActionTypes.Quick).DImproves(false,false).Improve(AImprovements.PatternShape,(int)ActPattern.Blast)
+                                 .CreateGear(new ActorPrefab("Pointing Glove",CTags.Fighter,EquipSlots.Hand).AddTags(CTags.UtilityGear)));
+                             //Hold Your Ground
+                             Add(new CharAction(Actions.HoldYourGround, "Hold Your Ground", "Buff", ActMove.Normal, 0,ActAnims.Yell,
+                                     new EventMsg().GainStat(new StatTrait().Add(IntStats.Defense,"M")),God.E(GEvents.EndMove).SetTargets(EventMsg.Targets.Source))
+                                 .SetAType(ActionTypes.Quick).AddFilters(TargetType.Self).SetUses(UsesNum.cSometimes)
+                                 .CreateGear(new ActorPrefab("Steadfast Boots",CTags.Fighter,EquipSlots.Feet)));
+                             //Leap
+                             Add(new CharAction(Actions.Leap, "Leap", "Movement", ActMove.Normal, 4,ActAnims.None,new EventMsg().DoMove(Point.Invalid, false).SetTargets(EventMsg.Targets.Source))
+                                 .SetUses(UsesNum.dOften).AddFilters(TargetType.Tile).SetAType(ActionTypes.Quick)
+                                 .DImproves(false,false).Improve(AImprovements.Range)
+                                 .CreateGear(new ActorPrefab("Leaping Boots",CTags.Fighter,EquipSlots.Feet).AddTags(CTags.UtilityGear)));
+                             //Last Stand
+                             Add(new CharAction(Actions.LastStand, "Last Stand", "Buff", ActMove.Normal, 0,ActAnims.Yell,
+                                     new EventMsg().GainStat(new StatTrait().Add(IntStats.Defense,"H")))
+                                 .SetAType(ActionTypes.Quick).AddFilters(TargetType.Self).SetUses(UsesNum.bTwice).DImproves(false,false)
+                                 .CreateGear(new ActorPrefab("Resolute Boots",CTags.Fighter,EquipSlots.Feet)));
+                         }
+                     
+                         public static void ThiefGear()
+                         {
+                             //Dagger - Hit and Run
+                             Add(new CharAction(Actions.HitAndRun, "Hit and Run", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("W", DamageTypes.Normal)).AddTags(ATags.SafeMove)
+                                 .SetAType(ActionTypes.Major,ActMove.Normal)
+                                 .SetStat(StrStats.Tags,"Take Another Movement").DImproves(true)
+                                 .CreateGear(new ActorPrefab("Harrying Dagger",CTags.Thief,EquipSlots.Held)));
+                             //Swapping Blow
+                             Add(new CharAction(Actions.SwappingBlow, "Swapping Blow", "Melee", ActMove.Normal, 1,ActAnims.Dagger, 
+                                     new EventMsg().TakeDamage("W", DamageTypes.Normal),
+                                     new EventMsg().DoMove(Point.Invalid,false).SetTag(EventTags.SafetyOverride).SetVerb("ToSource"),
+                                     new EventMsg().DoMove(Point.Invalid,false).SetTag(EventTags.NoAoO).SetTargets(EventMsg.Targets.Source))
+                                 .SetAType(ActionTypes.Major).DImproves(true)
+                                 .CreateGear(new ActorPrefab("Guiding Dagger",CTags.Thief,EquipSlots.Held)));
+                             //Poisoned Strike
+                             Add(new CharAction(Actions.PoisonedStrike, "Poisoned Strike", "Melee", ActMove.Normal, 1,ActAnims.Dagger, 
+                                 new EventMsg().TakeDamage("W", DamageTypes.Normal),new EventMsg().GainStatus(Traits.Poisoned, "1d4"))
+                                 .SetAType(ActionTypes.Major).DImproves(true)
+                                 .CreateGear(new ActorPrefab("Poisoned Blade",CTags.Thief,EquipSlots.Held)));
+                             //Stab of Opportunity
+                             Add(new CharAction(Actions.StabOfOpportunity, "Stab of Opportunity", "Melee", ActMove.Normal, 1,ActAnims.Dagger, 
+                                     new EventMsg().TakeDamage("W", DamageTypes.Normal),God.E(GEvents.TakeAoO))
+                                 .SetAType(ActionTypes.Major).DImproves(true)
+                                 .CreateGear(new ActorPrefab("Opportunity Knife",CTags.Thief,EquipSlots.Held)));
+                             
+                             //Sand in Eyes
+                             Add(new CharAction(Actions.SandInEyes, "Sand in the Eyes", "Mental", ActMove.Normal, 2,ActAnims.Dagger,
+                                     new EventMsg().TakeStatus(Traits.Stunned, "2d6+4"))
+                                 .SetAType(ActionTypes.Quick).SetUses(UsesNum.eConstant)
+                                 .DImproves(false,false).Improve(AImprovements.Range).Improve(AImprovements.PatternShape,(int)ActPattern.Cone)
+                                 .CreateGear(new ActorPrefab("Bag of Sand",CTags.Thief,EquipSlots.Head)));
+                             
+                             //Bow
+                             Add(new CharAction(Actions.ShootArrow, "Shoot Arrow", "Ranged", ActMove.Normal,
+                                     4,ActAnims.Dagger, new EventMsg().TakeDamage("1d6", DamageTypes.Normal)).SetPriority(AIPriority.BreadAndButter, 3)
+                                 .AddTags(ATags.Unsafe).SetAType(ActionTypes.Major).SetUses(UsesNum.eConstant)
+                                 .DImproves(false,true).Improve(AImprovements.Range,2,1).Improve(AImprovements.PatternShape,(int)ActPattern.Pierce)
+                                 .CreateGear(new ActorPrefab("Bow & Arrows",CTags.Thief,EquipSlots.OffHand)));
+                             
+                             //Shove
+                             Add(new CharAction(Actions.Shove, "Shove", "Melee", ActMove.Normal, 1,ActAnims.Interact,
+                                     new EventMsg().TakePush(Point.Up, "1").SetTag(EventTags.EnemiesOnly),
+                                     new EventMsg().TakePush(Point.Up, "1").SetTag(EventTags.AlliesOnly).SetTag(EventTags.NoAoO))    
+                                 .SetUses(UsesNum.dOften).DImproves(false,false)
+                                 .SetAType(ActionTypes.Quick).CreateGear(new ActorPrefab("Prodding Stick",CTags.Thief,EquipSlots.OffHand)));
+                             
+                             //Stumble
+                             Add(new CharAction(Actions.Stumble, "Stumble", "Movement", ActMove.Normal, 5,ActAnims.Dagger,
+                                     new EventMsg().TakeStat(new StatTrait().Add(IntStats.Movespeed,-2),"1d10+8")).SetAType(ActionTypes.Quick)
+                                 .SetUses(UsesNum.dOften).DImproves(false,false).Improve(AImprovements.PatternShape,(int)ActPattern.Blast)
+                                 .CreateGear(new ActorPrefab("Hat Full of Marbles",CTags.Thief,EquipSlots.Head)));
+                             
+                             //Evade Notice
+                             Add(new CharAction(Actions.EvadeNotice, "Evade Notice", "Mental", ActMove.Normal, 4,ActAnims.Yell,
+                                     new EventMsg(GEvents.IgnoreMe).SetTag(EventTags.EnemiesOnly)).SetAType(ActionTypes.Quick).SetPattern(ActPattern.Blast,1)
+                                 .SetUses(UsesNum.cSometimes).DImproves(false,false).Improve(AImprovements.PatternSize,1,2)
+                                 .CreateGear(new ActorPrefab("Ski Mask",CTags.Thief,EquipSlots.Head)));
+                             
+                             
+                             
+                             //Poison Bomb
+                             Add(new CharAction(Actions.PoisonBomb, "Toss Poison Bomb", "Ranged", ActMove.Normal, 4,ActAnims.Dagger,
+                                     new EventMsg().GainStatus(Traits.Poisoned, "1d3+2")).SetPattern(ActPattern.Blast,1)
+                                 .AddFilters(TargetType.Tile).AddTags(ATags.Consumable).SetAType(ActionTypes.Major)
+                                 .SetUses(UsesNum.bTwice).DImproves(false,false).Improve(AImprovements.PatternSize,1,2)
+                                 .CreateGear(new ActorPrefab("Poison Bomb",CTags.Thief,EquipSlots.Body)));
+                             
+                             //Backstab
+                             Add(new CharAction(Actions.Backstab, "Backstab", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("W", DamageTypes.Normal)).SetUses(UsesNum.bTwice)
+                                 .AddTrait(ATraits.TeamDmg,0).DImproves(false,true)
+                                 .CreateGear(new ActorPrefab("Back Sheathe",CTags.Thief,EquipSlots.Body))
+                             );
+                             //Bypass Armor
+                             Add(new CharAction(Actions.BypassArmor, "Bypass Armor", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("W", DamageTypes.Normal).SetTag(EventTags.IgnoreArmor)).SetUses(UsesNum.bTwice)
+                                 .DImproves(false,true)
+                                 .CreateGear(new ActorPrefab("Chest-Strapped Dirk",CTags.Thief,EquipSlots.Body))
+                             );
+                             
+                             //Throwing Knife
+                             Add(new CharAction(Actions.ThrowKnife, "Throw Knife", "Ranged", ActMove.Normal, 4,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("1",DamageTypes.Normal)).SetAType(ActionTypes.Quick)
+                                 .SetUses(UsesNum.dOften).DImproves(false,false).Improve(AImprovements.Range,2,1).Improve(AImprovements.PatternShape,(int)ActPattern.Blast)
+                                 .CreateGear(new ActorPrefab("Hidden Knives",CTags.Thief,EquipSlots.Hand)));
+                             //RagePowder
+                             Add(new CharAction(Actions.RagePowder, "Rage Powder", "Mental", ActMove.Normal, 2,ActAnims.Dagger, //Maybe just do upcoming action in a random direction?
+                                     new EventMsg().TakeStatus(Traits.LashOut,"2d6+6")).SetAType(ActionTypes.Quick)
+                                 .SetUses(UsesNum.dOften).DImproves(false,false).Improve(AImprovements.PatternShape,(int)ActPattern.Pierce)
+                                 .CreateGear(new ActorPrefab("Bag of Rage",CTags.Thief,EquipSlots.Hand)));
+                             
+                             //Quick Interact
+                             Add(new CharAction(Actions.QuickInteract, "Quick Interact", "Interact", ActMove.Normal, 1,ActAnims.Interact,new EventMsg(GEvents.Interact))
+                                 .SetAType(ActionTypes.Quick).SetSpecial(SpecialActions.Interact).CreateGear(new ActorPrefab("Fingerless Gloves",CTags.Thief,EquipSlots.Hand).AddTags(CTags.UtilityGear)));
+                             
+                             //Fire Flask
+                             Add(new CharAction(Actions.FireFlask, "Toss Fire Flask", "Ranged", ActMove.Normal, 3,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("1d8",DamageTypes.Fire)).SetPattern(ActPattern.Blast,1)
+                                 .AddFilters(TargetType.Tile).AddTags(ATags.Consumable).SetAType(ActionTypes.Major)
+                                 .SetUses(UsesNum.cSometimes).DImproves(false,true).Improve(AImprovements.PatternSize,1,1)
+                                 .CreateGear(new ActorPrefab("Fire Flask",CTags.Thief,EquipSlots.OffHand)));
+                             
+                             //Tumble
+                             Add(new CharAction(Actions.Tumble, "Tumble", "Movement", ActMove.Normal, 0,ActAnims.None)
+                                 .AddTags(ATags.SafeMove).SetAType(ActionTypes.Quick,ActMove.Normal).SetUses(UsesNum.dOften)
+                                 .DImproves(false,false)
+                                 .CreateGear(new ActorPrefab("Circus Shoes",CTags.Thief,EquipSlots.Feet).AddTags(CTags.UtilityGear)));
+                             
+                     //        Add(new CharAction(Actions.Teleport, "Teleport", "Movement", ActMove.Normal, 5,ActAnims.Magic,new EventMsg().DoMove(Point.Invalid, false).SetTargets(EventMsg.Targets.Source))
+                     //            .SetUses(UsesNum.cSometimes).AddFilters(TargetType.Tile).SetAType(ActionTypes.Quick).CreateGear(new ActorPrefab("Teleporting Shoes",CTags.Wizard,EquipSlots.Feet)));
+                             
+                             //Quick Step
+                             Add(new CharAction(Actions.QuickStep, "Quick Step", "Movement", ActMove.Normal, 0,ActAnims.None)
+                                 .SetAType(ActionTypes.Quick,ActMove.Normal).AddTags(ATags.ExtraMove).SetUses(UsesNum.dOften)
+                                 .DImproves(false,false)
+                                 .CreateGear(new ActorPrefab("Circus Shoes",CTags.Thief,EquipSlots.Feet).AddTags(CTags.UtilityGear)));
+                             
+                             //Swap
+                             Add(new CharAction(Actions.Swap, "Swap", "Movement", ActMove.Normal, 1,ActAnims.Interact,
+                                     new EventMsg().DoMove(Point.Invalid,false).SetTag(EventTags.SafetyOverride,EventTags.AlliesOnly,EventTags.NoAoO).SetVerb("ToSource"),
+                                     new EventMsg().DoMove(Point.Invalid,false).SetTag(EventTags.SafetyOverride,EventTags.EnemiesOnly).SetVerb("ToSource"),
+                                     new EventMsg().DoMove(Point.Invalid,false).SetTag(EventTags.NoAoO).SetTargets(EventMsg.Targets.Source))
+                                 .SetAType(ActionTypes.Quick).SetUses(UsesNum.dOften)
+                                 .DImproves(false,false).Improve(AImprovements.Range,1,2)
+                                 .CreateGear(new ActorPrefab("Swap Shoes",CTags.Thief,EquipSlots.Feet)));
+                     
+                         }
+                     
+                         public static void ClericGear()
+                         {
+                             //Mace - Knockback Strike
+                             Add(new CharAction(Actions.KnockbackStrike, "Knockback Strike", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("W", DamageTypes.Normal),new EventMsg().TakePush(Point.Up, "1"))
+                                 .SetAType(ActionTypes.Major).DImproves(true)
+                                 .CreateGear(new ActorPrefab("Heavy Mace",CTags.Cleric,EquipSlots.Held)));
+                             //Rallying Strike
+                             Add(new CharAction(Actions.RallyingStrike, "Rallying Strike", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("W", DamageTypes.Normal), new EventMsg().GainStat(new StatTrait().Add(IntStats.Defense,1))
+                                         .SetPattern(ActPattern.Blast).SetTag(EventTags.AlliesOnly,EventTags.IgnoreSelf))
+                                 .SetAType(ActionTypes.Major).DImproves(true).Improve(AImprovements.PatternSize,1,1)
+                                 .CreateGear(new ActorPrefab("Inspirational Banner",CTags.Cleric,EquipSlots.Held)));
+                             //Expose Opening
+                             Add(new CharAction(Actions.ExposeOpening, "Expose Opening", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("W", DamageTypes.Normal),new EventMsg().GainStat(new StatTrait().Add(IntStats.Vulnerable,1)))
+                                 .SetAType(ActionTypes.Major).DImproves(true)
+                                 .CreateGear(new ActorPrefab("Unbalancing Flail",CTags.Cleric,EquipSlots.Held)));
+                             //Stunning Strike
+                             Add(new CharAction(Actions.StunningStrike, "Stunning Strike", "Melee", ActMove.Normal, 1,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("W", DamageTypes.Normal),new EventMsg().TakeStatus(Traits.Stunned,"1d3"))
+                                 .SetAType(ActionTypes.Major).DImproves(true)
+                                 .CreateGear(new ActorPrefab("Stunning Hammer",CTags.Cleric,EquipSlots.Held)));
+                             //Heal
+                             Add(new CharAction(Actions.Heal, "Heal", "Heal", ActMove.Normal, 2,ActAnims.Heal,
+                                     new EventMsg(GEvents.Heal).SetAmount("1d6+1")).SetAType(ActionTypes.Quick)
+                                 .AddFilters(TargetType.Ally).SetUses(UsesNum.eConstant)
+                                 .DImproves(false,false).Improve(AImprovements.PatternShape,(int)ActPattern.Blast)
+                                 .CreateGear(new ActorPrefab("Holy Symbol of Healing",CTags.Cleric,EquipSlots.OffHand)));
+                             //Shield
+                             Add(new CharAction(Actions.Shield, "Shield", "Buff", ActMove.Normal, 3,ActAnims.Magic,
+                                     new EventMsg().GainStat(new StatTrait().Add(IntStats.Defense,2))).SetAType(ActionTypes.Quick)
+                                 .AddFilters(TargetType.Ally).SetUses(UsesNum.eConstant)
+                                 .DImproves(false,false).Improve(AImprovements.PatternShape,(int)ActPattern.Blast)
+                                 .CreateGear(new ActorPrefab("Symbol of Protection",CTags.Cleric,EquipSlots.OffHand)));
+                             //Strengthen
+                             Add(new CharAction(Actions.Strengthen, "Strengthen", "Buff", ActMove.Normal, 3,ActAnims.Magic,
+                                 new EventMsg().GainStat(new StatTrait().Add(IntStats.Damage,2))).SetAType(ActionTypes.Quick)
+                                 .AddFilters(TargetType.Ally).SetUses(UsesNum.dOften)
+                                 .DImproves(false,false).Improve(AImprovements.PatternShape,(int)ActPattern.Blast)
+                                 .CreateGear(new ActorPrefab("Symbol of Strength",CTags.Cleric,EquipSlots.OffHand)));
+                             //Bless
+                             Add(new CharAction(Actions.Bless, "Bless", "Buff", ActMove.Normal, 0,ActAnims.Magic,//new EventMsg().GainStatus(Traits.Blessed,40)
+                                     new EventMsg().GainStat(new StatTrait("BLESS","BLESS ENDS",40).SetTag("Blessed").Add(IntStats.Damage,1).Add(IntStats.Defense,1)).SetTag(EventTags.AlliesOnly))
+                                 .AddFilters(TargetType.Ally).SetAType(ActionTypes.Major).SetUses(UsesNum.aOnce).SetPattern(ActPattern.Blast,6)
+                                 .DImproves(false,false)
+                                 .CreateGear(new ActorPrefab("Blessed Plate Mail",CTags.Cleric,EquipSlots.Body)));
+                             //Blessing of Speed
+                             Add(new CharAction(Actions.BlessingOfSpeed, "Blessing of Speed", "Buff", ActMove.Normal, 0,ActAnims.Magic,//new EventMsg().GainStatus(Traits.Blessed,40)
+                                     new EventMsg().GainStat(new StatTrait("QUICK","QUICK ENDS",40).SetTag("Quick").Add(IntStats.Movespeed,1).Add(IntStats.Reactions,1)).SetTag(EventTags.AlliesOnly))
+                                 .AddFilters(TargetType.Ally).SetAType(ActionTypes.Major).SetUses(UsesNum.aOnce).SetPattern(ActPattern.Blast,6)
+                                 .DImproves(false,false)
+                                 .CreateGear(new ActorPrefab("Blessed Plate Mail",CTags.Cleric,EquipSlots.Body)));
+                             //Wave of Health
+                             Add(new CharAction(Actions.WaveOfHealth, "Wave of Health", "Heal", ActMove.Normal, 0,ActAnims.Magic,
+                                     new EventMsg(GEvents.Heal).SetAmount("2d6+6").SetTag(EventTags.AlliesOnly))
+                                 .AddFilters(TargetType.Ally).SetAType(ActionTypes.Quick).SetUses(UsesNum.aOnce).SetPattern(ActPattern.Blast,6)
+                                 .DImproves(false,false)
+                                 .CreateGear(new ActorPrefab("Healing Tabard",CTags.Cleric,EquipSlots.Body)));
+                             //Stunning Word
+                             Add(new CharAction(Actions.StunningWord, "Stunning Word", "Mental", ActMove.Normal, 5,ActAnims.Dagger,
+                                     new EventMsg().TakeStatus(Traits.Stunned, "2d6+4").SetTag(EventTags.EnemiesOnly)).SetPattern(ActPattern.Blast,2)
+                                 .SetAType(ActionTypes.Quick).SetUses(UsesNum.aOnce).DImproves(false,false).Improve(AImprovements.PatternSize,1,2)
+                                 .CreateGear(new ActorPrefab("Echoing Armor",CTags.Cleric,EquipSlots.Head)));
+                             //Rend Armor
+                             Add(new CharAction(Actions.RendArmor, "Rend Armor", "Mental", ActMove.Normal, 2,ActAnims.Dagger,
+                                     new EventMsg().TakeDamage("10",DamageTypes.Normal).SetTag(EventTags.ArmorOnly)).SetUses(UsesNum.cSometimes)
+                                 .SetAType(ActionTypes.Quick).DImproves(false,false).Improve(AImprovements.PatternShape,(int)ActPattern.Horizontal)
+                                 .CreateGear(new ActorPrefab("Circlet of Rending",CTags.Cleric,EquipSlots.Head)));
+                             //Fear
+                             Add(new CharAction(Actions.Fear, "Fear", "Mental", ActMove.Normal, 4,ActAnims.Magic,
+                                     new EventMsg().TakeStatus(Traits.Afraid, "2d6+2"))
+                                 .SetAType(ActionTypes.Major).SetUses(UsesNum.cSometimes)
+                                 .DImproves(false,false).Improve(AImprovements.PatternShape,(int)ActPattern.Wave)
+                                 .CreateGear(new ActorPrefab("Terrifying Mask",CTags.Cleric,EquipSlots.Head)));
+                             //Weaken
+                             Add(new CharAction(Actions.Weaken, "Weaken", "Mental", ActMove.Normal, 4,ActAnims.Magic,
+                                     new EventMsg().GainStat(new StatTrait().Add(IntStats.Damage,-2))).SetAType(ActionTypes.Quick)
+                                 .SetUses(UsesNum.dOften)
+                                 .DImproves(false,false).Improve(AImprovements.PatternShape,(int)ActPattern.Blast)
+                                 .CreateGear(new ActorPrefab("Symbol of Strength",CTags.Cleric,EquipSlots.Head)));
+                             //Summon Wall
+                             Add(new CharAction(Actions.SummonWall, "Summon Wall", "Item", ActMove.Normal, 4,ActAnims.Magic,
+                                     new EventMsg().Spawn(ActorP.PhantomWall)).SetPattern(ActPattern.Horizontal,2).SetAType(ActionTypes.Quick)
+                                 .AddFilters(TargetType.Tile).SetUses(UsesNum.cSometimes)
+                                 .DImproves(false,false).Improve(AImprovements.PatternSize,1,1)
+                                 .CreateGear(new ActorPrefab("Holy Symbol of Construction",CTags.Cleric,EquipSlots.Hand)));
+                             //Cure Status
+                             Add(new CharAction(Actions.CureStatus, "Cure Status", "Heal", ActMove.Normal, 4,ActAnims.Heal,
+                                     new EventMsg(GEvents.CureStatus).SetAmount(10).SetTag(EventTags.AlliesOnly)).SetPattern(ActPattern.Blast)
+                                 .AddFilters(TargetType.Ally).SetAType(ActionTypes.Quick)
+                                 .SetUses(UsesNum.cSometimes).DImproves(false,false).Improve(AImprovements.PatternSize,1,1)
+                                 .CreateGear(new ActorPrefab("Hands of Laying",CTags.Cleric,EquipSlots.Hand).AddTags(CTags.UtilityGear)));
+                             //Regen
+                             Add(new CharAction(Actions.Regen, "Regenerate", "Heal", ActMove.Normal, 4,ActAnims.Heal,
+                                     new EventMsg().GainStatus(Traits.Regenerating,20)).AddFilters(TargetType.Ally).SetAType(ActionTypes.Quick)
+                                 .SetUses(UsesNum.cSometimes).DImproves(false,false)
+                                 .CreateGear(new ActorPrefab("Trollskin Glove",CTags.Cleric,EquipSlots.Hand)));
+                             //Wellspring of Health
+                             Add(new CharAction(Actions.WellspringOfHealth, "Wellspring of Health", "Heal", ActMove.Normal, 0,ActAnims.Heal,
+                                     new EventMsg(GEvents.Heal).SetAmount("M").SetPattern(ActPattern.Blast,1),
+                                     God.E(GEvents.EndMove).SetTargets(EventMsg.Targets.Source)).SetAType(ActionTypes.Quick)
+                                 .AddFilters(TargetType.Ally).SetUses(UsesNum.cSometimes).DImproves(false,false).Improve(AImprovements.PatternSize,1,1)
+                                 .CreateGear(new ActorPrefab("Boots of the World Tree",CTags.Cleric,EquipSlots.Feet)));
+                             //Shockwave Stomp
+                             Add(new CharAction(Actions.ShockwaveStomp, "Shockwave Stomp", "Movement", ActMove.Normal, 0,ActAnims.Dagger,
+                                     new EventMsg().TakePush(Point.Up).SetPattern(ActPattern.Blast,1).SetTag(EventTags.EnemiesOnly)).SetAType(ActionTypes.Quick)
+                                 .AddFilters(TargetType.Enemy).SetUses(UsesNum.cSometimes).DImproves(false,false).Improve(AImprovements.PatternSize,1,1)
+                                 .CreateGear(new ActorPrefab("Boots of the Power",CTags.Cleric,EquipSlots.Feet)));
+                         }
+                     
+                         public static void WizardGear()
+                         {
+                             //Wand - Fire Dart
+                             Add(new CharAction(Actions.FireDart, "Fire Dart", "Ranged", ActMove.Normal, 6,ActAnims.Magic,
+                                     new EventMsg().TakeDamage("1d6", DamageTypes.Fire),God.E(GEvents.TakeFire).SetPattern(ActPattern.Blast,1))
+                                 .SetAType(ActionTypes.Major).DImproves(true)
+                                 .CreateGear(new ActorPrefab("Wand of Fire Dart",CTags.Wizard,EquipSlots.Held)));
+                             //Arcane Blast
+                             Add(new CharAction(Actions.ArcaneBlast, "Arcane Blast", "Ranged", ActMove.Normal, 5,ActAnims.Magic,
+                                     new EventMsg().TakeDamage("1d5", DamageTypes.Arcane)).SetPattern(ActPattern.Blast)
+                                 .DImproves(true).Improve(AImprovements.PatternSize,1,1).Improve(AImprovements.Range,1,1)
+                                 .SetAType(ActionTypes.Major).CreateGear(new ActorPrefab("Wand of Arcane Blast",CTags.Wizard,EquipSlots.Held)));
+                             //Freeze
+                             Add(new CharAction(Actions.Freeze, "Freeze", "Ranged", ActMove.Normal, 6,ActAnims.Magic,
+                                     new EventMsg().TakeDamage("1d6", DamageTypes.Cold),God.E().TakeStat(new StatTrait().Add(IntStats.Movespeed,-2),"1d10+5"))
+                                 .SetAType(ActionTypes.Major).DImproves(true)
+                                 .CreateGear(new ActorPrefab("Wand of Freeze",CTags.Wizard,EquipSlots.Held)));
+                             //Force Bolt
+                             Add(new CharAction(Actions.ForceBolt, "Force Bolt", "Ranged", ActMove.Normal, 5,ActAnims.Magic,
+                                     new EventMsg().TakeDamage("1d6", DamageTypes.Normal),God.E().TakePush(Point.Up))
+                                 .DImproves(true).Improve(AImprovements.Range,1,1)
+                                 .SetAType(ActionTypes.Major).CreateGear(new ActorPrefab("Wand of Force Bolt",CTags.Wizard,EquipSlots.Held)));
+                             
+                             //Icy Wind
+                             Add(new CharAction(Actions.IcyWind, "Icy Wind", "Ranged", ActMove.Normal, 1,ActAnims.Magic,
+                                     new EventMsg().TakeDamage("1d5", DamageTypes.Cold),God.E().TakeStat(new StatTrait().Add(IntStats.Movespeed,-2),"1d10+5"),
+                                     God.E().TakePush(Point.Up,"3")).SetPattern(ActPattern.Cone, 1)
+                                 .SetAType(ActionTypes.Major).SetUses(UsesNum.dOften)
+                                 .DImproves(false,true).Improve(AImprovements.PatternSize,1,1)
+                                 .CreateGear(new ActorPrefab("Orb of Ice",CTags.Wizard,EquipSlots.OffHand)));
+                             //Distract
+                             Add(new CharAction(Actions.Distract, "Distract", "Mental", ActMove.Normal, 5,ActAnims.Magic,
+                                     God.E().GainStat(new StatTrait().Add(IntStats.Reactions,-1)).SetTag(EventTags.IgnoreAllies)).SetUses(UsesNum.dOften).SetPattern(ActPattern.Blast,1)
+                                 .SetAType(ActionTypes.Quick).DImproves(false,false).Improve(AImprovements.PatternSize,1,1)
+                                 .CreateGear(new ActorPrefab("Orb of Distraction",CTags.Wizard,EquipSlots.OffHand).AddTags(CTags.UtilityGear)));
+                             //Confuse
+                             Add(new CharAction(Actions.Confuse, "Confuse", "Mental", ActMove.Normal, 4,ActAnims.Magic,
+                                     God.E().TakeStatus(Traits.Confused,"1d10+30")).SetUses(UsesNum.cSometimes)
+                                 .SetAType(ActionTypes.Quick).DImproves(false,false).Improve(AImprovements.PatternShape,(int)ActPattern.Blast)
+                                 .CreateGear(new ActorPrefab("Orb of Confusion",CTags.Wizard,EquipSlots.OffHand)));
+                             
+                             //Charm
+                             Add(new CharAction(Actions.Charm, "Charm", "Mental", ActMove.Normal, 4,ActAnims.Magic,
+                                     new EventMsg().TakeStatus(Traits.Charmed, "2d4+1"))
+                                 .SetAType(ActionTypes.Major).DImproves(false,false)
+                                 .SetUses(UsesNum.aOnce).CreateGear(new ActorPrefab("Mask of the Friend",CTags.Wizard,EquipSlots.Head)));
+                             //Death
+                             Add(new CharAction(Actions.Death, "Death", "Mental", ActMove.Normal, 4,ActAnims.Magic,
+                                     new EventMsg().TakeMsg(God.E(GEvents.Die), "1d10+10"))
+                                 .SetAType(ActionTypes.Major).DImproves(false,false)
+                                 .SetUses(UsesNum.aOnce).CreateGear(new ActorPrefab("Skull Mask",CTags.Wizard,EquipSlots.Head)));
+                             
+                             //Sleep
+                             Add(new CharAction(Actions.Sleep, "Sleep", "Mental", ActMove.OneStep, 6, ActAnims.Magic,
+                                     new EventMsg().TakeStatus(Traits.Asleep, "2d8")).SetPattern(ActPattern.Blast, 2)
+                                 .SetAType(ActionTypes.Major).SetUses(UsesNum.aOnce)
+                                 .DImproves(false,false).Improve(AImprovements.PatternSize,1,1)
+                                 .CreateGear(new ActorPrefab("Robes of Sleep",CTags.Wizard, EquipSlots.Body)));
+                             //Fireball
+                             Add(new CharAction(Actions.Fireball, "Fireball", "Ranged", ActMove.OneStep, 6,ActAnims.Magic,
+                                     new EventMsg().TakeDamage("2d6+3", DamageTypes.Fire)).SetPattern(ActPattern.Blast, 3)
+                                 .SetAType(ActionTypes.Major).SetUses(UsesNum.aOnce).Improve(AImprovements.MaxDamage,4,2)
+                                 .DImproves(false,false).Improve(AImprovements.PatternSize,1,1).Improve(AImprovements.Damage,4,2)
+                                 .CreateGear(new ActorPrefab("Robe of Fireball",CTags.Wizard,EquipSlots.Body)));
+                             //Summon
+                             Add(new CharAction(Actions.SummonRats, "Summon Rats", "Item", ActMove.Normal, 4,ActAnims.Magic,
+                                     new EventMsg().Spawn(CharClass.GiantRat).SetAmount(40)).SetUses(UsesNum.aOnce).SetPattern(ActPattern.Blast)
+                                 .AddFilters(TargetType.Tile).DImproves(false,false).Improve(AImprovements.PatternSize,1,1)
+                                 .CreateGear(new ActorPrefab("Rat Totem",CTags.Wizard,EquipSlots.Body)));
+                             
+                             //Mage Hand
+                             Add(new CharAction(Actions.MageHand, "Mage Hand", "Interact", ActMove.Normal, 5,ActAnims.Interact,new EventMsg(GEvents.Interact))
+                                 .SetAType(ActionTypes.Major).SetSpecial(SpecialActions.Interact)
+                                 .DImproves(false,false).Improve(AImprovements.Range,2,1)
+                                 .CreateGear(new ActorPrefab("Mage Gloves",CTags.Wizard,EquipSlots.Hand).AddTags(CTags.UtilityGear)));
+                             //Phantom Servant
+                             Add(new CharAction(Actions.PhantomServant, "Phantom Servant", "Item", ActMove.Normal, 4,ActAnims.Magic,
+                                     new EventMsg().Spawn(CharClass.PhantomServant).SetAmount(40)).SetUses(UsesNum.cSometimes).AddFilters(TargetType.Tile).SetAType(ActionTypes.Quick)
+                                 .CreateGear(new ActorPrefab("Ring of Service",CTags.Wizard,EquipSlots.Hand).AddTags(CTags.UtilityGear)));
+                             //Heat Armor
+                             Add(new CharAction(Actions.HeatArmor, "Heat Armor", "Ranged", ActMove.Normal, 4,ActAnims.Magic,
+                                     new EventMsg(GEvents.HeatArmor)).SetAType(ActionTypes.Quick).SetUses(UsesNum.cSometimes)
+                                 .DImproves(false,false)
+                                 .CreateGear(new ActorPrefab("Crown of Flames",CTags.Wizard,EquipSlots.Head)));
+                             
+                             //Teleport
+                             Add(new CharAction(Actions.Teleport, "Teleport", "Movement", ActMove.Normal, 5,ActAnims.Magic,new EventMsg().DoMove(Point.Invalid, false).SetTargets(EventMsg.Targets.Source))
+                                 .SetUses(UsesNum.dOften).AddFilters(TargetType.Tile).SetAType(ActionTypes.Quick)
+                                 .DImproves(false,false).Improve(AImprovements.Range,2,1)
+                                 .CreateGear(new ActorPrefab("Teleporting Shoes",CTags.Wizard,EquipSlots.Feet).AddTags(CTags.UtilityGear)));
+                             //Blink
+                             Add(new CharAction(Actions.Blink, "Blink", "Movement", ActMove.Normal, 5,ActAnims.Magic,new EventMsg().DoMove(Point.Invalid, false).SetTargets(EventMsg.Targets.Source))
+                                 .SetUses(UsesNum.eConstant).AddFilters(TargetType.Tile).AddTags(ATags.RandomTarget,ATags.SafeMove).SetAType(ActionTypes.Quick)
+                                 .DImproves(false,false)
+                                 .CreateGear(new ActorPrefab("Blinking Shoes",CTags.Wizard,EquipSlots.Feet).AddTags(CTags.UtilityGear)));
+                             //Explosive Teleport
+                             Add(new CharAction(Actions.ExplosiveTeleport, "Explosive Teleport", "Movement", ActMove.Normal, 4,ActAnims.Magic,God.E().TakeDamage("1d3",DamageTypes.Fire).SetPattern(ActPattern.Blast),
+                                     new EventMsg().DoMove(Point.Invalid, false).SetTargets(EventMsg.Targets.Source))
+                                 .SetUses(UsesNum.cSometimes).AddFilters(TargetType.Tile).SetAType(ActionTypes.Quick).Improve(AImprovements.Range,2,1)
+                                 .DImproves(false,false).Improve(AImprovements.Damage,1,2)  .Improve(AImprovements.MaxDamage,2,2).Improve(AImprovements.PatternSize,1,1)    
+                                 .CreateGear(new ActorPrefab("Fire Shoes",CTags.Wizard,EquipSlots.Feet).AddTags(CTags.UtilityGear)));
+                         }
+                     
+                         public static void GenericGear()
+                         {
+                             //10 Foot Pole
+                             Add(new CharAction(Actions.TenFootPoke, "Ten Foot Poke", "Interact", ActMove.Normal, 2,ActAnims.Interact,
+                                     new EventMsg(GEvents.Poke).SetAmount(1)).AddFilters(TargetType.Tile).SetUses(UsesNum.eConstant)
+                                 .SetAType(ActionTypes.Quick).CreateGear(new ActorPrefab("10 Foot Pole",CTags.None,EquipSlots.Tool).AddTags(CTags.UtilityGear)));
+                             
+                             
+                             //Healing Potion
+                             Add(new CharAction(Actions.HealingPotion, "Drink Healing Potion", "Item", ActMove.Normal, 1,ActAnims.Heal,
+                                     new EventMsg(GEvents.Heal).SetAmount("1d6+1")).SetUses(UsesNum.aOnce)
+                                 .AddFilters(TargetType.Ally).AddTags(ATags.Consumable).SetAType(ActionTypes.Quick)
+                                 .CreateGear(new ActorPrefab("Healing Potion",CTags.None,EquipSlots.Tool).AddTags(CTags.UtilityGear)));
+                             
+                             //Caltrops
+                             Add(new CharAction(Actions.Caltrops, "Scatter Caltrops", "Item", ActMove.Normal, 3,ActAnims.Dagger,
+                                     new EventMsg().Spawn(ActorP.Caltrops)).SetUses(UsesNum.aOnce).SetPattern(ActPattern.Blast,1)
+                                 .AddFilters(TargetType.Tile).AddTags(ATags.Consumable).SetAType(ActionTypes.Quick)
+                                 .CreateGear(new ActorPrefab("Bag of Caltrops",CTags.None,EquipSlots.Tool).AddTags(CTags.UtilityGear)));
+                             
+                             //Strength Potion
+                             Add(new CharAction(Actions.StrengthPotion, "Drink Strength Potion", "Item", ActMove.Normal, 1,ActAnims.Magic,
+                                     new EventMsg().GainStat(new StatTrait().Add(IntStats.Damage,3))).SetUses(UsesNum.aOnce)// Traits.PlusDamage,3)
+                                 .AddFilters(TargetType.Ally).AddTags(ATags.Consumable).SetAType(ActionTypes.Quick)
+                                 .CreateGear(new ActorPrefab("Strength Potion",CTags.None,EquipSlots.Tool).AddTags(CTags.UtilityGear)));
+                             
+                             //SafeStep
+                             Add(new CharAction(Actions.SafeStep, "Safe Step", "Movement", ActMove.Normal, 1,ActAnims.None,new EventMsg().DoMove(Point.Invalid, false).SetTargets(EventMsg.Targets.Source))
+                                 .AddFilters(TargetType.Tile).AddTags(ATags.SafeMove).SetAType(ActionTypes.Quick).SetUses(UsesNum.dOften)
+                                 .CreateGear(new ActorPrefab("Shoes of Withdrawl",CTags.None,EquipSlots.Feet).AddTags(CTags.UtilityGear)));
+                                 
+                             //SwapOut
+                             Add(new CharAction(Actions.SwapOut, "Swap Out", "Movement", ActMove.Normal, 1,ActAnims.Interact,
+                                     new EventMsg().DoMove(Point.Invalid,false).SetTag(EventTags.SafetyOverride,EventTags.AlliesOnly,EventTags.NoAoO).SetVerb("ToSource"),
+                                     new EventMsg().DoMove(Point.Invalid,false).SetTag(EventTags.NoAoO).SetTargets(EventMsg.Targets.Source))
+                                 .SetAType(ActionTypes.Quick).SetUses(UsesNum.eConstant)
+                                 .CreateGear(new ActorPrefab("Swapping Sandals",CTags.None,EquipSlots.Feet).AddTags(CTags.UtilityGear)));
+                         }
+                     
+                         public static void MiscGear()
+                         {
+                             Add(new CharAction(Actions.Test, "TEST ACTION", "Ranged", ActMove.Normal, 5,ActAnims.Dagger,
+                                     new EventMsg().GainStatus(Traits.Poisoned, "3")).SetPattern(ActPattern.Blast,5)
+                                 .AddFilters(TargetType.Tile).SetAType(ActionTypes.Major)
+                                 .CreateGear(new ActorPrefab("Test Item",CTags.None,EquipSlots.Tool),false));
+                             
+                             //Rocks
+                             Add(new CharAction(Actions.ThrowRock, "throw rocks at whoever looks weakest", "Ranged", ActMove.Normal,
+                                     4,ActAnims.Dagger, new EventMsg().TakeDamage("1", DamageTypes.Normal)).SetPriority(AIPriority.BreadAndButter, 2)
+                                 .AddTags(ATags.Unsafe).SetAType(ActionTypes.Major)
+                                 .AddFilters(TargetType.Enemy, TargetFilters.LowestHP)
+                                 .CreateGear(new ActorPrefab("Some Rocks",CTags.None,EquipSlots.Tool),false));
+                         }

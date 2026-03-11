@@ -87,8 +87,7 @@ public class ActorThing : Thing
 
     public void AddAction(ActionPrefab a)
     {
-        ActionScript act = ThingBuilder.MakeAction(a);
-        act.Who = this;
+        ActionScript act = ThingBuilder.MakeAction(a,this);
         if(KnownActions.ContainsKey(act.Slot)) KnownActions[act.Slot] = act;
         else KnownActions.Add(act.Slot, act);
         if(a.Tags.Contains(ATags.ReactionOK) && !KnownActions.ContainsKey(ActionSlot.Reaction))
@@ -96,8 +95,7 @@ public class ActorThing : Thing
     }
     public void AddAction(Actions a,ActionSlot slot=ActionSlot.None)
     {
-        ActionScript act = ThingBuilder.MakeAction(a);
-        act.Who = this;
+        ActionScript act = ThingBuilder.MakeAction(a,this);
         if (slot == ActionSlot.None) slot = act.Slot;
         if(KnownActions.ContainsKey(slot)) KnownActions[slot] = act;
         else KnownActions.Add(slot, act);
@@ -317,7 +315,7 @@ public class ActorThing : Thing
     public override void ImprintCard(CardScript c)
     {
         Sprite s = null;
-        string name = Type.ToString();
+        string name = Name;
         string desc = "";
         if (Class != CharClass.None)
         {

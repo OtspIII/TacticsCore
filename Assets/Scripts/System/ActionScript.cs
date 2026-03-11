@@ -23,8 +23,9 @@ public class ActionScript : Thing
     public int Uses = 0;
     public List<ATags> Tags = new List<ATags>();
 
-    public void Imprint(ActionPrefab p)
+    public void Imprint(ActionPrefab p,ActorThing who)
     {
+        Who = who;
         Name = p.Name;
         Icon = p.Icon;
         MaxUses = (int)p.Uses;
@@ -209,13 +210,38 @@ public class ActionScript : Thing
 
     public float GetTileValue(GameTile t,ActionScript main=null)
     {
-        float r = 1;   //The value of the tile in and of itself
+        float r = 0;   //The value of the tile in and of itself
         float mod = 0; //For things like how dangerous it is to stand there
-        if (Phase.Target == TargetType.EmptyTile) //main exists only for moves to get a NPC in place for another act
+        ActionPhase phase = Phase;
+        if (phase.Target == TargetType.EmptyTile) //main exists only for moves to get a NPC in place for another act
         {
             int idealRange = main != null ? main.Range : 1;
             if (Tags.Contains(ATags.NearEnemy)) idealRange = 1;
             r = 10 - Mathf.Abs(t.BestPDistance-idealRange);
+        }
+
+        foreach (ActorThing targ in phase.GetHitActs(t))
+        {
+            bool enem = Who.IsEnemy(targ);
+            switch (phase.AI)
+            {
+                case AITarget.Allies:
+                {
+                    if (enem) r -= God.FriendlyFirePenalty;
+                    if (Has(ATags.Buff) && targ.Has(CTags.Support)) break;
+                    r += God.HitTargetBonus;
+                    break;
+                }
+                case AITarget.HurtAllies:
+                {
+                    if (enem) r -= God.FriendlyFirePenalty;
+                    float hpperc = 1 - targ.HPPerc(); 
+                    r += God.HitTargetBonus * (hpperc * 2);
+                    break;
+                }
+                case AITarget.Enemies: r += enem ? God.HitTargetBonus : -God.FriendlyFirePenalty ; break;
+                case AITarget.Anyone: r += God.HitTargetBonus; break;
+            }
         }
         // Debug.Log("GET VALUE: " + Who + " / " + Type + " / " + r + " / " + mod);
         EventInfo e = God.E(EventTypes.ActionValue).Set(t).SetF(r).SetF("Mod",mod).Set("Main Action",main).Set(this);
@@ -232,114 +258,7 @@ public class ActionScript : Thing
         return Execute(Phase,Info);
     }
 
-    public List<GameTile> GetPattern(ActionPhase p, ActionEvent a,GameTile target)
-    {
-        GameTile source = Who.Location;
-        if (a.Target == ActEventTarget.Self) target = source;
-        ActPattern actPattern = a.Pattern;
-        int patternSize=a.Size;
-        Directions rot = God.GetDir(source.Location,target.Location);
-        List<GameTile> r = new List<GameTile>();
-        switch (actPattern)
-        {
-            case ActPattern.None:case ActPattern.TargetOnly:
-                r.Add (target);
-                break;
-            case ActPattern.Blast:
-                r.AddRange (target.Flood (patternSize,NeighborMode.WallsBlock));
-                break;
-            case ActPattern.Cone:
-            {
-                List<GameTile> active = new List<GameTile>(){target};
-				
-                bool left = true;
-                bool right = true;
-                r.Add(target);
-                for (int n = 0; n < patternSize; n++)
-                {
-                    List<GameTile> temp = new List<GameTile>();
-                    //Every existing tile goes forward
-                    foreach (GameTile gt in active)
-                    {
-                        if (gt == null)
-                            continue;
-                        GameTile t = gt.Neighbor(God.Rotate(new Vector2Int(0, 1), rot));
-                        if (t != null && gt.ValidNeighbor(t,NeighborMode.WallsBlock))
-                            temp.Add(t);
-                    }
-
-                    if (left && active.Count > 0)
-                    {
-                        GameTile t = active[0].Neighbor(God.Rotate(new Vector2Int(-1, 1), rot));
-                        if (t != null && active[0].ValidNeighbor(t,NeighborMode.WallsBlock))
-                            temp.Insert(0, t);
-                        else
-                            left = false;
-                    }
-                    if (right && active.Count > 0)
-                    {
-                        GameTile t = active[active.Count-1].Neighbor(God.Rotate(new Vector2Int(1, 1), rot));
-                        if (t != null && active[active.Count-1].ValidNeighbor(t,NeighborMode.WallsBlock ))
-                            temp.Add(t);
-                        else
-                            right = false;
-                    }
-                    foreach(GameTile gt in temp)
-                        r.Add(gt);
-                    active = temp;
-                }
-                break;
-            }
-            case ActPattern.Horizontal:
-            {
-                for (int n = 0; n < patternSize; n++)
-                {
-                    r.Add(target.Neighbor(God.Rotate(new Vector2Int(-n, 0), rot)));
-                    if (n != 0)
-                        r.Add(target.Neighbor(God.Rotate(new Vector2Int(n, 0), rot)));
-                }
-
-                break;
-            }
-            case ActPattern.Pierce:
-            {
-                List<GameTile> active = new List<GameTile>() { target };
-                r.Add(target);
-                for (int n = 0; n < patternSize; n++)
-                {
-                    List<GameTile> temp = new List<GameTile>();
-                    //Every existing tile goes forward
-                    foreach (GameTile gt in active)
-                    {
-                        if (gt == null)
-                            continue;
-                        GameTile t = gt.Neighbor(God.Rotate(new Vector2Int(0, 1), rot));
-                        if (t != null && gt.ValidNeighbor(t, NeighborMode.WallsBlock))
-                            temp.Add(t);
-                    }
-
-                    foreach (GameTile gt in temp)
-                        r.Add(gt);
-                    active = temp;
-                }
-                break;
-            }
-            case ActPattern.Source:
-            {
-                r.Add(source);
-                break;
-            }
-            default:
-            {
-                God.LogWarning(("UNPROGRAMMED PATTERN: " + actPattern));
-                r.Add(target);
-                break;
-            }
-        }
-        while (r.Contains(null))
-            r.Remove(null);
-        return r;
-    }
+    
     
     public bool Execute(ActionPhase p,ActionInfo i)
     {
@@ -357,7 +276,7 @@ public class ActionScript : Thing
             
             foreach (ActionEvent a in p.Events)
             {
-                List<GameTile> pat = GetPattern(p,a,t);
+                List<GameTile> pat = a.GetPattern(p,t,Who);
                 foreach (GameTile tt in pat)
                 {
                     ActorThing targ = tt.Contents;
@@ -503,6 +422,11 @@ public class ActionScript : Thing
         if (Type == Actions.Sprint) return 0.5f;
         return r; //Will eventually be AI for knowing if this move is worth it or not
     }
+
+    public bool Has(ATags tag)
+    {
+        return Tags.Contains(tag);
+    }
 }
 
 public class ActionInfo
@@ -606,6 +530,42 @@ public class ActionPhase
         UniqueTiles = u;
         return this;
     }
+
+    public List<GameTile> GetHitTiles(GameTile t)
+    {
+        List<GameTile> r = new List<GameTile>();
+        foreach (ActionEvent a in Events)
+        {
+            List<GameTile> pat = a.GetPattern(this,t,Src);
+            foreach (GameTile pt in pat)
+            {
+                if(!r.Contains(pt)) r.Add(pt);
+            }
+        }
+        return r;
+        
+    }
+    
+    public List<ActorThing> GetHitActs(GameTile t)
+    {
+        if (Target == TargetType.Self) t = Src.Location;
+        List<ActorThing> r = new List<ActorThing>();
+        foreach (ActionEvent a in Events)
+        {
+            if (a.Target == ActEventTarget.Floor) continue;
+            List<GameTile> pat = a.GetPattern(this,t,Src);
+            foreach (GameTile pt in pat)
+            {
+                ActorThing who = pt.Contents;
+                if (who == null || r.Contains(who)) continue;
+                if (a.Target == ActEventTarget.Allies && Src.IsEnemy(who)) continue;
+                if (a.Target == ActEventTarget.Enemies && !Src.IsEnemy(who)) continue;
+                if (a.Target == ActEventTarget.Self && Src != who) continue;
+                r.Add(who);
+            }
+        }
+        return r;
+    }
 }
 
 public class ActionEvent
@@ -634,8 +594,115 @@ public class ActionEvent
     {
         Events.AddRange(events);
     }
-
     
+    public List<GameTile> GetPattern(ActionPhase p,GameTile target,ActorThing who)
+    {
+        GameTile source = who.Location;
+        if (Target == ActEventTarget.Self) target = source;
+        ActPattern actPattern = Pattern;
+        int patternSize=Size;
+        Directions rot = God.GetDir(source.Location,target.Location);
+        List<GameTile> r = new List<GameTile>();
+        switch (actPattern)
+        {
+            case ActPattern.None:case ActPattern.TargetOnly:
+                r.Add (target);
+                break;
+            case ActPattern.Blast:
+                r.AddRange (target.Flood (patternSize,NeighborMode.WallsBlock));
+                break;
+            case ActPattern.Cone:
+            {
+                List<GameTile> active = new List<GameTile>(){target};
+				
+                bool left = true;
+                bool right = true;
+                r.Add(target);
+                for (int n = 0; n < patternSize; n++)
+                {
+                    List<GameTile> temp = new List<GameTile>();
+                    //Every existing tile goes forward
+                    foreach (GameTile gt in active)
+                    {
+                        if (gt == null)
+                            continue;
+                        GameTile t = gt.Neighbor(God.Rotate(new Vector2Int(0, 1), rot));
+                        if (t != null && gt.ValidNeighbor(t,NeighborMode.WallsBlock))
+                            temp.Add(t);
+                    }
+
+                    if (left && active.Count > 0)
+                    {
+                        GameTile t = active[0].Neighbor(God.Rotate(new Vector2Int(-1, 1), rot));
+                        if (t != null && active[0].ValidNeighbor(t,NeighborMode.WallsBlock))
+                            temp.Insert(0, t);
+                        else
+                            left = false;
+                    }
+                    if (right && active.Count > 0)
+                    {
+                        GameTile t = active[active.Count-1].Neighbor(God.Rotate(new Vector2Int(1, 1), rot));
+                        if (t != null && active[active.Count-1].ValidNeighbor(t,NeighborMode.WallsBlock ))
+                            temp.Add(t);
+                        else
+                            right = false;
+                    }
+                    foreach(GameTile gt in temp)
+                        r.Add(gt);
+                    active = temp;
+                }
+                break;
+            }
+            case ActPattern.Horizontal:
+            {
+                for (int n = 0; n < patternSize; n++)
+                {
+                    r.Add(target.Neighbor(God.Rotate(new Vector2Int(-n, 0), rot)));
+                    if (n != 0)
+                        r.Add(target.Neighbor(God.Rotate(new Vector2Int(n, 0), rot)));
+                }
+
+                break;
+            }
+            case ActPattern.Pierce:
+            {
+                List<GameTile> active = new List<GameTile>() { target };
+                r.Add(target);
+                for (int n = 0; n < patternSize; n++)
+                {
+                    List<GameTile> temp = new List<GameTile>();
+                    //Every existing tile goes forward
+                    foreach (GameTile gt in active)
+                    {
+                        if (gt == null)
+                            continue;
+                        GameTile t = gt.Neighbor(God.Rotate(new Vector2Int(0, 1), rot));
+                        if (t != null && gt.ValidNeighbor(t, NeighborMode.WallsBlock))
+                            temp.Add(t);
+                    }
+
+                    foreach (GameTile gt in temp)
+                        r.Add(gt);
+                    active = temp;
+                }
+                break;
+            }
+            case ActPattern.Source:
+            {
+                r.Add(source);
+                break;
+            }
+            default:
+            {
+                God.LogWarning(("UNPROGRAMMED PATTERN: " + actPattern));
+                r.Add(target);
+                break;
+            }
+        }
+        while (r.Contains(null))
+            r.Remove(null);
+        return r;
+    }
 }
 
 

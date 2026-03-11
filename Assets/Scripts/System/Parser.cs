@@ -16,6 +16,7 @@ public static class Parser
         TraitDict.Add(Traits.Stunned, new StunTrait());
         TraitDict.Add(Traits.Taunted, new TauntedTrait());
         TraitDict.Add(Traits.RatBiteFever, new RatBiteFeverTrait());
+        TraitDict.Add(Traits.PickOff, new PickOffTrait());
     }
     
     public static TraitThing Get(Traits t)

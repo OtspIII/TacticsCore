@@ -27,14 +27,15 @@ public class EnemyTurnPhase : PhaseScript
             God.GM.StartPhase();
             return;
         }
-        ActorThing a = Queued.Random();
+
+        ActorThing a = Queued[0];
         Queued.Remove(a);
         if (a == null || a.Destroyed) return;
 
         ActionScript main = a.SelectedAction;
         ActionScript move = a.PickAction(ActionCost.Move,main);
         ActionScript bonus = a.PickAction(ActionCost.Bonus);
-        if (move != null && a.ActionsLeft.Contains(ActionCost.Move))
+        if (move != null && a.ActionsLeft.Contains(ActionCost.Move) && (main == null || !main.Tags.Contains(ATags.DontMove)))
         {
             move.AISelect(main);
             move.Execute();
@@ -49,6 +50,25 @@ public class EnemyTurnPhase : PhaseScript
             main.AISelect();
             main.Execute();
         }
+    }
+
+    public void SortQueue()
+    {
+        List<ActorThing> fast = new List<ActorThing>();
+        List<ActorThing> normal = new List<ActorThing>();
+        List<ActorThing> slow = new List<ActorThing>();
+        foreach (ActorThing a in Queued)
+        {
+            if (a.SelectedAction == null) normal.Add(a);
+            else if(a.SelectedAction.Has(ATags.Fast)) fast.Add(a);
+            else if(a.SelectedAction.Has(ATags.Slow)) slow.Add(a);
+            else normal.Add(a);
+        }
+        List<ActorThing> r = new List<ActorThing>();
+        r.AddRange(fast.Shuffle());
+        r.AddRange(normal.Shuffle());
+        r.AddRange(slow.Shuffle());
+        Queued = r;
     }
 
     public override PhaseScript NextPhase()

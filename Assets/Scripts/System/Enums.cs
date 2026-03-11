@@ -73,6 +73,8 @@ public enum Traits
 	GearPowerup		=8002,
 	StatReward		=8003,
 	BoonReward		=8004,
+	//Action		#9000
+	PickOff			=9000,
 	
 }
 
@@ -179,7 +181,7 @@ public enum ATags{
 	DontMove=1,		//#Tells the NPC not to move before the action
 	ExtraMove=2,
 	SafeMove=3,
-	Quick=4,		//##Goes before players
+	Quick=4,		//Goes before players
 	Flee=5,			//The target runs away, probably should be moved to trait
 	NearEnemy=6,	//For actions like movement and summons that should be done near enemies
 	Unsafe=8,		//##Provokes AoO
@@ -188,7 +190,7 @@ public enum ATags{
 	Consumable=12,	//Destroys the item that grants it
 	Fast=13,		//NPCs doing this move go first (for buffs/etc)
 	Hidden=14,		//When you Command someone, this option doesn't show up
-	Buff=15,		//Only do this to non-supports
+	Buff=15,		//#Only do this to non-supports
 	IncapOk=16,		//You can do this even if you're incapacitated (like sleeping)
 	RandomTarget=17,//Picks a random target
 	FriendlyFireOk=18,//Good if you hit your allies with this
@@ -196,8 +198,9 @@ public enum ATags{
 	Aggressive=20,	//Makes sure you try to move next to an enemy, even if this isn't an attack
 	LoseWhenTransform=21,//For lycanthropes, lose these abilities when you transform
 	RequireBloodied=22,//You only want to do this move if you've been hurt
-	Slow=23,		//#Go after all other monsters have acted
+	Slow=23,		//Go after all other monsters have acted
 	ReactionOK=24,  //Can be used as a reaction
+	LowPriority=25, //#Only do if other actions not valid
 //	IgnoreChosenTarg=24,//Don't bother setting a chosen target for this, just use it on the most appropriate at the time
 }
 

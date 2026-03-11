@@ -176,6 +176,12 @@ public class ActionPrefab
         return this;
     }
     
+    public ActionPrefab ATrait(params Traits[] t)
+    {
+        Trait.AddRange(t);
+        return this;
+    }
+    
     public ActionPrefab GTrait(int range,Traits tr,string res, int dur,params EventInfo[] events)
     {
         GTrait(range, ActPattern.TargetOnly,1,tr, res,dur);

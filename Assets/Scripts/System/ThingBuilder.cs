@@ -38,18 +38,57 @@ public static class ThingBuilder
             .Act(new ActionPrefab("Pounce","Movement",ActionSlot.BeforePlayers,ActionCost.Move).Move(God.N(IntStats.Movespeed)),true);
         //Vermin
         AddNPC(CharClass.GiantRat,1,"Giant Rat",3,0,5,"1d4").Tag(CTags.Beast)
-            .Act(new ActionPrefab("Filthy Nibble","Melee",ActionSlot.BasicAttack).Attack(1).EAdd(God.E(EventTypes.GainTrait).Set(Traits.RatBiteFever).Resist("2d6-6")),true);
+            .Act(new ActionPrefab("Filthy Nibble","Melee",ActionSlot.BasicAttack).Attack(1).EAdd(God.E(EventTypes.GainTrait).Set(Traits.RatBiteFever).Resist("2d6-6")),true);//##Implement fever
         AddNPC(CharClass.GoblinDog,1,"Goblin Dog",4,1,4,"1d4").Tag(CTags.Beast)
             .Act(new ActionPrefab("Heel Gnaw","Melee",ActionSlot.BasicAttack).Attack(1).EAdd(God.E(EventTypes.ChangeStat).Set(IntStats.Movespeed).Set(-2)));
         AddNPC(CharClass.GiantBat,1,"Evil Bat",6,0,5,"1d6").Tag(CTags.Beast)
-            .Act(new ActionPrefab("Blood Drink","Heal",ActionSlot.BasicAttack).Attack(1,"1d4"),true)//Lifedrain
+            .Act(new ActionPrefab("Blood Drink","Heal",ActionSlot.BasicAttack).Attack(1,"1d4"),true)//##Lifedrain
             .Act(new ActionPrefab("Dive Attack","Melee",ActionSlot.Secondary).Attack(1).Move())
-            .Act(new ActionPrefab("Guano Explosion","Interact",ActionSlot.OnDeath).AttackTag(1,ActPattern.Blast,1,"1",DamageTypes.Normal,"IgnoreSelf").PTarg(TargetType.Self));//Spawn Guano Instead
+            .Act(new ActionPrefab("Guano Explosion","Interact",ActionSlot.OnDeath).AttackTag(1,ActPattern.Blast,1,"1",DamageTypes.Normal,"IgnoreSelf").PTarg(TargetType.Self));//##Spawn Guano Instead
         AddNPC(CharClass.GiantCentipede,1,"Giant Centipede",3,1,4,"1d3").Tag(CTags.Beast)
-            .Act(new ActionPrefab("Nauseating Bite","Melee",ActionSlot.BasicAttack).Attack(1).EAdd(God.E(EventTypes.ChangeStat).Set(IntStats.MaxDamage).Set(-1).Resist("1d6+1")),true);//Maybe last one full extra round?
+            .Act(new ActionPrefab("Nauseating Bite","Melee",ActionSlot.BasicAttack).Attack(1).EAdd(God.E(EventTypes.ChangeStat).Set(IntStats.MaxDamage).Set(-1).Resist("1d6+1")),true);//##Maybe last one full extra round?
+        //Goblins
+        AddNPC(CharClass.GoblinPyro,1,"Goblin Pyromaniac",3,0,3,"1d4")
+            .Act(new ActionPrefab("Throw Molotov","Ranged",ActionSlot.BasicAttack).Attack(4,ActPattern.Blast,0,"1d4",DamageTypes.Fire))
+            .Act(new ActionPrefab("Self Destruct","Interact",ActionSlot.OnDeath).AttackTag(1,ActPattern.Blast,1,"1d6",DamageTypes.Fire,"IgnoreSelf").PTarg(TargetType.Self));
+        AddNPC(CharClass.GoblinTroublemaker,1,"Goblin Troublemaker",5,0,3,"1d6")
+            .Act(new ActionPrefab("Shank","Melee",ActionSlot.BasicAttack).Attack(1).ATrait(Traits.PickOff));//##need to implement pick off
+        AddNPC(CharClass.GoblinBigmouth,1,"Goblin Bigmouth",4,0,3,"1d4").Tag(CTags.Support)
+            .Act(new ActionPrefab("Slap","Melee",ActionSlot.BasicAttack).Attack(1,"1").PAdd(ActEventTarget.Characters,God.E(EventTypes.Knockback).Set(1)).Tag(ATags.LowPriority))
+            .Act(new ActionPrefab("Goad On", "Mental", ActionSlot.Secondary).SingleTarget(5,God.E(EventTypes.ChangeStat).Set(IntStats.Damage).Set(2))
+                .PTarg(TargetType.Character,AITarget.HurtAllies).Tag(ATags.Fast,ATags.Buff));
         
         /*
-                
+                         
+        //Goblin Bigmouth -- Hurl Insult -- Goad On
+        Add(new ClassPrefab(CharClass.GoblinBigmouth, "Goblin Bigmouth", "GoblinBigmouth",1).SetStats(4, "1d4")
+            .AddAdj("Crude", "Loud", "Cowardly").AddTags(CTags.Support)
+        //Goad On
+            .AddAction(new CharAction("Goad On", "yell encouraging insults at their allies", "Buff", ActMove.Normal,
+                5,ActAnims.Yell,God.E().GainStat(new StatTrait("DMG #").Add(IntStats.Damage,2)).SetTag(EventTags.AlliesOnly)).AddTags(ATags.Fast,ATags.Buff)
+            .AddFilters(TargetType.Ally, TargetFilters.Attacking))
+        //Slap
+        .AddAction(new CharAction("Slap", "try to slap you away", "Mental"
+                , ActMove.Normal, 1,ActAnims.Dagger,God.E().TakeDamage("1",DamageTypes.Normal), God.E().TakePush(Point.Up, "1"))
+            .AddFilters(TargetType.Enemy, TargetFilters.Closest).SetPriority(AIPriority.RatherNot,20))
+        //Hurl Insult
+            .AddAction(new CharAction("Hurl Insult", "shout questionable statements about your mother", "Mental"
+                , ActMove.Normal, 5,ActAnims.Yell,God.E().TakePush(Point.Down, "1d3")).AddTags(ATags.Fast,ATags.Buff)
+            .AddFilters(TargetType.Enemy, TargetFilters.LowestAC))
+        );
+        
+        //Goblin Ratwhipper -- Throw Bait -- Whip
+        Add(new ClassPrefab(CharClass.GoblinBeasttamer, "Goblin Ratwhipper", "GoblinBeasttamer",1)
+            .SetStats(4, "1d4",1).AddAdj("Smelly", "Yelly", "Vermin Loving")
+        //Goblin Whip
+            .AddAction(new CharAction("Goblin Whip", "lash you with a soggy leather whip", "Melee", ActMove.Normal, 2,ActAnims.Dagger,
+                God.E().TakeDamage("W", DamageTypes.Normal))
+            .AddFilters(TargetType.Enemy, TargetFilters.LowestAC),true)
+        //Throw Bait
+            .AddAction(new CharAction("Throw Bait", "throw fragrant fat at you, driving its allies into a feeding frenzy", "Ranged", ActMove.Normal, 4,ActAnims.Dagger,
+                God.E().TakeDamage("1", DamageTypes.Normal),God.E(GEvents.TakeAoO)).AddTags(ATags.Buff,ATags.Slow)
+            .AddFilters(TargetType.Enemy, TargetFilters. MostAoOThreat))
+        );
          */
 
         AddAction(Actions.Walk, "Walk","Movement",ActionCost.None, ActionSlot.BasicMove).Move();
@@ -148,18 +187,18 @@ public static class ThingBuilder
         return r;
     }
     
-    public static ActionScript MakeAction(Actions a)
+    public static ActionScript MakeAction(Actions a,ActorThing who)
     {
         ActionScript r = new ActionScript();
         ActionPrefab p = ActionDict[a];
-        r.Imprint(p);
+        r.Imprint(p,who);
         return r;
     }
     
-    public static ActionScript MakeAction(ActionPrefab p)
+    public static ActionScript MakeAction(ActionPrefab p,ActorThing who)
     {
         ActionScript r = new ActionScript();
-        r.Imprint(p);
+        r.Imprint(p,who);
         return r;
     }
     
