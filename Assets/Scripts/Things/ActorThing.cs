@@ -256,7 +256,7 @@ public class ActorThing : Thing
             TakeListen.TryGetValue(e.Type, out List<Traits> take);
             // Debug.Log("TAKE EVENT C: " + e.Type + " / " + (take == null ? "X" : take.Count));
             if (take != null)
-                foreach (Traits t in take)
+                foreach (Traits t in take.ToArray())
                 {
                     Get(t)?.TakeEvent(e);
                     if (e.Abort) break;
@@ -291,18 +291,53 @@ public class ActorThing : Thing
         return e;
     }
 
-    public void Walk(GameTile t,bool useMove=true,bool provokeAoO=true,bool teleport=false)
+    public void Push(Directions dir, int amt = 1, bool provokeAoO = true, bool teleport = false)
+    { Push(God.Dir2Vector2Int(dir), amt, provokeAoO, teleport); }
+    public void Push(Vector2Int dir, int amt=1,bool provokeAoO = true, bool teleport = false)
+    {
+        GameTile pos = Location;
+        List<GameTile> path = new List<GameTile>();
+        for (int n = 0; n < amt; n++)
+        {
+            GameTile t = pos.Neighbor(dir);
+            if (t == null) break;
+            if (t.Contents != null)
+            {
+                //##Push them too?
+                break;
+            }
+            path.Add(t);
+            pos = t;
+        }
+        if (pos == Location) return;
+        if(teleport) path = new List<GameTile>(){pos};
+        foreach (GameTile g in path)
+            Step(g, false, provokeAoO);
+    }
+    
+    public void Walk(GameTile t, bool useMove = true, bool provokeAoO = true, bool teleport = false)
+    {
+        List<GameTile> path = teleport ? new List<GameTile>(){t} : new WalkPath(this, t,teleport).Path;
+        foreach(GameTile g in path)
+            if (Step(g, useMove, provokeAoO))
+                break;
+    }
+    
+    
+    public bool Step(GameTile t,bool useMove=true,bool provokeAoO=true)
     {
         if (t == null)
         {
             God.LogError("Tried to walk to null tile: " + this);
-            return;
+            return true;
         }
         GameTile o = Location;
         if (useMove)
         {
-            int dist = Mathf.Abs(o.X - t.X) + Mathf.Abs(o.Y - t.Y);
-            int left = Change(IntStats.MoveLeft, -dist);
+            int cost = t.GetCost(this);
+            int ml = Get(IntStats.MoveLeft);
+            if (ml < cost) return true;
+            int left = Change(IntStats.MoveLeft, -cost);
             if (left <= 0) ActionsLeft.Remove(ActionCost.Move);
         }
 
@@ -312,9 +347,10 @@ public class ActorThing : Thing
             TakeEvent(e,true);
         }
         bool ok = !Destroyed && Ask(EventTypes.CanAct).GetBool();
-        if (!ok) return;
+        if (!ok) return true;
         SetLocation(t);
         God.GM.AddCut(new MoveCut(this,o,t));
+        return false;
     }
 
     public void Destruct(bool silent=false)

@@ -91,8 +91,7 @@ public class PhaseScript
         TileTint tt = new TileTint(t, tiles);
         if (Tints.ContainsKey(t))
         {
-            Tints[t] = tt;
-            return;
+            WipeTint(t);
         }
         Tints.Add(t,tt);
     }
@@ -101,8 +100,7 @@ public class PhaseScript
         TileTint tt = new TileTint(t, tiles);
         if (Tints.ContainsKey(t))
         {
-            Tints[t] = tt;
-            return;
+            WipeTint(t);
         }
         Tints.Add(t,tt);
     }

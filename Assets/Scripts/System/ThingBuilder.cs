@@ -35,7 +35,7 @@ public static class ThingBuilder
                 God.E(EventTypes.ChangeStat).Set(IntStats.Vulnerable).Set(1),God.E(EventTypes.ChangeStat).Set(IntStats.Damage).Set(1)).PTarg(TargetType.Character,AITarget.HurtAllies));
         AddNPC(CharClass.RatmanMutant,1,"Ratfolk Mutant",4,0,4,"2d4")
             .Act(new ActionPrefab("Flailing Claws","Melee",ActionSlot.BasicAttack).AttackTag(1,ActPattern.Blast,1,"W",DamageTypes.Normal,"IgnoreSelf").PTarg(TargetType.Self),true)
-            .Act(new ActionPrefab("Pounce","Movement",ActionSlot.BeforePlayers,ActionCost.Move).Move(God.N(IntStats.Movespeed)),true);
+            .Act(new ActionPrefab("Pounce","Movement",ActionSlot.BeforePlayers,ActionCost.Move).Move(God.N(IntStats.Movespeed),true).Tag(ATags.SafeMove),true);
         //Vermin
         AddNPC(CharClass.GiantRat,1,"Giant Rat",3,0,5,"1d4").Tag(CTags.Beast)
             .Act(new ActionPrefab("Filthy Nibble","Melee",ActionSlot.BasicAttack).Attack(1).EAdd(God.E(EventTypes.GainTrait).Set(Traits.RatBiteFever).Resist("2d6-6")),true);//##Implement fever

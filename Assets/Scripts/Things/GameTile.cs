@@ -106,12 +106,23 @@ public class GameTile : Thing
         return r;
     }
 
-    public bool ValidNeighbor(GameTile t,NeighborMode nm=NeighborMode.None)
+    public bool ValidNeighbor(GameTile t,NeighborMode nm=NeighborMode.None,ActorThing who=null,bool terminal=true)
     {
         if (t == null) return false;
         switch (nm)
         {
-            case NeighborMode.Walking: return t.Contents == null;
+            case NeighborMode.None:break;
+            case NeighborMode.WallsBlock: return t.Contents == null;
+            case NeighborMode.Walking:
+            {
+                if(terminal || who == null) return t.Contents == null;
+                return t.Contents == null || who.Team == t.Contents.Team;
+            }
+            default:
+            {
+                God.LogWarning("Unsupported neighbor mode: " + nm);
+                break;
+            }
         }
         return true;
     }
@@ -172,6 +183,11 @@ public class GameTile : Thing
         foreach(ActorThing a in Watches[e.Type].Keys.ToArray())
             a.WatchEvent(e,who,this);
             
+    }
+
+    public int GetCost(ActorThing who=null)
+    {
+        return 1;
     }
 
     public override string ToString()

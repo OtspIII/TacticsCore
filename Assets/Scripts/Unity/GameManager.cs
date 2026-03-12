@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     public Vector3 CursorStart;
     public List<CardScript> CardLine = new List<CardScript>();
     public CardScript MainCard;
+    public ActionScript MidAction = null;
 
     void Awake()
     {

@@ -204,13 +204,13 @@ public class ActionPrefab
         return this;
     }
     
-    public ActionPrefab Move(Number range=null,List<EventInfo> preE=null,List<EventInfo> postE=null)
+    public ActionPrefab Move(Number range=null,bool teleport=false,List<EventInfo> preE=null,List<EventInfo> postE=null)
     {
         if (range == null) range = God.N(IntStats.MoveLeft);
         ActionPhase p = new ActionPhase(range,Cutscenes.None,TargetType.EmptyTile,AITarget.Empty);
         List<EventInfo> evs = new List<EventInfo>();
         if(preE!=null) evs.AddRange(preE);
-        evs.Add(God.E(EventTypes.WalkTo));
+        evs.Add(God.E(EventTypes.WalkTo).Set("Teleport",teleport));
         if(postE!=null) evs.AddRange(postE);
         p.Add(ActEventTarget.Self, evs.ToArray());
         Phases.Add(p);

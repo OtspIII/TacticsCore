@@ -273,7 +273,8 @@ public class ActionScript : Thing
     
     public bool Execute(ActionPhase p,ActionInfo i,bool quick=false)
     {
-        if(Name != "Walk") Who.Body.SetHeadtext(Name,Colors.DoAction);
+        if(!quick) God.GM.MidAction = this;
+        if(Name != "Walk" && PhaseI == 0) God.GM.AddCut(new HeadtextCut(Who,Name,Colors.DoAction));// Who.Body.SetHeadtext(Name,Colors.DoAction);
         foreach (GameTile t in i.Tiles)
         {
 
@@ -300,7 +301,7 @@ public class ActionScript : Thing
                         if (targ == Who && e.GetBool("IgnoreSelf")) continue;
                         EventInfo ae = God.E();
                         ae.Clone(e);
-                        ae.Set("Target", t).Set("Source", Who);
+                        ae.Set("Target", t).Set("Source", Who).Set("Action",this);
                         AuditEvent(ae);
                         targ.TakeEvent(ae);
                     }
@@ -328,10 +329,15 @@ public class ActionScript : Thing
         
     }
     
-    public void End() //Note that this doesn't get called by reactions
+    public void End()
     {
+        if(God.GM.MidAction == this) God.GM.MidAction = null;
         if(Who.SelectedAction == this) Who.SelectedAction = null;
-        if(Cost == ActionCost.Major) Who.ActionsLeft.Clear();
+        if (Cost == ActionCost.Major)
+        {
+            Who.ActionsLeft.Clear();
+            Who.Set(IntStats.MoveLeft,0);
+        }
         else Who.ActionsLeft.Remove(Cost);
         God.GM.TakeEvent(God.E(EventTypes.ActionEnd).Set(Who));
     }

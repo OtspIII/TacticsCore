@@ -5,7 +5,6 @@ public class PlayerTurnPhase : PhaseScript
 {
     public List<ActorThing> Players = new List<ActorThing>();
     public ActorThing Selected;
-    public bool MidEvent=false;
     
     public PlayerTurnPhase()
     {
@@ -35,6 +34,12 @@ public class PlayerTurnPhase : PhaseScript
 
     public override void TileClick(GameTile t)
     {
+        if (Selected != null && Input.GetKey(KeyCode.LeftShift))
+        {
+            WalkPath p = new WalkPath(Selected, t);
+            SetTint(TileTints.Path,p.Path);
+            return;
+        }
         if (t.Contents != null && (Selected?.SelectedAction == null || !Selected.SelectedAction.Info.Opts.Contains(t)))
         {
             if (Players.Contains(t.Contents))
@@ -87,9 +92,10 @@ public class PlayerTurnPhase : PhaseScript
             //Give some feedback that the select failed
             return;
         }
-        if (MidEvent && Selected.SelectedAction != a)
+        // if (Selected.SelectedAction == null) MidEvent = false;
+        if (God.GM.MidAction != null && God.GM.MidAction != a)
         {
-            Selected.SelectedAction.End();
+            God.GM.MidAction.End();
         }
         WipeTint();
         Selected.SelectedAction = a;
@@ -108,7 +114,6 @@ public class PlayerTurnPhase : PhaseScript
         {
             case EventTypes.NewPhase: //Only called for phases after the first
             {
-                MidEvent = true;
                 ActorThing who = e.GetActor();
                 if (Selected != who) break;
                 if(God.GM.Cuts.Count == 0) Selected.SelectedAction?.BeginSelect();
@@ -129,7 +134,6 @@ public class PlayerTurnPhase : PhaseScript
                     Players.Remove(Selected);
                     UnselectPlayer();
                 }
-                MidEvent = false;
                 break;
             }
             case EventTypes.SelectCard:

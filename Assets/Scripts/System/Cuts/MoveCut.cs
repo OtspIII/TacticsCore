@@ -46,7 +46,7 @@ public class MoveCut : Cutscene
 
     public float GetSpeed()
     {
-        return 0.5f;
+        return 0.2f;
     }
 
     public override bool Merge(Cutscene c)

@@ -118,7 +118,11 @@ public class MobileTrait : TraitThing
             {
                 GameTile t = e.GetTile();
                 if (t == null) t = e.GetTile("Target");
-                i.Who.Walk(t);
+                ActionScript act = e.GetThing("Action") as ActionScript;
+                bool useMove = act.Cost == ActionCost.None;
+                bool aoo = !act.Has(ATags.SafeMove);
+                bool tp = e.GetBool("Teleport");
+                i.Who.Walk(t,useMove,aoo,tp);
                 break;
             }
             case EventTypes.Knockback:
@@ -287,6 +291,7 @@ public class AliveTrait : TraitThing
         {
             case EventTypes.ProvokeAoO:
             {
+                if (God.GM.MidAction?.Who == i.Who) return;
                 if (!i.Who.IsEnemy(who)) return;
                 if (!i.Who.ActionsLeft.Contains(ActionCost.Reaction)) return;
                 ActionScript a = i.Who.GetAct(ActionSlot.Reaction);

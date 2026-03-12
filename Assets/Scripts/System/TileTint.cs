@@ -48,6 +48,7 @@ public class TileTint
             case TileTints.OkayOption: return Color.yellow;
             case TileTints.ActiveThing: return Color.cornflowerBlue;
             case TileTints.Harmful: return Color.red;
+            case TileTints.Path: return Color.teal;
         }
         return Color.magenta;
     }

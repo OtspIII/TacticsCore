@@ -315,6 +315,7 @@ public enum TileTints
 	ActiveThing=3,
 	OkayOption=6,
 	GoodOption=9,
+	Path=10,
 	Threat=12,
 	Harmful=15,
 	Custom=18,
