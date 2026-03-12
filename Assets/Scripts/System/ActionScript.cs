@@ -253,14 +253,25 @@ public class ActionScript : Thing
         return r + mod;
     }
 
+    public void QuickExecute(GameTile targ,ActionCost c=ActionCost.None,bool force=false) //Force means do it even if you don't have the cost
+    {
+        if (Phases.Count == 0) return;
+        ActionCost cost = c;
+        if (cost == ActionCost.Default) cost = Cost;
+        if (!force && cost != ActionCost.None && !Who.ActionsLeft.Contains(cost)) return;
+        ActionPhase ph = Phases[0];
+        ActionInfo i = new ActionInfo(this, 0);
+        i.Tiles.Add(targ);
+        Execute(ph, i,true);
+        if(cost != ActionCost.None) Who.ActionsLeft.Remove(cost);
+    }
+    
     public bool Execute()
     {
         return Execute(Phase,Info);
     }
-
     
-    
-    public bool Execute(ActionPhase p,ActionInfo i)
+    public bool Execute(ActionPhase p,ActionInfo i,bool quick=false)
     {
         if(Name != "Walk") Who.Body.SetHeadtext(Name,Colors.DoAction);
         foreach (GameTile t in i.Tiles)
@@ -299,7 +310,7 @@ public class ActionScript : Thing
         }
         EndSelect();
         PhaseI++;
-        if (PhaseI >= Phases.Count)
+        if (PhaseI >= Phases.Count && !quick)
         {
             End();
             return true;
@@ -317,7 +328,7 @@ public class ActionScript : Thing
         
     }
     
-    public void End()
+    public void End() //Note that this doesn't get called by reactions
     {
         if(Who.SelectedAction == this) Who.SelectedAction = null;
         if(Cost == ActionCost.Major) Who.ActionsLeft.Clear();
@@ -711,7 +722,9 @@ public enum ActionCost
     None=0,
     Major=1,
     Bonus=2,
-    Move=3
+    Move=3,
+    Reaction=4,
+    Default=5,//Used by QuickExecute
 }
 
 public enum TargetType

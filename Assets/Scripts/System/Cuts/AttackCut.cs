@@ -21,6 +21,12 @@ public class AttackCut : Cutscene
     
     public override IEnumerator Script()
     {
+        if (Src?.Body == null || Targ?.Body == null)
+        {
+            God.LogError("TRIED TO ATTACK ANIM WITH NULL ACTOR: " + Src + " / " + Targ);
+            End();
+            yield break;
+        }
         Vector3 s = Src.Location.Body.GetContentPos(Src);
         Vector3 e = Targ.Body.GetContentPos(null);
         float t = 0;

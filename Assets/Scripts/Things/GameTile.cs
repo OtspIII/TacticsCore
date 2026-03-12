@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameTile : Thing
@@ -168,9 +169,14 @@ public class GameTile : Thing
     public void WatchEvent(EventInfo e, ActorThing who)
     {
         if (!Watches.ContainsKey(e.Type)) return;
-        foreach(ActorThing a in Watches[e.Type].Keys)
+        foreach(ActorThing a in Watches[e.Type].Keys.ToArray())
             a.WatchEvent(e,who,this);
             
+    }
+
+    public override string ToString()
+    {
+        return "Tile:["+X+","+Y+","+Contents+"]";
     }
 }
 

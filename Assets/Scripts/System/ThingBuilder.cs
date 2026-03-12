@@ -16,7 +16,7 @@ public static class ThingBuilder
         if (IsSetup) return;
         IsSetup = true;
         AddPlayer(CharClass.Fighter,10,3,3,"1d8").Act(Actions.GuardedStrike).Act(Actions.Taunt);//.Act(new ActionPrefab("Snack Break","Melee",ActionSlot.Secondary).Self(God.E(EventTypes.Heal).Roll("2d4+2")));
-        AddPlayer(CharClass.Wizard,5,0,3,"1d4").Act(Actions.FireDart).Act(Actions.IcyWind);
+        AddPlayer(CharClass.Wizard,3,0,3,"1d4").Act(Actions.FireDart).Act(Actions.IcyWind);
         AddPlayer(CharClass.Cleric,8,2,3,"1d6").Act(Actions.KnockbackStrike).Act(Actions.Heal);
         AddPlayer(CharClass.Thief,7,1,4,"1d8").Act(Actions.HitAndRun).Act(Actions.SandInEyes);
         
@@ -60,7 +60,7 @@ public static class ThingBuilder
             .Act(new ActionPrefab("Hurl Insult", "Mental", ActionSlot.Secondary).SingleTarget(5,God.E(EventTypes.Knockback).Set(-3)).Tag(ATags.Fast));
         AddNPC(CharClass.GoblinBeasttamer,1,"Goblin Ratwhipper",4,1,3,"1d4")
             .Act(new ActionPrefab("Goblin Whip","Melee",ActionSlot.BasicAttack).Attack(2),true)
-            .Act(new ActionPrefab("Throw Bait","Ranged",ActionSlot.Secondary).Attack(4,"1",DamageTypes.Fire).EAdd(God.E(EventTypes.TakeAoO)).Tag(ATags.Slow));//##need to implement takeAoO and maybe ai trait
+            .Act(new ActionPrefab("Throw Bait","Ranged",ActionSlot.Secondary).Attack(4,"1",DamageTypes.Fire).EAdd(God.E(EventTypes.ProvokeAoO)).Tag(ATags.Slow));//##need to implement takeAoO and maybe ai trait
         /*
                   
         

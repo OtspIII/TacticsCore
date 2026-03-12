@@ -6,8 +6,12 @@ public class LevelThing
     public Dictionary<int, Dictionary<int, GameTile>> Map = new Dictionary<int, Dictionary<int, GameTile>>();
     public List<GameTile> AllTiles = new List<GameTile>();
     public List<ActorThing> AllActors = new List<ActorThing>();
-    
+
     public LevelThing()
+    {
+        
+    }
+    public void Build()
     {
         for(int x=0;x<God.LevelSize.x;x++)
             for (int y = 0; y < God.LevelSize.y; y++)

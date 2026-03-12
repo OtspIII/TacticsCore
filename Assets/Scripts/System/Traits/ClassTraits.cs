@@ -151,6 +151,10 @@ public class AliveTrait : TraitThing
         AddListen(EventTypes.Heal);
         AddListen(EventTypes.ChangeStat);
         AddListen(EventTypes.CanAct,1);
+        AddListen(EventTypes.ProvokeAoO); //No definition, just for watches
+        AddListen(EventTypes.LeaveTile);
+        AddListen(EventTypes.ArriveTile);
+        
     }
     
     public override void TakeEvent(TraitInfo i, EventInfo e)
@@ -167,6 +171,7 @@ public class AliveTrait : TraitThing
                 i.Who.ActionsLeft.Add(ActionCost.Major);
                 i.Who.ActionsLeft.Add(ActionCost.Bonus);
                 i.Who.ActionsLeft.Add(ActionCost.Move);
+                i.Who.ActionsLeft.Add(ActionCost.Reaction);
                 int arm = i.Who.Get(IntStats.Armor);
                 i.Who.Set(IntStats.Defense,arm);
                 i.Who.Body.HP.SetArmor(arm,arm);
@@ -207,7 +212,7 @@ public class AliveTrait : TraitThing
                 int mhp = i.Who.Get(IntStats.MaxHP);
                 God.GM.AddCut(new HeadtextCut(i.Who,"-"+dmg,hp,-1,mhp,injury,Colors.Damage));
                 if(hp <= 0)
-                    i.Who.TakeEvent(EventTypes.Death);
+                    i.Who.TakeEvent(God.E(EventTypes.Death),true);
                 break;
             }
             case EventTypes.TempDefense:
@@ -261,6 +266,31 @@ public class AliveTrait : TraitThing
             case EventTypes.CanAct:
             {
                 e.Set(!i.Who.Has(CTags.Corpse));
+                break;
+            }
+            case EventTypes.LeaveTile:
+            {
+                i.ClearWatches();
+                break;
+            }
+            case EventTypes.ArriveTile:
+            {
+                i.Who.AddWatch(EventTypes.ProvokeAoO,i,i.Who.Location.Neighbors().ToArray());
+                break;
+            }
+        }
+    }
+
+    public override void TakeWatch(TraitInfo i, EventInfo e, ActorThing who, GameTile tile)
+    {
+        switch (e.Type)
+        {
+            case EventTypes.ProvokeAoO:
+            {
+                if (!i.Who.IsEnemy(who)) return;
+                if (!i.Who.ActionsLeft.Contains(ActionCost.Reaction)) return;
+                ActionScript a = i.Who.GetAct(ActionSlot.Reaction);
+                a.QuickExecute(tile,ActionCost.Reaction);
                 break;
             }
         }

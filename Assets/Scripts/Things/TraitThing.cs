@@ -21,6 +21,13 @@ public class TraitInfo : EventInfo
     public void PreEvent(EventInfo e) { Parser.Get(Trait).PreEvent(this,e); }
     public void TakeEvent(EventInfo e) { Parser.Get(Trait).TakeEvent(this,e); }
 
+    public void ClearWatches()
+    {
+        foreach(WatchInfo w in Watches.ToArray())
+            Who.RemoveWatch(w);
+        if(Watches.Count > 0) God.LogError("Watches Not Cleared: " + Trait + " / " + Who + " / " + Watches.Count);
+    }
+    
     public override string ToString()
     {
         return Trait + "["+BuildString()+"]";
@@ -98,7 +105,7 @@ public class TraitThing
         
     }
     
-    public virtual void TakeWatch(TraitInfo a, EventInfo e, ActorThing who, GameTile tile)
+    public virtual void TakeWatch(TraitInfo i, EventInfo e, ActorThing who, GameTile tile)
     {
         
     }

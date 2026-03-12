@@ -17,6 +17,12 @@ public class DeathCut : Cutscene
     
     public override IEnumerator Script()
     {
+        if (Who?.Body == null )
+        {
+            God.LogError("TRIED TO ATTACK ANIM WITH NULL ACTOR: " + Who);
+            End();
+            yield break;
+        }
         float t = 0;
         while (t < 1)
         {

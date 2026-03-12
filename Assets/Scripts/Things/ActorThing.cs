@@ -104,13 +104,16 @@ public class ActorThing : Thing
 
     public void SetLocation(GameTile l)
     {
-        if (Location != null)
+        GameTile old = Location;
+        if (old != null)
         {
-            Location.Contents = null;
+            TakeEvent(God.E(EventTypes.LeaveTile).Set(old).Set("To",l));
+            old.Contents = null;
         }
         Location = l;
         if (l == null) return;
         l.Contents = this;
+        TakeEvent(God.E(EventTypes.ArriveTile).Set(l).Set("From",old));
     }
     
     ///Adds a new trait to the Thing
@@ -247,17 +250,20 @@ public class ActorThing : Thing
                 if (e.Abort) break;
             }
         }
-        if (e.Abort) return;
-        
-        TakeListen.TryGetValue(e.Type, out List<Traits> take);
-        // Debug.Log("TAKE EVENT C: " + e.Type + " / " + (take == null ? "X" : take.Count));
-        if(take != null)
-            foreach (Traits t in take)
-            {
-                Get(t)?.TakeEvent(e);
-                if(e.Abort) break;
-            }
-        loc.WatchEvent(e,this);
+        if (!e.Abort)
+        {
+
+            TakeListen.TryGetValue(e.Type, out List<Traits> take);
+            // Debug.Log("TAKE EVENT C: " + e.Type + " / " + (take == null ? "X" : take.Count));
+            if (take != null)
+                foreach (Traits t in take)
+                {
+                    Get(t)?.TakeEvent(e);
+                    if (e.Abort) break;
+                }
+
+            loc?.WatchEvent(e, this);
+        }
         MidEvent = false;
         if (EventQueue.Count > 0)
         {
@@ -285,7 +291,7 @@ public class ActorThing : Thing
         return e;
     }
 
-    public void Walk(GameTile t,bool useMove=true)
+    public void Walk(GameTile t,bool useMove=true,bool provokeAoO=true,bool teleport=false)
     {
         if (t == null)
         {
@@ -300,6 +306,13 @@ public class ActorThing : Thing
             if (left <= 0) ActionsLeft.Remove(ActionCost.Move);
         }
 
+        if (provokeAoO)
+        {
+            EventInfo e = God.E(EventTypes.ProvokeAoO);
+            TakeEvent(e,true);
+        }
+        bool ok = !Destroyed && Ask(EventTypes.CanAct).GetBool();
+        if (!ok) return;
         SetLocation(t);
         God.GM.AddCut(new MoveCut(this,o,t));
     }
@@ -400,7 +413,7 @@ public class ActorThing : Thing
     public void RemoveWatch(WatchInfo i)
     {
         Watches.Remove(i);
-        foreach(GameTile t in i.Tiles)
+        foreach(GameTile t in i.Tiles.ToArray())
         {
             t.RemoveWatch(i);
         }

@@ -23,6 +23,12 @@ public class MoveCut : Cutscene
     {
         foreach (MiniMoveCut mmc in Moves)
         {
+            if (mmc.A?.Body == null)
+            {
+                God.LogError("TRIED TO MOVE ANIM WITH NULL ACTOR: " + mmc.A);
+                End();
+                yield break;
+            }
             Vector3 s = mmc.Old.Body.GetContentPos(mmc.A);
             Vector3 e = mmc.New.Body.GetContentPos(mmc.A);
             float t = 0;

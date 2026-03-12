@@ -396,9 +396,11 @@ public enum EventTypes{
     TrueDeath       =2002,
     Heal            =2010,
     Knockback       =2100,
-    TakeAoO         =2101, //##
+    ProvokeAoO      =2101, //##
     
     WalkTo          =3000,
+    LeaveTile       =3001,
+    ArriveTile      =3002,
     Summon          =3100,
     
     CanAct          =4000,
