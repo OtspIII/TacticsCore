@@ -72,6 +72,8 @@ public class TraitThing
         foreach (StatMod m in i.Mods)
             i.Who.RemoveMod(m);
         OnRemove(i,n);
+        foreach (WatchInfo w in i.Watches)
+            w.Who.RemoveWatch(w);
     }
     
     protected virtual void OnRemove(TraitInfo i,EventInfo n)
@@ -96,7 +98,7 @@ public class TraitThing
         
     }
     
-    public virtual void TakeWatch(TraitInfo a, EventInfo e)
+    public virtual void TakeWatch(TraitInfo a, EventInfo e, ActorThing who, GameTile tile)
     {
         
     }

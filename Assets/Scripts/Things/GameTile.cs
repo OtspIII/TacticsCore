@@ -12,8 +12,8 @@ public class GameTile : Thing
     public Dictionary<ActorThing,int> PDistance = new Dictionary<ActorThing, int>();
     public int BestPDistance = 0;
 
-    public Dictionary<EventType, Dictionary<ActorThing, List<WatchInfo>>> Watches =
-        new Dictionary<EventType, Dictionary<ActorThing, List<WatchInfo>>>();
+    public Dictionary<EventTypes, Dictionary<ActorThing, List<WatchInfo>>> Watches =
+        new Dictionary<EventTypes, Dictionary<ActorThing, List<WatchInfo>>>();
 
     public GameTile(int x, int y)
     {
@@ -163,6 +163,14 @@ public class GameTile : Thing
         Watches[i.Event][i.Who].Remove(i);
         if (Watches[i.Event][i.Who].Count == 0)
             Watches[i.Event].Remove(i.Who);
+    }
+
+    public void WatchEvent(EventInfo e, ActorThing who)
+    {
+        if (!Watches.ContainsKey(e.Type)) return;
+        foreach(ActorThing a in Watches[e.Type].Keys)
+            a.WatchEvent(e,who,this);
+            
     }
 }
 

@@ -237,6 +237,7 @@ public class ActorThing : Thing
             return;
         }
         e.Set("Who", this);
+        GameTile loc = Location;
         MidEvent = true;
         PreListen.TryGetValue(e.Type, out List<Traits> pre);
         if(pre != null) {
@@ -246,7 +247,6 @@ public class ActorThing : Thing
                 if (e.Abort) break;
             }
         }
-
         if (e.Abort) return;
         
         TakeListen.TryGetValue(e.Type, out List<Traits> take);
@@ -257,6 +257,7 @@ public class ActorThing : Thing
                 Get(t)?.TakeEvent(e);
                 if(e.Abort) break;
             }
+        loc.WatchEvent(e,this);
         MidEvent = false;
         if (EventQueue.Count > 0)
         {
@@ -305,8 +306,11 @@ public class ActorThing : Thing
 
     public void Destruct(bool silent=false)
     {
+        if (Destroyed) return;
         Destroyed = true;
         Location.Contents = null;
+        foreach (WatchInfo w in Watches.ToArray())
+            RemoveWatch(w);
         if(silent)
             Body.Destruct();
         else
@@ -382,7 +386,7 @@ public class ActorThing : Thing
         return r;
     }
 
-    public void AddWatch(EventType e, TraitInfo tr,params GameTile[] tiles)
+    public void AddWatch(EventTypes e, TraitInfo tr,params GameTile[] tiles)
     {
         WatchInfo i = new WatchInfo(this, e, tr);
         Watches.Add(i);
@@ -395,7 +399,12 @@ public class ActorThing : Thing
     
     public void RemoveWatch(WatchInfo i)
     {
-        //###INCOMPLETE
+        Watches.Remove(i);
+        foreach(GameTile t in i.Tiles)
+        {
+            t.RemoveWatch(i);
+        }
+        if(i.Trait != null) i.Trait.Watches.Remove(i);
     }
 
     public int AddMod(StatMod s,TraitInfo t=null,int dur=-1)
@@ -515,6 +524,12 @@ public class ActorThing : Thing
         if (r.Count == 0 && c == ActionCost.Move) return GetAct(ActionSlot.BasicMove);
         return r.Random();
     }
+
+    public void WatchEvent(EventInfo e, ActorThing who, GameTile tile)
+    {
+        foreach(Traits t in Trait.Keys)
+            Parser.Get(t).TakeWatch(Trait[t],e,who,tile);
+    }
 }
 
 
@@ -557,12 +572,12 @@ public class StatMod
 public class WatchInfo
 {
     public ActorThing Who;
-    public EventType Event;
+    public EventTypes Event;
     public TraitInfo Trait;
     public List<GameTile> Tiles =  new List<GameTile>();
     public List<ActorThing> Watched =  new List<ActorThing>();
 
-    public WatchInfo(ActorThing who, EventType e,TraitInfo t=null)
+    public WatchInfo(ActorThing who, EventTypes e,TraitInfo t=null)
     {
         Who = who;
         Event = e;
