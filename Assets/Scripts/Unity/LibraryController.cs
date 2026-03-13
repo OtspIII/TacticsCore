@@ -10,6 +10,7 @@ public class LibraryController : MonoBehaviour
     
     protected Dictionary<string,Sprite> FeatureArt = new Dictionary<string, Sprite>();
     protected Dictionary<string,Sprite> ClassPortraits = new Dictionary<string, Sprite>();
+    protected Dictionary<string,Sprite> ClassArt = new Dictionary<string, Sprite>();
     protected Dictionary<string,Sprite> Icons = new Dictionary<string, Sprite>();
     
     void Awake()
@@ -30,6 +31,11 @@ public class LibraryController : MonoBehaviour
 		    Sprite s = (Sprite)o;
 		    FeatureArt.Add(s.name,s);
 	    }
+	    res = Resources.LoadAll ("Classes", typeof(Sprite));
+	    foreach (Object o in res) {
+		    Sprite s = (Sprite)o;
+		    ClassArt.Add(s.name,s);
+	    }
 	    res = Resources.LoadAll ("Icons", typeof(Sprite));
 	    foreach (Object o in res) {
 		    Sprite s = (Sprite)o;
@@ -43,7 +49,13 @@ public class LibraryController : MonoBehaviour
     }
     public Sprite GetPortrait(CharClass a)
     {
+	    // if (ClassArt.TryGetValue(a.ToString(), out Sprite art)) return art;
 	    return ClassPortraits.TryGetValue(a.ToString(), out Sprite r) ? r : null;
+    }
+    public Sprite GetArt(CharClass a)
+    {
+	    if (ClassArt.TryGetValue(a.ToString(), out Sprite art)) return art;
+	    return null;
     }
     
     public Sprite GetIcon(string a)

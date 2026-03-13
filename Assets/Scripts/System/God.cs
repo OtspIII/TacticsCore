@@ -17,8 +17,9 @@ public static class God
    public static string DebugTxt = "";
 
    public static float CardSize = 1.5f;
-   public static Vector2Int LevelSize = new Vector2Int(8, 8);
-   public static Vector2 LevelOffset = new Vector2(1, 1.5f);
+   public static float TileSize = 1f;
+   public static Vector2Int LevelSize = new Vector2Int(10, 10);
+   public static Vector2 LevelOffset = new Vector2(0, 0.5f);
 
    public static float HitTargetBonus = 1;
    public static float FriendlyFirePenalty = 0.1f;

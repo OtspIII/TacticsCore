@@ -76,7 +76,7 @@ public class GameTile : Thing
     public void WipeTint()
     {
         Tints.Clear();
-        SetTint(Color.clear);
+        SetTint(Color.clear); 
     }
     
     public List<GameTile> Neighbors(NeighborMode nm=NeighborMode.None,ActorThing who=null,bool eightDir=false) //NeighborMode m=0,ActorThing who=null,

@@ -13,7 +13,7 @@ public class TileController : MonoBehaviour
     {
         Info = src;
         Info.Body = this;
-        transform.position = new Vector3(src.X-(God.LevelSize.x/2)+God.LevelOffset.x, src.Y-(God.LevelSize.y/2)+God.LevelOffset.y, 10);
+        transform.position = new Vector3(src.X-(God.LevelSize.x/2)+God.LevelOffset.x, src.Y-(God.LevelSize.y/2)+God.LevelOffset.y, 10) * God.TileSize;
     }
     
     private void Awake()

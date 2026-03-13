@@ -19,8 +19,19 @@ public class ActorController : MonoBehaviour
         // Debug.Log(Info.Class);
         if (Info.Class != CharClass.None)
         {
-            Sprite s = God.Library.GetPortrait(Info.Class);
-            if (s != null) Portrait.sprite = s;
+            Sprite s = God.Library.GetArt(Info.Class);
+            if (s == null)
+            {
+                s = God.Library.GetPortrait(Info.Class);
+                if (s != null) Portrait.sprite = s;
+            }
+            else
+            {
+                SR.sprite = s;
+                Ring.gameObject.SetActive(false);
+                SR.gameObject.SetActive(true);
+            }
+          
             
             // Debug.Log("SPRITE: " + s);
         }
@@ -30,6 +41,7 @@ public class ActorController : MonoBehaviour
             if (s != null) SR.sprite = s;
             Ring.gameObject.SetActive(false);
             SR.gameObject.SetActive(true);
+            HP.gameObject.SetActive(false);
         }
         Audit();
     }
@@ -88,7 +100,7 @@ public class ActorController : MonoBehaviour
         }
         else
         {
-            HP.gameObject.SetActive(true);
+            HP.gameObject.SetActive(Info.Has(Traits.Alive));
             Portrait.color = Color.white;
         }
     }
