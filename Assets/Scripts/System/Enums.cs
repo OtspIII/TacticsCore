@@ -1,7 +1,8 @@
 public enum Actors
 {
     None=0,
-    Character=1
+    Character=1,
+    Pillar=2,
 }
 
 

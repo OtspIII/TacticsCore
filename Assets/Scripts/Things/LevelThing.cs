@@ -18,10 +18,26 @@ public class LevelThing
                 AddTile(x, y);
         List<GameTile> OpenTiles = new List<GameTile>();
         OpenTiles.AddRange(AllTiles);
+        List<GameTile> rim = new List<GameTile>();
+        for (int x = 0; x < God.LevelSize.x; x++)
+        {
+            rim.Add(GetTile(x,0));
+            rim.Add(GetTile(x,God.LevelSize.y-1));
+        }
+        for (int y = 0; y < God.LevelSize.y-1; y++)
+        {
+            rim.Add(GetTile(0,y));
+            rim.Add(GetTile(God.LevelSize.x-1,y));
+        }
+        foreach (GameTile t in rim)
+        {
+            AddActor(Actors.Pillar, t);
+            OpenTiles.Remove(t);
+        }
         List<CharClass> playerOpts = ThingBuilder.GetPlayers();
         List<GameTile> PlayerStart = new List<GameTile>();
         for(int x=0;x<=1;x++)
-        for (int y = 0; y <= 1; y++)
+        for (int y = 1; y <= 2; y++)
             PlayerStart.Add(GetTile(x+(God.LevelSize.x/2)-1,y));
         foreach (CharClass c in playerOpts)
         {

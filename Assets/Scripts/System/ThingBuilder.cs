@@ -19,6 +19,8 @@ public static class ThingBuilder
         AddPlayer(CharClass.Wizard,3,0,3,"1d4").Act(Actions.FireDart).Act(Actions.IcyWind);
         AddPlayer(CharClass.Cleric,8,2,3,"1d6").Act(Actions.KnockbackStrike).Act(Actions.Heal);
         AddPlayer(CharClass.Thief,7,1,4,"1d8").Act(Actions.HitAndRun).Act(Actions.SandInEyes);
+
+        AddThing(Actors.Pillar, "Wall");
         
         //---Level 1---
         //Ratfolk
@@ -114,6 +116,15 @@ public static class ThingBuilder
         r.Cost = cost;
         r.Level = lvl;
         ClassList.Add(r);
+        return r;
+    }
+    
+    public static ActorPrefab AddThing(Actors c,string name)
+    {
+        ActorPrefab r = new ActorPrefab(c);
+        r.Name = name;
+        ActorDict.Add(c,r);
+        r.Trait(Traits.Universal);
         return r;
     }
     
