@@ -5,6 +5,7 @@ using UnityEngine;
 public class TileController : MonoBehaviour
 {
     public SpriteRenderer SR;
+    public SpriteRenderer Tint;
     public GameTile Info;
     public TextMeshPro DebugTxt;
     

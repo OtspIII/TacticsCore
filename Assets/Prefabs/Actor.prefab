@@ -512,6 +512,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Portrait: {fileID: 6495897148850987360}
+  SR: {fileID: 212344710601347074}
   Ring: {fileID: 4505771178665836208}
   HeadText: {fileID: 0}
   HP: {fileID: 6295123379587116928}
@@ -687,15 +688,15 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: e745ffe9ad3914b41be7014db2ebfd6c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 247c9fdef8646564fa8396c50e59748a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.27, y: 0.75}
+  m_Size: {x: 0.97894734, y: 0.97894734}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
 --- !u!1 &1603362030649112
 GameObject:
@@ -851,11 +852,13 @@ MonoBehaviour:
   Def: {fileID: 7169140699221489518}
   Who: {fileID: 114740529478942634}
   HPFlat: 1
+  HPFlatHeal: 1
   HPFlatMax: 1
   Max: 1
   DFlat: 0
   DFlatMax: 1
   Perc: 1
+  HealPerc: 1
   DPerc: 0
   PercShown: 1
   DPercShown: 0

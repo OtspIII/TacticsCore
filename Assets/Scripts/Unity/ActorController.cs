@@ -6,6 +6,7 @@ public class ActorController : MonoBehaviour
 {
     public ActorThing Info;
     public SpriteRenderer Portrait;
+    public SpriteRenderer SR;
     public SpriteRenderer Ring;
     public TextMeshPro HeadText;
     public HPBar HP;
@@ -22,6 +23,13 @@ public class ActorController : MonoBehaviour
             if (s != null) Portrait.sprite = s;
             
             // Debug.Log("SPRITE: " + s);
+        }
+        else
+        {
+            Sprite s = God.Library.GetPortrait(Info.Type);
+            if (s != null) SR.sprite = s;
+            Ring.gameObject.SetActive(false);
+            SR.gameObject.SetActive(true);
         }
         Audit();
     }

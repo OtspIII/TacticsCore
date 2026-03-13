@@ -37,9 +37,20 @@ public class GameTile : Thing
         return Neighbor(dir.x, dir.y);
     }
 
+    public void SetTint(Color c)
+    {
+        if (c == Color.clear)
+        {
+            Body.Tint.gameObject.SetActive(false);
+            return;
+        }
+        Body.Tint.gameObject.SetActive(true);
+        Body.Tint.color = c;
+    }
+
     public Color GetTint()
     {
-        Color r = Color.white;
+        Color r = Color.clear;
         int best = 0;
         foreach (TileTint t in Tints)
         {
@@ -53,19 +64,19 @@ public class GameTile : Thing
     public void AddTint(TileTint t)
     {
         Tints.Add(t);
-        Body.SR.color = GetTint();
+        SetTint(GetTint());
     }
     
     public void RemoveTint(TileTint t)
     {
         Tints.Remove(t);
-        Body.SR.color = GetTint();
+        SetTint(GetTint());
     }
 
     public void WipeTint()
     {
         Tints.Clear();
-        Body.SR.color = Color.white;
+        SetTint(Color.clear);
     }
     
     public List<GameTile> Neighbors(NeighborMode nm=NeighborMode.None,ActorThing who=null,bool eightDir=false) //NeighborMode m=0,ActorThing who=null,
